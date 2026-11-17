@@ -1,16 +1,29 @@
 import { useState } from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
-  color, role, text as type, space, radius, shadow,
-  useMotion, usePulse, useFloat,
-} from '@/theme';
-import {
-  Text, Card, Button, Chip, SegmentedControl, Toast, useToast,
-  AppHeader, BottomNavigation, BottomSheet, Press, type BottomNavigationItem,
+  AppHeader, BottomNavigation, BottomSheet,
+  Button,
+  Card,
+  Chip,
+  Press,
+  SegmentedControl,
+  Text,
+  Toast, useToast,
 } from '@/components/ui';
+import { TAB_ITEMS } from '@/constants/navigation';
+import {
+  color,
+  radius,
+  role,
+  shadow,
+  space,
+  text as type,
+  useFloat,
+  useMotion, usePulse,
+} from '@/theme';
 
 const fieldOptions = [
   '기획/아이디어',
@@ -21,37 +34,6 @@ const fieldOptions = [
   'IT/개발',
   '디자인',
 ] as const;
-
-const bottomNavigationItems = [
-  {
-    key: 'home',
-    label: '홈',
-    icon: { ios: 'house', android: 'home', web: 'home' },
-    activeIcon: { ios: 'house.fill', android: 'home', web: 'home' },
-  },
-  {
-    key: 'team',
-    label: '팀',
-    icon: { phosphor: 'circles-three' },
-  },
-  {
-    key: 'hub',
-    label: '기웃허브',
-    icon: { image: require('../../assets/images/giut-symbol.png') },
-  },
-  {
-    key: 'chat',
-    label: '채팅',
-    icon: { ios: 'text.bubble', android: 'chat', web: 'chat' },
-    activeIcon: { ios: 'text.bubble.fill', android: 'chat', web: 'chat' },
-  },
-  {
-    key: 'my',
-    label: '마이',
-    icon: { ios: 'person', android: 'person_outline', web: 'person_outline' },
-    activeIcon: { ios: 'person.fill', android: 'person', web: 'person' },
-  },
-] satisfies BottomNavigationItem[];
 
 export default function DesignSystemScreen() {
   return <Inner />;
@@ -394,7 +376,7 @@ function Inner() {
         }}
       >
         <BottomNavigation
-          items={bottomNavigationItems}
+          items={TAB_ITEMS}
           value={bottomTab}
           onChange={setBottomTab}
         />
