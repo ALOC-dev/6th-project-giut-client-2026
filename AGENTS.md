@@ -37,5 +37,12 @@ Docs: https://docs.expo.dev/eas/index.md
 ## Rules
 
 - If `ios/` and `android/` directories do not exist, they are generated (Continuous Native Generation). Never create or edit them by hand — configure native behavior in `app.json` and config plugins.
-- Expo Go only includes its bundled native modules. After adding a library with native code, the app needs a development build: `npx expo run:ios|android` locally, or `eas build --profile development`.
+- Expo Go only includes its bundled native modules. A library with native code works in Expo Go only when that native module is already bundled. Otherwise, use a development build with `npx expo run:ios`, `npx expo run:android`, or `npx eas-cli@latest build --profile development`.
 - Prefer recommended Expo modules over third-party libraries, and check your available skills before adding dependencies. Docs: https://docs.expo.dev/versions/latest/index.md
+
+## Design Tokens
+
+- Treat `tokens.json` as the source of truth for colors, typography, spacing, radii, and shadows.
+- Run `npm run theme` after changing `tokens.json`.
+- Never edit generated files directly: `src/theme/colors.ts`, `src/theme/typography.ts`, `src/theme/layout.ts`, and `src/theme/shadows.ts`.
+- Edit `src/theme/motion.ts`, `src/theme/fonts.ts`, and `src/theme/index.ts` directly when needed.
