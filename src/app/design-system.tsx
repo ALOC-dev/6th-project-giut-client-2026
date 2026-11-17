@@ -383,7 +383,16 @@ function Inner() {
         </Section>
       </ScrollView>
 
-      <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, paddingBottom: insets.bottom, backgroundColor: color.surface }}>
+      <View
+        pointerEvents="box-none"
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          paddingBottom: insets.bottom > 0 ? space[3] : 0,
+        }}
+      >
         <BottomNavigation
           items={bottomNavigationItems}
           value={bottomTab}
