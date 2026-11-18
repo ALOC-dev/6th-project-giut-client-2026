@@ -2,7 +2,6 @@ import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Easing as RNEasing,
   FlatList,
-  Modal,
   Pressable,
   Animated as RNAnimated,
   ScrollView,
@@ -15,7 +14,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CheckIcon, ChevronIcon, PlusIcon } from '@/components/icons';
 import { ContestCard } from '@/components/contests/ContestCard';
-import { AppHeader, BottomNavigationHeightContext, Press, Text } from '../../components/ui';
+import {
+  AppHeader,
+  BottomNavigationHeightContext,
+  BottomSheet,
+  Press,
+  Text,
+} from '../../components/ui';
 import {
   ACTIVITY_LABEL,
   ACTIVITY_TABS,
@@ -283,39 +288,29 @@ export function ContestListScreen({
         onApply={(next) => setFilter(next)}
       />
 
-      <Modal
+      <BottomSheet
         visible={sortOpen}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setSortOpen(false)}
+        onClose={() => setSortOpen(false)}
+        title="정렬"
+        accessibilityLabel="정렬"
+        contentStyle={screenStyles.sortContent}
       >
-        <Pressable
-          style={screenStyles.backdrop}
-          onPress={() => setSortOpen(false)}
-          accessibilityLabel="닫기"
-        />
-        <View style={[screenStyles.sortSheet, { paddingBottom: space[8] + insets.bottom }]}>
-          <View style={screenStyles.handle} />
-          <Text variant="titleMd" style={screenStyles.sortTitle}>
-            정렬
-          </Text>
-          {SORTS.map((o) => (
-            <Pressable
-              key={o.key}
-              onPress={() => {
-                setSort(o.key);
-                setSortOpen(false);
-              }}
-              style={screenStyles.sortRow}
-            >
-              <Text variant="label" color={sort === o.key ? 'brand' : 'ink'}>
-                {o.label}
-              </Text>
-              {sort === o.key && <CheckIcon size={16} color={color.brand} />}
-            </Pressable>
-          ))}
-        </View>
-      </Modal>
+        {SORTS.map((option) => (
+          <Pressable
+            key={option.key}
+            onPress={() => {
+              setSort(option.key);
+              setSortOpen(false);
+            }}
+            style={screenStyles.sortRow}
+          >
+            <Text variant="label" color={sort === option.key ? 'brand' : 'ink'}>
+              {option.label}
+            </Text>
+            {sort === option.key && <CheckIcon size={16} color={color.brand} />}
+          </Pressable>
+        ))}
+      </BottomSheet>
     </View>
   );
 }
@@ -369,33 +364,7 @@ const screenStyles = StyleSheet.create({
     justifyContent: 'center',
     height: 52,
   },
-  backdrop: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    backgroundColor: color.overlayDim,
-  },
-  sortSheet: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: color.surface,
-    borderTopLeftRadius: radius['2xl'],
-    borderTopRightRadius: radius['2xl'],
-    paddingHorizontal: space[3],
-    paddingTop: space[3],
-  },
-  handle: {
-    width: 36,
-    height: space[1],
-    borderRadius: radius.full,
-    backgroundColor: color.line,
-    alignSelf: 'center',
-  },
-  sortTitle: { paddingHorizontal: space[2], paddingTop: space[3], paddingBottom: space[2] },
+  sortContent: { paddingHorizontal: space[3], paddingBottom: space[8] },
   sortRow: {
     flexDirection: 'row',
     alignItems: 'center',

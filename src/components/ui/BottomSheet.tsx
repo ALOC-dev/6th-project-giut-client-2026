@@ -8,13 +8,16 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
+import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import Animated, {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
+  withSpring,
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { scheduleOnRN } from 'react-native-worklets';
 
 import { color, radius, space, useMotion } from '@/theme';
 
@@ -68,9 +71,11 @@ function BottomSheetContent({
   const { height: windowHeight } = useWindowDimensions();
   const { reduced, slide } = useMotion();
   const progress = useSharedValue(reduced ? 1 : 0);
+  const dragY = useSharedValue(0);
 
   useEffect(() => {
     if (visible) {
+      dragY.set(0);
       progress.set(reduced ? 1 : withTiming(1, slide.sheet.in));
       return;
     }
@@ -86,19 +91,46 @@ function BottomSheetContent({
         if (finished) runOnJS(onExited)();
       }),
     );
-  }, [onExited, progress, reduced, slide.sheet.in, slide.sheet.out, visible]);
+  }, [dragY, onExited, progress, reduced, slide.sheet.in, slide.sheet.out, visible]);
 
   const close = () => {
     onClose();
   };
 
-  const backdropStyle = useAnimatedStyle(() => ({
-    opacity: progress.value,
-  }));
+  const panGesture = usePanGesture({
+    activeOffsetY: [-6, 6],
+    failOffsetX: [-20, 20],
+    onUpdate: (event) => {
+      dragY.set(Math.max(0, event.translationY));
+    },
+    onDeactivate: (event) => {
+      const shouldClose = event.translationY > windowHeight * 0.18 || event.velocityY > 900;
+
+      if (shouldClose) {
+        scheduleOnRN(close);
+        return;
+      }
+
+      dragY.set(
+        reduced
+          ? 0
+          : withSpring(0, {
+              damping: 20,
+              stiffness: 240,
+              mass: 0.7,
+            }),
+      );
+    },
+  });
+
+  const backdropStyle = useAnimatedStyle(() => {
+    const dragProgress = Math.min(dragY.value / (windowHeight * 0.5), 1);
+    return { opacity: progress.value * (1 - dragProgress) };
+  });
   const sheetAnimatedStyle = useAnimatedStyle(() => ({
     transform: [
       {
-        translateY: windowHeight * (1 - progress.value),
+        translateY: windowHeight * (1 - progress.value) + dragY.value,
       },
     ],
   }));
@@ -133,9 +165,11 @@ function BottomSheetContent({
             sheetStyle,
           ]}
         >
-          <View style={styles.handleArea}>
-            <View style={styles.handle} />
-          </View>
+          <GestureDetector gesture={panGesture}>
+            <View style={styles.handleArea}>
+              <View style={styles.handle} />
+            </View>
+          </GestureDetector>
 
           {title || headerAction ? (
             <View style={styles.header}>
@@ -166,13 +200,13 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   handleArea: {
-    height: 24,
+    height: space[8],
     alignItems: 'center',
     justifyContent: 'center',
   },
   handle: {
-    width: 28,
-    height: 3,
+    width: 36,
+    height: space[1],
     borderRadius: radius.full,
     backgroundColor: color.line,
   },
