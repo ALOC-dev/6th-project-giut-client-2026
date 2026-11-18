@@ -11,6 +11,7 @@ export { BellButton, type BellButtonProps } from './BellButton';
 export { SearchButton, type SearchButtonProps } from './SearchButton';
 export {
   BottomNavigation,
+  BottomNavigationHeightContext,
   type BottomNavigationIcon,
   type BottomNavigationItem,
   type BottomNavigationProps,

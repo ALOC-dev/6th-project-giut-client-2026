@@ -4,7 +4,11 @@ import { TabList, TabSlot, TabTrigger, Tabs } from 'expo-router/ui';
 import { View, type LayoutChangeEvent } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { BottomNavigation, type BottomNavigationItem } from '@/components/ui';
+import {
+  BottomNavigation,
+  BottomNavigationHeightContext,
+  type BottomNavigationItem,
+} from '@/components/ui';
 import { space } from '@/theme';
 
 type TabKey = 'home' | 'team' | 'giuthub' | 'chat' | 'my';
@@ -52,7 +56,7 @@ export default function TabsLayout() {
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
   const [bottomNavigationHeight, setBottomNavigationHeight] = useState(0);
-  const contentPaddingBottom = bottomNavigationHeight;
+  const contentPaddingBottom = pathname === '/contest' ? 0 : bottomNavigationHeight;
   const bottomNavigationOffset = Math.max(insets.bottom - space[4], 0);
 
   const handleBottomNavigationLayout = (event: LayoutChangeEvent) => {
@@ -63,37 +67,40 @@ export default function TabsLayout() {
     (Object.keys(TAB_PATHS) as TabKey[]).find((key) => TAB_PATHS[key] === pathname) ?? 'home';
 
   return (
-    <Tabs>
-      <View style={{ flex: 1, paddingBottom: contentPaddingBottom }}>
-        <TabSlot />
-      </View>
+    <BottomNavigationHeightContext.Provider value={bottomNavigationHeight}>
+      <Tabs>
+        <View style={{ flex: 1, paddingBottom: contentPaddingBottom }}>
+          <TabSlot />
+        </View>
 
-      <TabList style={{ display: 'none' }}>
-        <TabTrigger name="home" href="/" />
-        <TabTrigger name="team" href="/team" />
-        <TabTrigger name="giuthub" href="/giuthub" />
-        <TabTrigger name="chat" href="/chat" />
-        <TabTrigger name="my" href="/my" />
-      </TabList>
+        <TabList style={{ display: 'none' }}>
+          <TabTrigger name="home" href="/" />
+          <TabTrigger name="team" href="/team" />
+          <TabTrigger name="giuthub" href="/giuthub" />
+          <TabTrigger name="chat" href="/chat" />
+          <TabTrigger name="my" href="/my" />
+          <TabTrigger name="contest" href="/contest" />
+        </TabList>
 
-      <View
-        pointerEvents="box-none"
-        onLayout={handleBottomNavigationLayout}
-        style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          bottom: 0,
-          paddingBottom: bottomNavigationOffset,
-        }}
-      >
-        <BottomNavigation
-          items={TAB_ITEMS}
-          value={currentTab}
-          style={{ marginHorizontal: space[6] }}
-          onChange={(key) => router.navigate(TAB_PATHS[key as TabKey])}
-        />
-      </View>
-    </Tabs>
+        <View
+          pointerEvents="box-none"
+          onLayout={handleBottomNavigationLayout}
+          style={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            paddingBottom: bottomNavigationOffset,
+          }}
+        >
+          <BottomNavigation
+            items={TAB_ITEMS}
+            value={currentTab}
+            style={{ marginHorizontal: space[6] }}
+            onChange={(key) => router.navigate(TAB_PATHS[key as TabKey])}
+          />
+        </View>
+      </Tabs>
+    </BottomNavigationHeightContext.Provider>
   );
 }
