@@ -10,30 +10,28 @@ import {
   View,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
-  type TextStyle,
 } from 'react-native';
-import Animated, {
-  useAnimatedProps,
-  useAnimatedStyle,
-  useSharedValue,
-  withDelay,
-  withSequence,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Circle, Path } from 'react-native-svg';
 
-import { AppHeader, BottomNavigationHeightContext, Button, Press, Text } from '../../components/ui';
 import {
-  color,
-  radius,
-  shadow,
-  space,
-  text,
-  useMotion,
-  type ColorToken,
-  type TextVariant,
-} from '../../theme';
+  AnimatedBookmarkIcon,
+  AnimatedFilterIcon,
+  CheckIcon,
+  ChevronIcon,
+  EyeIcon,
+  PlusIcon,
+  TeamIcon,
+} from '@/components/icons';
+import {
+  AppHeader,
+  BottomNavigationHeightContext,
+  Button,
+  Odometer,
+  Press,
+  Text,
+} from '../../components/ui';
+import { color, radius, shadow, space, text, useMotion } from '../../theme';
 
 /**
  * 공모전 목록 — 서버 enum을 그대로 옮긴 타입.
@@ -228,246 +226,6 @@ export function overlaps(aFrom: string, aTo: string, bFrom: string, bTo: string)
   return parseDay(aFrom) <= parseDay(bTo) && parseDay(aTo) >= parseDay(bFrom);
 }
 
-type IconProps = { size?: number; color?: string };
-
-/** 팀 두 사람. 모집 중인 팀이 없으면 회색으로 넘겨 쓴다. */
-export function TeamIcon({ size = 13, color: c = color.ink }: IconProps) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill={c}>
-      <Circle cx={9} cy={7.5} r={4} />
-      <Path d="M1.5 20.5a7.5 7.5 0 0 1 15 0V21h-15z" />
-      <Circle cx={17} cy={8.5} r={3.2} />
-      <Path d="M17.5 13.2a6.3 6.3 0 0 1 5 6.3V21h-4.4v-.5a9 9 0 0 0-2.6-6.4 6 6 0 0 1 2-.9z" />
-    </Svg>
-  );
-}
-
-export function EyeIcon({ size = 14, color: c = color.textFaint }: IconProps) {
-  return (
-    <Svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke={c}
-      strokeWidth={1.8}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <Path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
-      <Circle cx={12} cy={12} r={3} />
-    </Svg>
-  );
-}
-
-export function BookmarkIcon({ size = 20, filled = false }: { size?: number; filled?: boolean }) {
-  return (
-    <Svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill={filled ? color.brand : 'none'}
-      stroke={filled ? color.brand : color.textMuted}
-      strokeWidth={1.8}
-      strokeLinejoin="round"
-    >
-      <Path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-    </Svg>
-  );
-}
-
-/** 필터 — 막대 두 개에 손잡이. */
-export function FilterIcon({ size = 15, color: c = color.ink }: IconProps) {
-  return (
-    <Svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke={c}
-      strokeWidth={2}
-      strokeLinecap="round"
-    >
-      <Path d="M3 7h18M3 17h18" opacity={0.35} />
-      <Path d="M3 7h11" />
-      <Circle cx={16} cy={7} r={2.2} fill={color.surface} />
-      <Path d="M10 17h11" />
-      <Circle cx={8} cy={17} r={2.2} fill={color.surface} />
-    </Svg>
-  );
-}
-
-export function ChevronIcon({
-  size = 12,
-  color: c = color.ink,
-  dir = 'down' as 'down' | 'left' | 'right',
-}) {
-  const d = dir === 'down' ? 'm6 9 6 6 6-6' : dir === 'left' ? 'M15 6l-6 6 6 6' : 'M9 6l6 6-6 6';
-  return (
-    <Svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke={c}
-      strokeWidth={2.4}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <Path d={d} />
-    </Svg>
-  );
-}
-
-export function CheckIcon({ size = 12, color: c = color.surface }: IconProps) {
-  return (
-    <Svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke={c}
-      strokeWidth={3.2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <Path d="m5 12 5 5 9-10" />
-    </Svg>
-  );
-}
-
-export function PlusIcon({ size = 20, color: c = color.surface }: IconProps) {
-  return (
-    <Svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke={c}
-      strokeWidth={2.4}
-      strokeLinecap="round"
-    >
-      <Path d="M12 5v14M5 12h14" />
-    </Svg>
-  );
-}
-
-const DIGITS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-const ROLL_DIGITS = [...DIGITS, 0];
-
-export type OdometerProps = {
-  value: number;
-  variant?: TextVariant;
-  color?: ColorToken;
-  /** 0에서 굴러 올라온다. 끄면 바로 그 숫자로 선다. */
-  roll?: boolean;
-  /** 자릿수마다 조금씩 늦게 멈춘다. 뒷자리가 먼저 서고 앞자리가 늦게. */
-  delay?: number;
-};
-
-/**
- * 숫자가 굴러 올라오는 표시. 조회수·스크랩 수에 쓴다.
- *
- * 한 자리마다 0~9를 세로로 쌓아 두고 그 기둥을 밀어 올린다.
- * 기둥 너비는 가장 넓은 숫자에 맞춰 잡히므로 값이 바뀌어도 자리가 흔들리지 않는다.
- */
-export function Odometer({
-  value,
-  variant = 'meta',
-  color: c = 'textFaint',
-  roll = true,
-  delay = 0,
-}: OdometerProps) {
-  const { reduced } = useMotion();
-  const chars = value.toLocaleString().split('');
-  const lineHeight = (text[variant] as TextStyle).lineHeight ?? 16;
-
-  return (
-    <View style={odometerStyles.row} accessibilityLabel={String(value)}>
-      {chars.map((ch, i) => {
-        const n = Number(ch);
-        if (Number.isNaN(n)) {
-          return (
-            <Text key={`c${i}`} variant={variant} color={c}>
-              {ch}
-            </Text>
-          );
-        }
-        return (
-          <Column
-            key={`d${i}`}
-            digit={n}
-            variant={variant}
-            tone={c}
-            lineHeight={lineHeight}
-            // 뒷자리일수록 짧게 — 앞자리가 마지막에 멈춘다
-            duration={500 + (chars.length - i) * 120}
-            delay={delay}
-            roll={roll && !reduced}
-          />
-        );
-      })}
-    </View>
-  );
-}
-
-function Column({
-  digit,
-  variant,
-  tone,
-  lineHeight,
-  duration,
-  delay,
-  roll,
-}: {
-  digit: number;
-  variant: TextVariant;
-  tone: ColorToken;
-  lineHeight: number;
-  duration: number;
-  delay: number;
-  roll: boolean;
-}) {
-  const targetIndex = roll && digit === 0 ? DIGITS.length : digit;
-  const y = useSharedValue(roll ? 0 : -targetIndex * lineHeight);
-  const { easing } = useMotion();
-
-  useEffect(() => {
-    y.value = withDelay(
-      delay,
-      withTiming(-targetIndex * lineHeight, {
-        duration: roll ? duration : 0,
-        easing: easing.out,
-      }),
-    );
-  }, [targetIndex, lineHeight, duration, delay, roll, y, easing.out]);
-
-  const style = useAnimatedStyle(() => ({ transform: [{ translateY: y.value }] }));
-
-  return (
-    <View style={{ height: lineHeight, overflow: 'hidden' }}>
-      <Animated.View style={style}>
-        {ROLL_DIGITS.map((n, index) => (
-          <Text key={`${n}-${index}`} variant={variant} color={tone} style={{ height: lineHeight }}>
-            {n}
-          </Text>
-        ))}
-      </Animated.View>
-    </View>
-  );
-}
-
-const odometerStyles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center' },
-});
-
-/** 여섯 방향으로 튀는 점. 홀수는 짧게, 짝수는 길게. */
-const DOTS = [0, 60, 120, 180, 240, 300].map((deg, i) => {
-  const rad = (deg * Math.PI) / 180;
-  const len = i % 2 ? 15 : 19;
-  return { dx: Math.sin(rad) * len, dy: -Math.cos(rad) * len };
-});
-
 export type ScrapButtonProps = {
   saved: boolean;
   count: number;
@@ -479,43 +237,6 @@ export type ScrapButtonProps = {
  * 고리와 점은 누른 뒤에만 나타나므로, 화면에 처음 그려질 때는 조용하다.
  */
 export function ScrapButton({ saved, count, onPress }: ScrapButtonProps) {
-  const { reduced, easing, duration } = useMotion();
-  const first = useRef(true);
-  const scale = useSharedValue(1);
-  const burst = useSharedValue(1);
-
-  useEffect(() => {
-    if (first.current) {
-      first.current = false;
-      return;
-    }
-    if (reduced) return;
-
-    if (saved) {
-      scale.value = withSequence(
-        withTiming(0.6, { duration: duration.d1 * 0.65, easing: easing.inOut }),
-        withTiming(1.3, { duration: duration.d1 * 0.7, easing: easing.spring }),
-        withTiming(1, { duration: duration.d1 * 0.65, easing: easing.spring }),
-      );
-      burst.value = withSequence(
-        withTiming(0, { duration: 0 }),
-        withDelay(60, withTiming(1, { duration: duration.d6, easing: easing.out })),
-      );
-    } else {
-      scale.value = withSequence(
-        withTiming(0.75, { duration: 100, easing: easing.inOut }),
-        withTiming(1, { duration: 150, easing: easing.spring }),
-      );
-    }
-  }, [saved, reduced, scale, burst, easing, duration]);
-
-  const iconStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
-  const ringStyle = useAnimatedStyle(() => ({
-    opacity: 0.6 * (1 - burst.value),
-    transform: [{ scale: 0.2 + burst.value * 1.4 }],
-    borderWidth: 6 * (1 - burst.value),
-  }));
-
   return (
     <Pressable
       onPress={onPress}
@@ -524,30 +245,10 @@ export function ScrapButton({ saved, count, onPress }: ScrapButtonProps) {
       accessibilityState={{ selected: saved }}
       style={scrapStyles.btn}
     >
-      <View style={scrapStyles.iconWrap}>
-        <Animated.View style={[scrapStyles.ring, ringStyle]} pointerEvents="none" />
-        {DOTS.map((d, i) => (
-          <Dot key={i} dx={d.dx} dy={d.dy} progress={burst} />
-        ))}
-        <Animated.View style={iconStyle}>
-          <BookmarkIcon filled={saved} />
-        </Animated.View>
-      </View>
+      <AnimatedBookmarkIcon saved={saved} />
       <Odometer value={count} roll={false} />
     </Pressable>
   );
-}
-
-function Dot({ dx, dy, progress }: { dx: number; dy: number; progress: { value: number } }) {
-  const style = useAnimatedStyle(() => ({
-    opacity: 1 - progress.value,
-    transform: [
-      { translateX: dx * progress.value },
-      { translateY: dy * progress.value },
-      { scale: 1 - progress.value },
-    ],
-  }));
-  return <Animated.View style={[scrapStyles.dot, style]} pointerEvents="none" />;
 }
 
 const scrapStyles = StyleSheet.create({
@@ -561,23 +262,6 @@ const scrapStyles = StyleSheet.create({
     marginRight: -space[2],
     borderRadius: radius.md,
   },
-  iconWrap: { width: 20, height: 20, alignItems: 'center', justifyContent: 'center' },
-  ring: {
-    position: 'absolute',
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    borderColor: color.brand,
-    opacity: 0,
-  },
-  dot: {
-    position: 'absolute',
-    width: 5,
-    height: 5,
-    borderRadius: 2.5,
-    backgroundColor: color.brand,
-    opacity: 0,
-  },
 });
 
 export type FilterButtonProps = {
@@ -585,35 +269,15 @@ export type FilterButtonProps = {
   onPress: () => void;
 };
 
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-
 /** 필터 버튼. 누르면 위아래 손잡이가 반대 방향으로 움직였다가 돌아온다. */
 export function FilterButton({ count, onPress }: FilterButtonProps) {
-  const { reduced, easing, duration } = useMotion();
-  const topHandleX = useSharedValue(16);
-  const bottomHandleX = useSharedValue(8);
-
-  const animateIcon = () => {
-    if (reduced) return;
-
-    const moveTo = (to: number, moveDuration: number) =>
-      withTiming(to, { duration: moveDuration, easing: easing.spring });
-
-    topHandleX.value = withSequence(moveTo(8, duration.d1), moveTo(18, 140), moveTo(16, 120));
-    bottomHandleX.value = withDelay(
-      60,
-      withSequence(moveTo(17, duration.d1), moveTo(6, 140), moveTo(8, 120)),
-    );
-  };
-
-  const topHandleProps = useAnimatedProps(() => ({ cx: topHandleX.value }));
-  const bottomHandleProps = useAnimatedProps(() => ({ cx: bottomHandleX.value }));
+  const [animationKey, setAnimationKey] = useState(0);
   const tone = count > 0 ? color.brand : color.ink;
 
   return (
     <Pressable
       onPress={() => {
-        animateIcon();
+        setAnimationKey((current) => current + 1);
         onPress();
       }}
       accessibilityRole="button"
@@ -630,33 +294,7 @@ export function FilterButton({ count, onPress }: FilterButtonProps) {
           </Text>
         </View>
       )}
-      <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-        <Path
-          d="M3 7h18M3 17h18"
-          stroke={tone}
-          strokeWidth={2}
-          strokeLinecap="round"
-          opacity={0.35}
-        />
-        <Path d="M3 7h11" stroke={tone} strokeWidth={2} strokeLinecap="round" />
-        <AnimatedCircle
-          animatedProps={topHandleProps}
-          cy={7}
-          r={2.4}
-          fill={color.surface}
-          stroke={tone}
-          strokeWidth={2}
-        />
-        <Path d="M10 17h11" stroke={tone} strokeWidth={2} strokeLinecap="round" />
-        <AnimatedCircle
-          animatedProps={bottomHandleProps}
-          cy={17}
-          r={2.4}
-          fill={color.surface}
-          stroke={tone}
-          strokeWidth={2}
-        />
-      </Svg>
+      <AnimatedFilterIcon color={tone} animationKey={animationKey} />
     </Pressable>
   );
 }

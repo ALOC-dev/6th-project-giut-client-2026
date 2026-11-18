@@ -9,6 +9,7 @@ export { BottomSheet, type BottomSheetProps } from './BottomSheet';
 export { AppHeader, type AppHeaderProps } from './AppHeader';
 export { BellButton, type BellButtonProps } from './BellButton';
 export { SearchButton, type SearchButtonProps } from './SearchButton';
+export { Odometer, type OdometerProps } from './Odometer';
 export {
   BottomNavigation,
   BottomNavigationHeightContext,
