@@ -1,7 +1,7 @@
+import { GlassView, isGlassEffectAPIAvailable } from 'expo-glass-effect';
 import { SymbolView, type AndroidSymbol, type SFSymbol } from 'expo-symbols';
 import bold from 'expo-symbols/androidWeights/bold';
 import semiBold from 'expo-symbols/androidWeights/semiBold';
-import { GlassView, isGlassEffectAPIAvailable } from 'expo-glass-effect';
 import { CirclesThreeIcon } from 'phosphor-react-native/src/icons/CirclesThree';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -78,10 +78,7 @@ function BottomNavigationTab({ item, selected, onPress }: BottomNavigationTabPro
   const iconColor = selected ? color.brand : color.textMuted;
 
   const animatedIconStyle = useAnimatedStyle(() => ({
-    transform: [
-      { translateY: translateY.value },
-      { scale: scale.value },
-    ],
+    transform: [{ translateY: translateY.value }, { scale: scale.value }],
   }));
 
   const handlePress = () => {
@@ -90,14 +87,18 @@ function BottomNavigationTab({ item, selected, onPress }: BottomNavigationTabPro
       cancelAnimation(scale);
       translateY.set(0);
       scale.set(1);
-      translateY.set(withSequence(
-        withTiming(-3, { duration: 80, easing: Easing.out(Easing.cubic) }),
-        withSpring(0, settleSpring),
-      ));
-      scale.set(withSequence(
-        withTiming(0.94, { duration: 70, easing: Easing.in(Easing.cubic) }),
-        withSpring(1, settleSpring),
-      ));
+      translateY.set(
+        withSequence(
+          withTiming(-3, { duration: 80, easing: Easing.out(Easing.cubic) }),
+          withSpring(0, settleSpring),
+        ),
+      );
+      scale.set(
+        withSequence(
+          withTiming(0.94, { duration: 70, easing: Easing.in(Easing.cubic) }),
+          withSpring(1, settleSpring),
+        ),
+      );
     }
 
     onPress();
@@ -171,9 +172,7 @@ export function BottomNavigation({ items, value, onChange, style }: BottomNaviga
   const pendingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastRequestedValue = useRef(value);
   const selectedIndex = items.findIndex((item) => item.key === value);
-  const cellWidth = items.length > 0
-    ? Math.max(0, (tabsWidth - space[2] * 2) / items.length)
-    : 0;
+  const cellWidth = items.length > 0 ? Math.max(0, (tabsWidth - space[2] * 2) / items.length) : 0;
 
   const selectDraggedTab = (index: number) => {
     const item = items[index];
@@ -207,17 +206,21 @@ export function BottomNavigation({ items, value, onChange, style }: BottomNaviga
       const indicatorCenter = space[2] + space[1] + (cellWidth - space[2]) / 2;
       const startX = dragStartTouchX.value - indicatorCenter;
       const clampedStartX = Math.min(maxX, Math.max(0, startX));
-      const needsCatchUp = !reduceMotion
-        && Math.abs(clampedStartX - selectedX.value) > cellWidth / 2;
+      const needsCatchUp =
+        !reduceMotion && Math.abs(clampedStartX - selectedX.value) > cellWidth / 2;
 
       dragTargetX.set(clampedStartX);
       isCatchingUp.set(needsCatchUp);
-      selectedX.set(needsCatchUp ? withSpring(clampedStartX, {
-        damping: 24,
-        stiffness: 320,
-        mass: 0.45,
-        overshootClamping: true,
-      }) : clampedStartX);
+      selectedX.set(
+        needsCatchUp
+          ? withSpring(clampedStartX, {
+              damping: 24,
+              stiffness: 320,
+              mass: 0.45,
+              overshootClamping: true,
+            })
+          : clampedStartX,
+      );
     },
     onUpdate: (event) => {
       'worklet';
@@ -234,12 +237,14 @@ export function BottomNavigation({ items, value, onChange, style }: BottomNaviga
           return;
         }
 
-        selectedX.set(withSpring(clampedNextX, {
-          damping: 24,
-          stiffness: 320,
-          mass: 0.45,
-          overshootClamping: true,
-        }));
+        selectedX.set(
+          withSpring(clampedNextX, {
+            damping: 24,
+            stiffness: 320,
+            mass: 0.45,
+            overshootClamping: true,
+          }),
+        );
         return;
       }
 
@@ -248,18 +253,19 @@ export function BottomNavigation({ items, value, onChange, style }: BottomNaviga
     onDeactivate: () => {
       'worklet';
       const maxIndex = Math.max(0, items.length - 1);
-      const nextIndex = Math.min(
-        maxIndex,
-        Math.max(0, Math.round(dragTargetX.value / cellWidth)),
-      );
+      const nextIndex = Math.min(maxIndex, Math.max(0, Math.round(dragTargetX.value / cellWidth)));
       const target = nextIndex * cellWidth;
 
       isCatchingUp.set(false);
-      selectedX.set(reduceMotion ? target : withSpring(target, {
-        damping: 19,
-        stiffness: 220,
-        mass: 0.7,
-      }));
+      selectedX.set(
+        reduceMotion
+          ? target
+          : withSpring(target, {
+              damping: 19,
+              stiffness: 220,
+              mass: 0.7,
+            }),
+      );
       scheduleOnRN(selectDraggedTab, nextIndex);
     },
   });
@@ -279,22 +285,28 @@ export function BottomNavigation({ items, value, onChange, style }: BottomNaviga
     }
 
     const target = selectedIndex * cellWidth;
-    const shouldAnimate = previousValue.current !== null
-      && previousValue.current !== value
-      && !reduceMotion;
+    const shouldAnimate =
+      previousValue.current !== null && previousValue.current !== value && !reduceMotion;
 
-    selectedX.set(shouldAnimate ? withSpring(target, {
-      damping: 19,
-      stiffness: 220,
-      mass: 0.7,
-    }) : target);
+    selectedX.set(
+      shouldAnimate
+        ? withSpring(target, {
+            damping: 19,
+            stiffness: 220,
+            mass: 0.7,
+          })
+        : target,
+    );
     lastRequestedValue.current = value;
     previousValue.current = value;
   }, [cellWidth, reduceMotion, selectedIndex, selectedX, value]);
 
-  useEffect(() => () => {
-    if (pendingTimer.current) clearTimeout(pendingTimer.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (pendingTimer.current) clearTimeout(pendingTimer.current);
+    },
+    [],
+  );
 
   const handleTabPress = (item: BottomNavigationItem, index: number) => {
     if (item.key === lastRequestedValue.current) return;
@@ -306,11 +318,15 @@ export function BottomNavigation({ items, value, onChange, style }: BottomNaviga
     pendingTimer.current = setTimeout(() => {
       if (pendingValue.current === item.key) pendingValue.current = null;
     }, 500);
-    selectedX.set(reduceMotion ? target : withSpring(target, {
-      damping: 19,
-      stiffness: 220,
-      mass: 0.7,
-    }));
+    selectedX.set(
+      reduceMotion
+        ? target
+        : withSpring(target, {
+            damping: 19,
+            stiffness: 220,
+            mass: 0.7,
+          }),
+    );
     onChange(item.key);
   };
 
@@ -320,13 +336,7 @@ export function BottomNavigation({ items, value, onChange, style }: BottomNaviga
   }));
 
   return (
-    <View
-      style={[
-        styles.shell,
-        shadow.raised,
-        style,
-      ]}
-    >
+    <View style={[styles.shell, shadow.raised, style]}>
       {supportsLiquidGlass ? (
         <GlassView
           colorScheme="light"
@@ -346,10 +356,7 @@ export function BottomNavigation({ items, value, onChange, style }: BottomNaviga
           style={styles.tabs}
         >
           {cellWidth > 0 && selectedIndex >= 0 ? (
-            <Animated.View
-              pointerEvents="none"
-              style={[styles.selectedGlass, selectedStyle]}
-            />
+            <Animated.View pointerEvents="none" style={[styles.selectedGlass, selectedStyle]} />
           ) : null}
 
           {items.map((item, index) => (

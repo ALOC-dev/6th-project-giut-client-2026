@@ -58,23 +58,29 @@ export function BellButton({
       return;
     }
 
-    dotScale.set(withDelay(
-      unread ? 0 : 250,
-      withTiming(unread ? 1 : 0, {
-        duration: 350,
-        easing: Easing.bezier(0.5, -0.8, 0.7, 1),
-      }),
-    ));
+    dotScale.set(
+      withDelay(
+        unread ? 0 : 250,
+        withTiming(unread ? 1 : 0, {
+          duration: 350,
+          easing: Easing.bezier(0.5, -0.8, 0.7, 1),
+        }),
+      ),
+    );
   }, [dotScale, reduced, unread]);
 
   const ring = useCallback(() => {
     if (!reduced) {
-      rotate.set(withSequence(
-        ...RING.map(([to, duration]) => withTiming(to, { duration, easing: easeOut })),
-      ));
-      clapperX.set(withSequence(
-        ...CLAP.map(([to, duration]) => withTiming(to, { duration, easing: easeOut })),
-      ));
+      rotate.set(
+        withSequence(
+          ...RING.map(([to, duration]) => withTiming(to, { duration, easing: easeOut })),
+        ),
+      );
+      clapperX.set(
+        withSequence(
+          ...CLAP.map(([to, duration]) => withTiming(to, { duration, easing: easeOut })),
+        ),
+      );
     }
 
     onPress();
@@ -100,17 +106,9 @@ export function BellButton({
       accessibilityRole="button"
       accessibilityLabel={unread ? '알림, 안 읽은 알림 있음' : '알림'}
       scaleOnPress={false}
-      style={[
-        { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
-        style,
-      ]}
+      style={[{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }, style]}
     >
-      <Animated.View
-        style={[
-          { width: size, height: size, transformOrigin: '50% 8%' },
-          bellStyle,
-        ]}
-      >
+      <Animated.View style={[{ width: size, height: size, transformOrigin: '50% 8%' }, bellStyle]}>
         <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
           <Path
             d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"

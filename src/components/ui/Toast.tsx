@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import Animated, {
-  useAnimatedStyle, useSharedValue, withTiming,
-} from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { color, radius, useMotion } from '@/theme';
 import { Text } from './Text';
 
@@ -19,7 +17,9 @@ export function Toast({ message, visible, bottom = 108 }: ToastProps) {
 
   useEffect(() => {
     p.value = reduced
-      ? (visible ? 1 : 0)
+      ? visible
+        ? 1
+        : 0
       : withTiming(visible ? 1 : 0, {
           duration: visible ? duration.d3 : duration.d2,
           easing: visible ? easing.out : easing.exit,
@@ -40,8 +40,12 @@ export function Toast({ message, visible, bottom = 108 }: ToastProps) {
       importantForAccessibility={visible ? 'yes' : 'no-hide-descendants'}
       style={[
         {
-          position: 'absolute', bottom, left: 0, right: 0,
-          alignItems: 'center', zIndex: 45,
+          position: 'absolute',
+          bottom,
+          left: 0,
+          right: 0,
+          alignItems: 'center',
+          zIndex: 45,
         },
         anim,
       ]}
@@ -75,7 +79,12 @@ export function useToast() {
     timer.current = setTimeout(() => setVisible(false), TOAST_MS);
   }, []);
 
-  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
 
   return { show, props: { message, visible } };
 }
