@@ -113,7 +113,6 @@ function BottomNavigationTab({ item, selected, onPress }: BottomNavigationTabPro
       scaleOnPress={false}
       style={{
         flex: 1,
-        minHeight: 64,
         alignItems: 'center',
         justifyContent: 'center',
         gap: 3,
@@ -375,7 +374,6 @@ export function BottomNavigation({ items, value, onChange, style }: BottomNaviga
 
 const styles = StyleSheet.create({
   shell: {
-    minHeight: 64,
     marginHorizontal: space[3],
     borderRadius: radius['2xl'],
     backgroundColor: '#FFFFFF',
