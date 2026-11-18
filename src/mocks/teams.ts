@@ -13,7 +13,8 @@ export const TEAMS: Team[] = [
       { id: 'm2', name: '이서연', role: 'design', isLeader: false },
     ],
     recruitingRoles: ['design', 'mkt'],
-    description: '학교 홍보 숏폼 영상을 함께 기획하고 촬영할 팀원을 찾아요. 편집 경험이 있으면 더 좋아요!',
+    description:
+      '학교 홍보 숏폼 영상을 함께 기획하고 촬영할 팀원을 찾아요. 편집 경험이 있으면 더 좋아요!',
     operationMethod: 'both',
     activityFrequency: '주 2회',
     activityPlace: '교내',
@@ -32,7 +33,8 @@ export const TEAMS: Team[] = [
       { id: 'm4', name: '최유나', role: 'plan', isLeader: false },
     ],
     recruitingRoles: ['dev', 'plan'],
-    description: '강의실 이용 데이터를 분석해서 공간 효율화 논문을 쓰려고 해요. 파이썬 데이터 분석 가능한 분 환영!',
+    description:
+      '강의실 이용 데이터를 분석해서 공간 효율화 논문을 쓰려고 해요. 파이썬 데이터 분석 가능한 분 환영!',
     operationMethod: 'online',
     activityFrequency: '주 1회',
     activityPlace: '상관 없음',
@@ -64,7 +66,8 @@ export const TEAMS: Team[] = [
       { id: 'm8', name: '윤채원', role: 'design', isLeader: false },
     ],
     recruitingRoles: ['plan', 'design'],
-    description: 'IoT 센서로 학습 환경을 개선하는 연구를 진행해요. 프로토타입까지 만들어볼 예정이에요.',
+    description:
+      'IoT 센서로 학습 환경을 개선하는 연구를 진행해요. 프로토타입까지 만들어볼 예정이에요.',
     operationMethod: 'both',
     activityFrequency: '주 2회',
     activityPlace: '수도권',
@@ -119,7 +122,8 @@ export const TEAMS: Team[] = [
     recruitEndDate: '2026-11-30',
     members: [{ id: 'm14', name: '문서윤', role: 'mkt', isLeader: true }],
     recruitingRoles: ['mkt', 'design'],
-    description: '동네 가게를 인스타그램으로 알리는 활동을 해요. 카드뉴스 만들 수 있는 분 환영해요.',
+    description:
+      '동네 가게를 인스타그램으로 알리는 활동을 해요. 카드뉴스 만들 수 있는 분 환영해요.',
     operationMethod: 'offline',
     activityFrequency: '주 1회',
     activityPlace: '서울 전체',
