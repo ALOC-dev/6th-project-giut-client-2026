@@ -1,7 +1,5 @@
 import { View, type StyleProp, type ViewStyle } from 'react-native';
-import Animated, {
-  useAnimatedStyle, useSharedValue, withTiming,
-} from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useEffect, useRef, useState } from 'react';
 import { color, radius, shadow, text as type, useMotion } from '@/theme';
 import { Press } from './Press';
@@ -35,9 +33,8 @@ export function SegmentedControl({ segments, value, onChange, style }: Segmented
     if (cell <= 0) return;
 
     const target = Math.max(0, selectedIndex) * cell;
-    const shouldAnimate = previousValue.current !== null
-      && previousValue.current !== value
-      && !reduced;
+    const shouldAnimate =
+      previousValue.current !== null && previousValue.current !== value && !reduced;
 
     x.value = shouldAnimate
       ? withTiming(target, { duration: duration.d3, easing: easing.out })
@@ -54,8 +51,10 @@ export function SegmentedControl({ segments, value, onChange, style }: Segmented
       onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
       style={[
         {
-          flexDirection: 'row', padding: 3,
-          borderRadius: radius.lg, borderCurve: 'continuous',
+          flexDirection: 'row',
+          padding: 3,
+          borderRadius: radius.lg,
+          borderCurve: 'continuous',
           backgroundColor: color.surfaceSunken,
         },
         style,
@@ -66,8 +65,13 @@ export function SegmentedControl({ segments, value, onChange, style }: Segmented
           pointerEvents="none"
           style={[
             {
-              position: 'absolute', top: 3, bottom: 3, left: 3,
-              width: cell, borderRadius: radius.md, borderCurve: 'continuous',
+              position: 'absolute',
+              top: 3,
+              bottom: 3,
+              left: 3,
+              width: cell,
+              borderRadius: radius.md,
+              borderCurve: 'continuous',
               backgroundColor: color.surface,
             },
             shadow.card,

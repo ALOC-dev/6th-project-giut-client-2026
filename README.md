@@ -46,15 +46,30 @@ Development Build는 필요한 네이티브 모듈을 포함해 빌드한 이 �
 
 ## 주요 명령어
 
-| 명령어 | 설명 |
-| --- | --- |
-| `npm start` | Expo 개발 서버 실행 |
-| `npm run android` | Android에서 실행 |
-| `npm run ios` | iOS 시뮬레이터에서 실행(macOS 필요) |
-| `npm run web` | 웹에서 실행 |
-| `npm run lint` | ESLint 검사 |
-| `npx tsc --noEmit` | TypeScript 타입 검사 |
-| `npm run theme` | 디자인 토큰으로 테마 파일 생성 |
+| 명령어                 | 설명                                |
+| ---------------------- | ----------------------------------- |
+| `npm start`            | Expo 개발 서버 실행                 |
+| `npm run android`      | Android에서 실행                    |
+| `npm run ios`          | iOS 시뮬레이터에서 실행(macOS 필요) |
+| `npm run web`          | 웹에서 실행                         |
+| `npm run lint`         | ESLint 검사                         |
+| `npm run format`       | Prettier로 전체 파일 포맷 적용      |
+| `npm run format:check` | Prettier 포맷 적용 여부 검사        |
+| `npx tsc --noEmit`     | TypeScript 타입 검사                |
+| `npm run theme`        | 디자인 토큰으로 테마 파일 생성      |
+
+## 코드 포맷
+
+프로젝트에 설치된 Prettier와 루트 설정 파일을 기준으로 모든 팀원이 동일한 코드 포맷을 사용합니다.
+
+VS Code에서는 권장 확장 프로그램인 `Prettier - Code formatter`를 설치하면 저장할 때 자동으로 포맷됩니다.
+
+```bash
+npm run format
+npm run format:check
+```
+
+포맷 설정은 `.prettierrc.json`, 제외 대상은 `.prettierignore`에서 관리합니다.
 
 ## 프로젝트 구조
 
@@ -135,15 +150,15 @@ git switch -c feat/FE-1-design-system
 <type>: <작업 내용>
 ```
 
-| 타입 | 설명 |
-| --- | --- |
-| `feat` | 새로운 기능 추가 |
-| `fix` | 버그 수정 |
+| 타입       | 설명                     |
+| ---------- | ------------------------ |
+| `feat`     | 새로운 기능 추가         |
+| `fix`      | 버그 수정                |
 | `refactor` | 동작 변경 없는 코드 개선 |
-| `style` | UI 스타일과 디자인 수정 |
-| `docs` | 문서 수정 |
-| `test` | 테스트 추가와 수정 |
-| `chore` | 설정, 패키지, 빌드 작업 |
+| `style`    | UI 스타일과 디자인 수정  |
+| `docs`     | 문서 수정                |
+| `test`     | 테스트 추가와 수정       |
+| `chore`    | 설정, 패키지, 빌드 작업  |
 
 예시:
 

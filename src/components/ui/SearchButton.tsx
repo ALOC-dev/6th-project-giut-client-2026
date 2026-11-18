@@ -29,12 +29,7 @@ const HOP = [
 const hopEase = Easing.bezier(0.3, 1.4, 0.5, 1);
 const outEase = Easing.out(Easing.quad);
 
-export function SearchButton({
-  onPress,
-  size = 24,
-  tint = color.ink,
-  style,
-}: SearchButtonProps) {
+export function SearchButton({ onPress, size = 24, tint = color.ink, style }: SearchButtonProps) {
   const { reduced } = useMotion();
   const scale = useSharedValue(1);
   const rotate = useSharedValue(0);
@@ -42,18 +37,26 @@ export function SearchButton({
 
   const hop = useCallback(() => {
     if (!reduced) {
-      scale.set(withSequence(
-        ...HOP.map((keyframe) => withTiming(keyframe.scale, {
-          duration: keyframe.duration,
-          easing: hopEase,
-        })),
-      ));
-      rotate.set(withSequence(
-        ...HOP.map((keyframe) => withTiming(keyframe.rotate, {
-          duration: keyframe.duration,
-          easing: hopEase,
-        })),
-      ));
+      scale.set(
+        withSequence(
+          ...HOP.map((keyframe) =>
+            withTiming(keyframe.scale, {
+              duration: keyframe.duration,
+              easing: hopEase,
+            }),
+          ),
+        ),
+      );
+      rotate.set(
+        withSequence(
+          ...HOP.map((keyframe) =>
+            withTiming(keyframe.rotate, {
+              duration: keyframe.duration,
+              easing: hopEase,
+            }),
+          ),
+        ),
+      );
       shine.set(0);
       shine.set(withTiming(1, { duration: 450, easing: outEase }));
     }
@@ -62,19 +65,17 @@ export function SearchButton({
   }, [onPress, reduced, rotate, scale, shine]);
 
   const lensStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: scale.value },
-      { rotate: `${rotate.value}deg` },
-    ],
+    transform: [{ scale: scale.value }, { rotate: `${rotate.value}deg` }],
   }));
 
   const glintStyle = useAnimatedStyle(() => {
     const progress = shine.value;
-    const opacity = progress === 0 || progress === 1
-      ? 0
-      : progress < 0.4
-        ? (progress / 0.4) * 0.9
-        : (1 - (progress - 0.4) / 0.6) * 0.9;
+    const opacity =
+      progress === 0 || progress === 1
+        ? 0
+        : progress < 0.4
+          ? (progress / 0.4) * 0.9
+          : (1 - (progress - 0.4) / 0.6) * 0.9;
 
     return {
       opacity,
@@ -92,27 +93,12 @@ export function SearchButton({
       accessibilityRole="button"
       accessibilityLabel="검색"
       scaleOnPress={false}
-      style={[
-        { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
-        style,
-      ]}
+      style={[{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }, style]}
     >
       <Animated.View style={[{ width: size, height: size }, lensStyle]}>
         <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-          <Circle
-            cx={11}
-            cy={11}
-            r={7}
-            stroke={tint}
-            strokeWidth={1.8}
-            strokeLinecap="round"
-          />
-          <Path
-            d="m20 20-3.5-3.5"
-            stroke={tint}
-            strokeWidth={1.8}
-            strokeLinecap="round"
-          />
+          <Circle cx={11} cy={11} r={7} stroke={tint} strokeWidth={1.8} strokeLinecap="round" />
+          <Path d="m20 20-3.5-3.5" stroke={tint} strokeWidth={1.8} strokeLinecap="round" />
         </Svg>
         <Animated.View
           pointerEvents="none"
