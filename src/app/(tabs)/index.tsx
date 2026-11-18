@@ -3,12 +3,17 @@ import { AppHeader } from '@/components/ui';
 import { useBottomNavigationInset } from '@/hooks/useBottomNavigationInset';
 import { CONTESTS } from '@/mocks/contests';
 import { color } from '@/theme';
+import { getDday } from '@/utils/date';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   const { contentPaddingBottom } = useBottomNavigationInset();
   const insets = useSafeAreaInsets();
+  const closingThisWeek = CONTESTS.filter((contest) => {
+    const dday = getDday(contest.endDate);
+    return dday >= 0 && dday <= 6;
+  });
 
   return (
     <View style={S.container}>
@@ -16,7 +21,7 @@ export default function HomeScreen() {
         <AppHeader onPressNotification={() => {}} onPressSearch={() => {}} />
       </View>
       <ScrollView contentContainerStyle={{ paddingBottom: contentPaddingBottom }}>
-        <DeadlineSection contests={CONTESTS} />
+        <DeadlineSection contests={closingThisWeek} />
       </ScrollView>
     </View>
   );

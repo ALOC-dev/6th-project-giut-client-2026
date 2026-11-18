@@ -14,7 +14,7 @@ export type Contest = {
   benefit: string;
   sourceUrl: string;
   sourceName: string;
-  posterUrl: string;
+  posterUrl?: string;
   startDate: string;
   endDate: string;
   description: string;
