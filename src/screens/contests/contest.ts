@@ -127,11 +127,6 @@ export function parseDay(iso: string): Date {
   return new Date(year, month - 1, day);
 }
 
-export function toISODay(date: Date): string {
-  const pad = (value: number) => String(value).padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-}
-
 export function startOfToday(): Date {
   const now = new Date();
   return new Date(now.getFullYear(), now.getMonth(), now.getDate());

@@ -10,6 +10,7 @@ export { AppHeader, type AppHeaderProps } from './AppHeader';
 export { BellButton, type BellButtonProps } from './BellButton';
 export { SearchButton, type SearchButtonProps } from './SearchButton';
 export { Odometer, type OdometerProps } from './Odometer';
+export { RangeCalendar, type RangeCalendarProps } from './RangeCalendar';
 export {
   BottomNavigation,
   BottomNavigationHeightContext,
