@@ -2,11 +2,9 @@ import { router } from 'expo-router';
 import { Alert } from 'react-native';
 import { useState } from 'react';
 
-import {
-  ContestListScreen,
-  SAMPLE_CONTESTS,
-  type Contest,
-} from '@/screens/contests/ContestListScreen';
+import { ContestListScreen } from '@/screens/contests/ContestListScreen';
+import type { Contest } from '@/screens/contests/contest';
+import { MOCK_CONTESTS } from '@/screens/contests/data';
 
 export default function ContestListRoute() {
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
@@ -21,7 +19,7 @@ export default function ContestListRoute() {
 
   return (
     <ContestListScreen
-      contests={SAMPLE_CONTESTS}
+      contests={MOCK_CONTESTS}
       savedIds={bookmarkedIds}
       onToggleSave={toggleBookmark}
       onPressContest={(contest) =>
