@@ -12,8 +12,14 @@ export type CardProps = ViewProps & {
 };
 
 export function Card({
-  elevation = 'card', corner = 'lg', padding = space[4],
-  bordered = false, onPress, style, children, ...rest
+  elevation = 'card',
+  corner = 'lg',
+  padding = space[4],
+  bordered = false,
+  onPress,
+  style,
+  children,
+  ...rest
 }: CardProps) {
   const base: StyleProp<ViewStyle> = [
     {
@@ -39,5 +45,9 @@ export function Card({
       </Press>
     );
   }
-  return <View style={base} {...rest}>{children}</View>;
+  return (
+    <View style={base} {...rest}>
+      {children}
+    </View>
+  );
 }

@@ -17,8 +17,14 @@ export type ButtonProps = {
 };
 
 export function Button({
-  label, variant = 'primary', disabled = false, loading = false,
-  full = true, left, onPress, style,
+  label,
+  variant = 'primary',
+  disabled = false,
+  loading = false,
+  full = true,
+  left,
+  onPress,
+  style,
 }: ButtonProps) {
   const off = disabled || loading;
 
@@ -45,9 +51,27 @@ export function Button({
   }
 
   const look = {
-    primary: { bg: color.brand, fg: '#FFFFFF', height: 56, corner: radius.xl, variant: 'button' as const },
-    secondary: { bg: color.surfaceMuted, fg: color.ink, height: 52, corner: radius.md, variant: 'label' as const },
-    danger: { bg: color.dangerStrong, fg: '#FFFFFF', height: 52, corner: radius.md, variant: 'label' as const },
+    primary: {
+      bg: color.brand,
+      fg: '#FFFFFF',
+      height: 56,
+      corner: radius.xl,
+      variant: 'button' as const,
+    },
+    secondary: {
+      bg: color.surfaceMuted,
+      fg: color.ink,
+      height: 52,
+      corner: radius.md,
+      variant: 'label' as const,
+    },
+    danger: {
+      bg: color.dangerStrong,
+      fg: '#FFFFFF',
+      height: 52,
+      corner: radius.md,
+      variant: 'label' as const,
+    },
   }[variant];
 
   return (

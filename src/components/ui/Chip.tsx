@@ -51,7 +51,10 @@ export function Chip(props: ChipProps) {
   if (deletable) {
     return (
       <View style={shell}>
-        <Press onPress={props.onPress} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+        <Press
+          onPress={props.onPress}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+        >
           {body}
         </Press>
         <Press
@@ -60,7 +63,9 @@ export function Chip(props: ChipProps) {
           accessibilityLabel={`${label} 삭제`}
           style={{ width: 24, height: 36, alignItems: 'center', justifyContent: 'center' }}
         >
-          <Text variant="caption" color="textMuted" maxFontSizeMultiplier={1.5}>✕</Text>
+          <Text variant="caption" color="textMuted" maxFontSizeMultiplier={1.5}>
+            ✕
+          </Text>
         </Press>
       </View>
     );
