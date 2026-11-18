@@ -32,10 +32,7 @@ export type BottomSheetProps = {
   accessibilityLabel?: string;
 };
 
-export function BottomSheet({
-  visible,
-  ...props
-}: BottomSheetProps) {
+export function BottomSheet({ visible, ...props }: BottomSheetProps) {
   const [mounted, setMounted] = useState(visible);
 
   useEffect(() => {
@@ -84,9 +81,11 @@ function BottomSheetContent({
       return;
     }
 
-    progress.set(withTiming(0, slide.sheet.out, (finished) => {
-      if (finished) runOnJS(onExited)();
-    }));
+    progress.set(
+      withTiming(0, slide.sheet.out, (finished) => {
+        if (finished) runOnJS(onExited)();
+      }),
+    );
   }, [onExited, progress, reduced, slide.sheet.in, slide.sheet.out, visible]);
 
   const close = () => {
@@ -97,9 +96,11 @@ function BottomSheetContent({
     opacity: progress.value,
   }));
   const sheetAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{
-      translateY: windowHeight * (1 - progress.value),
-    }],
+    transform: [
+      {
+        translateY: windowHeight * (1 - progress.value),
+      },
+    ],
   }));
 
   return (
@@ -114,17 +115,9 @@ function BottomSheetContent({
     >
       <View style={styles.root}>
         <Animated.View
-          style={[
-            StyleSheet.absoluteFill,
-            { backgroundColor: color.overlayDim },
-            backdropStyle,
-          ]}
+          style={[StyleSheet.absoluteFill, { backgroundColor: color.overlayDim }, backdropStyle]}
         >
-          <Pressable
-            style={StyleSheet.absoluteFill}
-            onPress={close}
-            accessible={false}
-          />
+          <Pressable style={StyleSheet.absoluteFill} onPress={close} accessible={false} />
         </Animated.View>
 
         <Animated.View

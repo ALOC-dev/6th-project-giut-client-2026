@@ -27,7 +27,8 @@
           "image": "./assets/images/giut-symbol.png",
           "imageWidth": 146
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,

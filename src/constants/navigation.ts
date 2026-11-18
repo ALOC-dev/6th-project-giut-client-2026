@@ -1,8 +1,8 @@
-import type { BottomNavigationItem } from "@/components/ui";
-import type { Href } from "expo-router";
+import type { BottomNavigationItem } from '@/components/ui';
+import type { Href } from 'expo-router';
 
-export const TAB_ITEMS=[
-    {
+export const TAB_ITEMS = [
+  {
     key: 'home',
     label: '홈',
     icon: { ios: 'house', android: 'home', web: 'home' },
@@ -32,12 +32,12 @@ export const TAB_ITEMS=[
   },
 ] satisfies BottomNavigationItem[];
 
-export type TabKey = 'home' | 'team' | 'giuthub' | 'chat' | 'my'
+export type TabKey = 'home' | 'team' | 'giuthub' | 'chat' | 'my';
 
-export const TAB_PATHS: Record<TabKey, Href>={
-    home: '/',
-    team: '/team',
-    giuthub: '/giuthub',
-    chat: '/chat',
-    my: '/my',
+export const TAB_PATHS: Record<TabKey, Href> = {
+  home: '/',
+  team: '/team',
+  giuthub: '/giuthub',
+  chat: '/chat',
+  my: '/my',
 };

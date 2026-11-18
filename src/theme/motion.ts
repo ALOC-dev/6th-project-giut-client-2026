@@ -20,19 +20,19 @@ export const easing = {
 } as const;
 
 export const duration = {
-   d1: 200,
-   d2: 250,
-   d3: 300,
-   d4: 350,
-   d5: 400,
-   d6: 450,
-   d7: 600,
+  d1: 200,
+  d2: 250,
+  d3: 300,
+  d4: 350,
+  d5: 400,
+  d6: 450,
+  d7: 600,
 } as const;
 
 export const ambient = {
-   float: 3200,
-   pulse: 1800,
-   shimmer: 1400,
+  float: 3200,
+  pulse: 1800,
+  shimmer: 1400,
 } as const;
 
 export const stagger = { tight: 40, card: 80, maxSteps: 5 } as const;
@@ -117,9 +117,7 @@ type EnterOff = { [K in keyof Enter]: (...args: never[]) => undefined };
 
 export function useMotion() {
   const reduced = useReducedMotion();
-  const off = Object.fromEntries(
-    Object.keys(enter).map((k) => [k, () => undefined]),
-  ) as EnterOff;
+  const off = Object.fromEntries(Object.keys(enter).map((k) => [k, () => undefined])) as EnterOff;
   return {
     reduced,
     easing,
@@ -138,7 +136,10 @@ export function usePulse(enabled = true) {
   const p = useSharedValue(0);
 
   useEffect(() => {
-    if (!enabled || reduced) { p.value = 0; return; }
+    if (!enabled || reduced) {
+      p.value = 0;
+      return;
+    }
     p.value = withRepeat(
       withTiming(1, { duration: ambient.pulse, easing: Easing.out(Easing.quad) }),
       -1,
@@ -157,7 +158,10 @@ export function useFloat(enabled = true, delay = 0) {
   const p = useSharedValue(0);
 
   useEffect(() => {
-    if (!enabled || reduced) { p.value = 0; return; }
+    if (!enabled || reduced) {
+      p.value = 0;
+      return;
+    }
     p.value = withDelay(
       delay,
       withRepeat(
