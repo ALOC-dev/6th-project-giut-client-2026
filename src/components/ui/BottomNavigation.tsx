@@ -310,7 +310,10 @@ export function BottomNavigation({ items, value, onChange, style }: BottomNaviga
   );
 
   const handleTabPress = (item: BottomNavigationItem, index: number) => {
-    if (item.key === lastRequestedValue.current) return;
+    if (item.key === lastRequestedValue.current) {
+      onChange(item.key);
+      return;
+    }
 
     const target = index * cellWidth;
     lastRequestedValue.current = item.key;

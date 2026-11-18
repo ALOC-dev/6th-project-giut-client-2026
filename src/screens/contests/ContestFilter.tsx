@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { AnimatedFilterIcon, CheckIcon } from '@/components/icons';
-import { Button, RangeCalendar, Text } from '@/components/ui';
+import { Button, RangeCalendar, Text, Toast, useToast } from '@/components/ui';
 import { color, radius, shadow, space } from '@/theme';
 
 import { CATEGORY_LABEL, CATEGORY_OPTIONS, type Category, type ContestFilter } from './contest';
@@ -50,6 +50,7 @@ export type ContestFilterSheetProps = {
 
 export function ContestFilterSheet({ open, value, onClose, onApply }: ContestFilterSheetProps) {
   const [draft, setDraft] = useState(value);
+  const toast = useToast();
 
   const toggleCategory = (category: Category) =>
     setDraft((current) => ({
@@ -64,6 +65,11 @@ export function ContestFilterSheet({ open, value, onClose, onApply }: ContestFil
     onClose();
   };
 
+  const reset = () => {
+    setDraft({ ...draft, categories: [], from: null, to: null });
+    toast.show('필터가 초기화되었어요.');
+  };
+
   return (
     <Modal visible={open} transparent animationType="slide" onRequestClose={close}>
       <Pressable style={styles.backdrop} onPress={close} accessibilityLabel="닫기" />
@@ -71,10 +77,7 @@ export function ContestFilterSheet({ open, value, onClose, onApply }: ContestFil
         <View style={styles.handle} />
 
         <View style={styles.resetRow}>
-          <Pressable
-            onPress={() => setDraft({ ...draft, categories: [], from: null, to: null })}
-            style={styles.resetButton}
-          >
+          <Pressable onPress={reset} style={styles.resetButton}>
             <Text variant="caption" color="textMuted">
               전체 초기화
             </Text>
@@ -126,6 +129,7 @@ export function ContestFilterSheet({ open, value, onClose, onApply }: ContestFil
           style={styles.applyButton}
         />
       </View>
+      <Toast {...toast.props} />
     </Modal>
   );
 }

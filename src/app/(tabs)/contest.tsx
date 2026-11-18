@@ -21,6 +21,7 @@ export default function ContestListRoute() {
     <ContestListScreen
       contests={MOCK_CONTESTS}
       savedIds={bookmarkedIds}
+      onPressHome={() => router.navigate('/')}
       onToggleSave={toggleBookmark}
       onPressContest={(contest) =>
         router.push({ pathname: '/contest/[id]', params: { id: contest.id } })

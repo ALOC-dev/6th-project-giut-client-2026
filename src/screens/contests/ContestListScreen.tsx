@@ -100,6 +100,7 @@ export type ContestListScreenProps = {
   contests: Contest[];
   /** 스크랩한 공모전 id */
   savedIds?: string[];
+  onPressHome?: () => void;
   onToggleSave?: (c: Contest) => void;
   onPressContest?: (c: Contest) => void;
   onPressCreate?: () => void;
@@ -108,6 +109,7 @@ export type ContestListScreenProps = {
 export function ContestListScreen({
   contests,
   savedIds = [],
+  onPressHome,
   onToggleSave,
   onPressContest,
   onPressCreate,
@@ -167,6 +169,7 @@ export function ContestListScreen({
   return (
     <View style={[screenStyles.screen, { paddingTop: insets.top }]}>
       <AppHeader
+        onPressLogo={onPressHome}
         onPressNotification={() => undefined}
         onPressSearch={() => undefined}
         hasUnreadNotification
@@ -190,7 +193,7 @@ export function ContestListScreen({
                 onPress={() => setFilter((f) => ({ ...f, activityType: t }))}
               >
                 <Text
-                  variant="titleSm"
+                  variant="titleMd"
                   color={on ? 'ink' : 'textFaint'}
                   style={on ? undefined : screenStyles.tabOff}
                   numberOfLines={1}
@@ -327,10 +330,10 @@ const screenStyles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: color.lineSoft,
   },
-  tabs: { paddingHorizontal: space[5], gap: 22 },
+  tabs: { paddingHorizontal: space[5], gap: space[5] },
   tab: {
-    paddingTop: 10,
-    paddingBottom: 11,
+    paddingTop: space[3],
+    paddingBottom: space[3],
     borderBottomWidth: 2,
     borderBottomColor: 'transparent',
     marginBottom: -1,
@@ -342,12 +345,12 @@ const screenStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: space[5],
-    paddingTop: 14,
+    paddingTop: space[4],
     paddingBottom: 0,
   },
   controls: { flexDirection: 'row', alignItems: 'center', gap: space[3] },
   control: { flexDirection: 'row', alignItems: 'center', gap: space[1], paddingVertical: space[1] },
-  sep: { width: 1, height: 12, backgroundColor: color.line },
+  sep: { width: 1, height: space[3], backgroundColor: color.line },
   sepLine: { height: 1, backgroundColor: color.lineSoft, marginHorizontal: space[5] },
   emptyListContent: { flexGrow: 1 },
   fab: {
@@ -372,7 +375,7 @@ const screenStyles = StyleSheet.create({
     right: 0,
     bottom: 0,
     left: 0,
-    backgroundColor: 'rgba(15,20,35,0.40)',
+    backgroundColor: color.overlayDim,
   },
   sortSheet: {
     position: 'absolute',
@@ -387,8 +390,8 @@ const screenStyles = StyleSheet.create({
   },
   handle: {
     width: 36,
-    height: 4,
-    borderRadius: 2,
+    height: space[1],
+    borderRadius: radius.full,
     backgroundColor: color.line,
     alignSelf: 'center',
   },
@@ -397,7 +400,7 @@ const screenStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 14,
+    paddingVertical: space[3],
     paddingHorizontal: space[3],
     borderRadius: radius.lg,
   },
@@ -408,7 +411,7 @@ const emptyStyles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 32,
+    paddingHorizontal: space[8],
   },
   art: { width: 150, height: 120 },
   cardBack: {
@@ -417,34 +420,34 @@ const emptyStyles = StyleSheet.create({
     top: 18,
     width: 96,
     height: 86,
-    borderRadius: 10,
+    borderRadius: radius.lg,
     backgroundColor: color.surfaceSunken,
     transform: [{ rotate: '-7deg' }],
   },
   cardFront: {
     position: 'absolute',
-    left: 24,
-    top: 12,
+    left: space[6],
+    top: space[3],
     width: 100,
     height: 90,
-    borderRadius: 10,
+    borderRadius: radius.lg,
     backgroundColor: color.surface,
     borderWidth: 1.5,
     borderColor: color.line,
-    paddingVertical: 16,
-    paddingHorizontal: 14,
-    gap: 9,
+    paddingVertical: space[4],
+    paddingHorizontal: space[4],
+    gap: space[2],
     ...shadow.card,
   },
-  line: { width: '100%', height: 7, borderRadius: 2, backgroundColor: color.lineSoft },
-  lineTint: { width: 34, backgroundColor: '#C9D3F5' },
+  line: { width: '100%', height: 7, borderRadius: radius.full, backgroundColor: color.lineSoft },
+  lineTint: { width: 34, backgroundColor: color.brandTint },
   lineShort: { width: '70%' },
-  lineLast: { width: 28, height: 9, marginTop: 'auto', backgroundColor: '#DCE3FB' },
+  lineLast: { width: 28, height: 9, marginTop: 'auto', backgroundColor: color.brandTint },
   lens: { position: 'absolute', right: 10, top: 6, width: 46, height: 46 },
   lensGlass: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: space[8],
+    height: space[8],
+    borderRadius: radius.xl,
     borderWidth: 2.4,
     borderColor: color.brand,
     backgroundColor: 'rgba(255,255,255,0.55)',
@@ -452,11 +455,11 @@ const emptyStyles = StyleSheet.create({
   lensShine: {
     position: 'absolute',
     left: 6,
-    top: 8,
+    top: space[2],
     width: 10,
     height: 2.2,
-    borderRadius: 2,
-    backgroundColor: '#8FA4FF',
+    borderRadius: radius.full,
+    backgroundColor: color.brand,
     transform: [{ rotate: '-35deg' }],
   },
   lensHandle: {
@@ -465,9 +468,9 @@ const emptyStyles = StyleSheet.create({
     top: 28,
     width: 13,
     height: 3.4,
-    borderRadius: 2,
+    borderRadius: radius.full,
     backgroundColor: color.brand,
     transform: [{ rotate: '45deg' }],
   },
-  title: { marginTop: 22, textAlign: 'center' },
+  title: { marginTop: space[5], textAlign: 'center' },
 });
