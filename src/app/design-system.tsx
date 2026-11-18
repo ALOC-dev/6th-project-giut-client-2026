@@ -4,14 +4,17 @@ import Animated from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
-  AppHeader, BottomNavigation, BottomSheet,
+  AppHeader,
+  BottomNavigation,
+  BottomSheet,
   Button,
   Card,
   Chip,
   Press,
   SegmentedControl,
   Text,
-  Toast, useToast,
+  Toast,
+  useToast,
 } from '@/components/ui';
 import { TAB_ITEMS } from '@/constants/navigation';
 import {
@@ -22,7 +25,8 @@ import {
   space,
   text as type,
   useFloat,
-  useMotion, usePulse,
+  useMotion,
+  usePulse,
 } from '@/theme';
 
 const fieldOptions = [
@@ -460,11 +464,7 @@ function Inner() {
           paddingBottom: insets.bottom > 0 ? space[3] : 0,
         }}
       >
-        <BottomNavigation
-          items={TAB_ITEMS}
-          value={bottomTab}
-          onChange={setBottomTab}
-        />
+        <BottomNavigation items={TAB_ITEMS} value={bottomTab} onChange={setBottomTab} />
       </View>
 
       <BottomSheet
