@@ -16,7 +16,7 @@ export function CategorySection() {
       <View style={S.grid}>
         {CATEGORIES.map(({ label, Icon }) => (
           <Press key={label} style={S.item} onPress={() => {}}>
-            <Icon size={24} color={color.ink} weight="duotone" />
+            <Icon size={24} color={color.ink} />
             <Text variant="caption">{label}</Text>
           </Press>
         ))}
