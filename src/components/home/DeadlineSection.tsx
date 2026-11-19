@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { ScrollView, View, useWindowDimensions, type ScrollViewInstance } from 'react-native';
 
+import { GiutMark } from '@/components/brand/GiutMark';
 import { Press, Text } from '@/components/ui';
 import { role, space, type RoleName } from '@/theme';
 import type { Contest } from '@/types/contest';
@@ -88,12 +89,7 @@ export function DeadlineSection({ contests }: DeadlineSectionProps) {
                   <View style={S.dim} />
                 </>
               ) : (
-                <Image
-                  source={require('../../../assets/images/giut-symbol.png')}
-                  style={S.fallbackSymbol}
-                  contentFit="contain"
-                  tintColor={palette.base}
-                />
+                <GiutMark width={200} color={palette.base} style={S.fallbackSymbol} />
               )}
 
               <View style={S.content}>
