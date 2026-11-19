@@ -28,6 +28,8 @@ export const CONTESTS: Contest[] = [
     startDate: '2026-11-02',
     endDate: '2026-11-19',
     description: SAMPLE_DESCRIPTION,
+    viewCount: 2410,
+    bookmarkCount: 186,
   },
   {
     id: '2',
@@ -43,6 +45,8 @@ export const CONTESTS: Contest[] = [
     startDate: '2026-10-26',
     endDate: '2026-11-25',
     description: SAMPLE_DESCRIPTION,
+    viewCount: 4305,
+    bookmarkCount: 538,
   },
   {
     id: '3',
@@ -58,6 +62,8 @@ export const CONTESTS: Contest[] = [
     startDate: '2026-11-01',
     endDate: '2026-11-21',
     description: SAMPLE_DESCRIPTION,
+    viewCount: 1260,
+    bookmarkCount: 94,
   },
   {
     id: '4',
@@ -73,6 +79,8 @@ export const CONTESTS: Contest[] = [
     startDate: '2026-11-10',
     endDate: '2026-11-22',
     description: SAMPLE_DESCRIPTION,
+    viewCount: 3120,
+    bookmarkCount: 301,
   },
   {
     id: '5',
@@ -88,6 +96,8 @@ export const CONTESTS: Contest[] = [
     startDate: '2026-11-15',
     endDate: '2026-12-06',
     description: SAMPLE_DESCRIPTION,
+    viewCount: 980,
+    bookmarkCount: 72,
   },
   {
     id: '6',
@@ -103,9 +113,70 @@ export const CONTESTS: Contest[] = [
     startDate: '2026-11-17',
     endDate: '2026-12-20',
     description: SAMPLE_DESCRIPTION,
+    viewCount: 1540,
+    bookmarkCount: 128,
+  },
+  // 아래 3개: 홈 "○○님을 위한 추천" 시안 데이터
+  {
+    id: '7',
+    title: 'Z세대 브랜드 캠페인 기획 공모전',
+    host: '한국광고홍보학회',
+    participationType: 'both',
+    category: '공모전',
+    field: '광고/마케팅',
+    targets: ['대학생'],
+    benefit: '총 상금 400만원 · 우수작 실제 캠페인 집행',
+    sourceUrl: 'https://example.com/contests/7',
+    sourceName: '한국광고홍보학회',
+    startDate: '2026-11-01',
+    endDate: '2026-11-19',
+    description: SAMPLE_DESCRIPTION,
+    viewCount: 1820,
+    bookmarkCount: 212,
+  },
+  {
+    id: '8',
+    title: '생성형 AI 서비스 아이디어 챌린지',
+    host: '청년디지털재단',
+    participationType: 'team',
+    category: '공모전',
+    field: 'IT/개발',
+    targets: ['대학생', '대학원생', '일반인'],
+    benefit: '총 상금 1,000만원 · 사업화 지원',
+    sourceUrl: 'https://example.com/contests/8',
+    sourceName: '청년디지털재단 공식 홈페이지',
+    startDate: '2026-11-05',
+    endDate: '2026-11-25',
+    description: SAMPLE_DESCRIPTION,
+    viewCount: 4305,
+    bookmarkCount: 538,
+  },
+  {
+    id: '9',
+    title: '공공 사이니지 UX 개선 공모전',
+    host: '서울디자인센터',
+    participationType: 'both',
+    category: '공모전',
+    field: '디자인',
+    targets: ['대학생', '일반인'],
+    benefit: '총 상금 300만원 · 수상작 시범 설치',
+    sourceUrl: 'https://example.com/contests/9',
+    sourceName: '서울디자인센터',
+    startDate: '2026-11-10',
+    endDate: '2026-11-30',
+    description: SAMPLE_DESCRIPTION,
+    viewCount: 960,
+    bookmarkCount: 87,
   },
 ];
 
 export function getContest(id: string): Contest | undefined {
   return CONTESTS.find((contest) => contest.id === id);
+}
+
+// 추천 공모전 (나중에 서버의 추천 결과로 바뀔 자리)
+const RECOMMENDED_IDS = ['7', '8', '9'];
+
+export function getRecommendedContests(): Contest[] {
+  return RECOMMENDED_IDS.map(getContest).filter((contest) => contest !== undefined);
 }

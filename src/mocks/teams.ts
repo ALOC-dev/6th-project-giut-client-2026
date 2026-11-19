@@ -131,6 +131,108 @@ export const TEAMS: Team[] = [
   },
 
   // 공모전 6: 서비스 디자인 경진대회는 "모집 중인 팀 0" 확인용으로 팀 없음
+
+  // 공모전 7: Z세대 브랜드 캠페인 (모집 중인 팀 3)
+  {
+    id: '8',
+    contestId: '7',
+    name: '브랜드 실험실',
+    capacity: 4,
+    recruitEndDate: '2026-11-19',
+    members: [
+      { id: 'm15', name: '유하진', role: 'mkt', isLeader: true },
+      { id: 'm16', name: '백승아', role: 'design', isLeader: false },
+    ],
+    recruitingRoles: ['plan', 'design'],
+    description: 'Z세대 감성 캠페인을 같이 기획할 분을 찾아요.',
+    operationMethod: 'online',
+    activityFrequency: '주 2회',
+    activityPlace: '상관 없음',
+    cooperationTools: ['디스코드', '노션'],
+  },
+  {
+    id: '9',
+    contestId: '7',
+    name: '캠페인 메이커스',
+    capacity: 3,
+    recruitEndDate: '2026-11-19',
+    members: [{ id: 'm17', name: '남궁민', role: 'plan', isLeader: true }],
+    recruitingRoles: ['mkt', 'design'],
+    description: '광고 공모전 수상 경험 있는 팀장과 함께해요.',
+    operationMethod: 'both',
+    activityFrequency: '주 1회',
+    activityPlace: '서울 전체',
+    cooperationTools: ['노션'],
+  },
+  {
+    id: '10',
+    contestId: '7',
+    name: '숏폼 크리에이터즈',
+    capacity: 3,
+    recruitEndDate: '2026-11-19',
+    members: [
+      { id: 'm18', name: '전다인', role: 'design', isLeader: true },
+      { id: 'm19', name: '황재민', role: 'mkt', isLeader: false },
+    ],
+    recruitingRoles: ['plan'],
+    description: '영상 위주 캠페인으로 갈 예정이에요. 기획자 한 분 모셔요!',
+    operationMethod: 'offline',
+    activityFrequency: '주 2회',
+    activityPlace: '수도권',
+    cooperationTools: ['디스코드'],
+  },
+
+  // 공모전 8: 생성형 AI 서비스 (모집 중인 팀 2)
+  {
+    id: '11',
+    contestId: '8',
+    name: 'AI 놀이터',
+    capacity: 4,
+    recruitEndDate: '2026-11-24',
+    members: [
+      { id: 'm20', name: '김도현', role: 'dev', isLeader: true },
+      { id: 'm21', name: '이수아', role: 'plan', isLeader: false },
+    ],
+    recruitingRoles: ['design', 'dev'],
+    description: 'LLM으로 대학생 생활 도우미 서비스를 만들어요.',
+    operationMethod: 'online',
+    activityFrequency: '주 2회',
+    activityPlace: '상관 없음',
+    cooperationTools: ['디스코드', '노션'],
+  },
+  {
+    id: '12',
+    contestId: '8',
+    name: '프롬프트 크루',
+    capacity: 4,
+    recruitEndDate: '2026-11-25',
+    members: [{ id: 'm22', name: '박서진', role: 'plan', isLeader: true }],
+    recruitingRoles: ['dev', 'design'],
+    description: '아이디어 단계부터 같이 고민할 개발자, 디자이너 환영해요.',
+    operationMethod: 'both',
+    activityFrequency: '주 1회',
+    activityPlace: '서울 전체',
+    cooperationTools: ['슬랙', '노션'],
+  },
+
+  // 공모전 9: 공공 사이니지 UX (모집 중인 팀 1)
+  {
+    id: '13',
+    contestId: '9',
+    name: '사인 앤 서비스',
+    capacity: 3,
+    recruitEndDate: '2026-11-28',
+    members: [
+      { id: 'm23', name: '최윤서', role: 'design', isLeader: true },
+      { id: 'm24', name: '정민규', role: 'design', isLeader: false },
+    ],
+    recruitingRoles: ['plan'],
+    description: '버스정류장 안내판 UX를 리서치부터 함께 개선해요.',
+    operationMethod: 'offline',
+    activityFrequency: '주 1회',
+    activityPlace: '서울 전체',
+    cooperationTools: ['노션', '구글 밋'],
+  },
 ];
 
 export function getTeam(id: string): Team | undefined {

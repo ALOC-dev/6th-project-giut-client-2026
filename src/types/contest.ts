@@ -18,4 +18,6 @@ export type Contest = {
   startDate: string;
   endDate: string;
   description: string;
+  viewCount: number;
+  bookmarkCount: number;
 };
