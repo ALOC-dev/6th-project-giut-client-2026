@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react';
 
 import { ContestListScreen } from '@/screens/contests/ContestListScreen';
 import type { Contest } from '@/screens/contests/contest';
-import { MOCK_CONTESTS } from '@/screens/contests/data';
+import { MOCK_CONTESTS } from '@/screens/contests/mocks';
 
 export default function ContestListRoute() {
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
