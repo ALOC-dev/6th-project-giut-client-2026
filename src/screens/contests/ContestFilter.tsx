@@ -96,7 +96,10 @@ export function ContestFilterSheet({ open, value, onClose, onApply }: ContestFil
       }
     >
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollBody}>
-        <Text variant="titleMd">분야</Text>
+        <View style={styles.sectionHeader}>
+          <Text variant="titleLg">분야</Text>
+          <View style={styles.sectionDivider} />
+        </View>
         <View style={styles.categoryList}>
           {CATEGORY_OPTIONS.map((category) => {
             const isSelected = draft.categories.includes(category);
@@ -119,9 +122,10 @@ export function ContestFilterSheet({ open, value, onClose, onApply }: ContestFil
           })}
         </View>
 
-        <View style={styles.divider} />
-
-        <Text variant="titleMd">참여 가능한 기간</Text>
+        <View style={[styles.sectionHeader, styles.timeSectionHeader]}>
+          <Text variant="titleLg">참여 가능한 기간</Text>
+          <View style={styles.sectionDivider} />
+        </View>
         <View style={styles.calendar}>
           <RangeCalendar
             from={draft.from}
@@ -157,6 +161,9 @@ const styles = StyleSheet.create({
   content: { paddingHorizontal: space[5] },
   resetButton: { paddingVertical: space[1] },
   scrollBody: { gap: space[4], paddingBottom: space[2] },
+  sectionHeader: { gap: space[1] },
+  timeSectionHeader: { marginTop: space[2] },
+  sectionDivider: { height: 1, backgroundColor: color.line },
   categoryList: { marginHorizontal: -space[2], marginTop: -6 },
   categoryRow: {
     flexDirection: 'row',
@@ -176,7 +183,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   selectionSelected: { backgroundColor: color.brand, borderColor: color.brand },
-  divider: { height: 1, backgroundColor: color.lineSoft, marginTop: 2 },
   calendar: { marginHorizontal: -space[2], marginTop: -6 },
   applyButton: { marginTop: space[2] },
 });

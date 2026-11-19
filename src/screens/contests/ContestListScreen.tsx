@@ -291,25 +291,27 @@ export function ContestListScreen({
       <BottomSheet
         visible={sortOpen}
         onClose={() => setSortOpen(false)}
-        title="정렬"
         accessibilityLabel="정렬"
         contentStyle={screenStyles.sortContent}
       >
-        {SORTS.map((option) => (
-          <Pressable
-            key={option.key}
-            onPress={() => {
-              setSort(option.key);
-              setSortOpen(false);
-            }}
-            style={screenStyles.sortRow}
-          >
-            <Text variant="label" color={sort === option.key ? 'brand' : 'ink'}>
-              {option.label}
-            </Text>
-            {sort === option.key && <CheckIcon size={16} color={color.brand} />}
-          </Pressable>
-        ))}
+        <Text variant="titleLg">정렬</Text>
+        <View style={screenStyles.sortOptions}>
+          {SORTS.map((option) => (
+            <Pressable
+              key={option.key}
+              onPress={() => {
+                setSort(option.key);
+                setSortOpen(false);
+              }}
+              style={screenStyles.sortRow}
+            >
+              <Text variant="label" color={sort === option.key ? 'brand' : 'ink'}>
+                {option.label}
+              </Text>
+              {sort === option.key && <CheckIcon size={16} color={color.brand} />}
+            </Pressable>
+          ))}
+        </View>
       </BottomSheet>
     </View>
   );
@@ -364,13 +366,18 @@ const screenStyles = StyleSheet.create({
     justifyContent: 'center',
     height: 52,
   },
-  sortContent: { paddingHorizontal: space[3], paddingBottom: space[8] },
+  sortContent: {
+    gap: space[4],
+    paddingHorizontal: space[5],
+    paddingBottom: space[8],
+  },
+  sortOptions: { marginHorizontal: -space[2], marginTop: -6 },
   sortRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: space[3],
-    paddingHorizontal: space[3],
+    paddingHorizontal: space[2],
     borderRadius: radius.lg,
   },
 });
