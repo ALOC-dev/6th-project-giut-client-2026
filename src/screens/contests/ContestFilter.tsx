@@ -70,6 +70,17 @@ export function ContestFilterSheet({ open, value, onClose, onApply }: ContestFil
     toast.show('필터가 초기화되었어요.');
   };
 
+  const apply = () => {
+    const next = {
+      ...draft,
+      activityType: value.activityType,
+      to: draft.from && !draft.to ? draft.from : draft.to,
+    };
+    setDraft(next);
+    onApply(next);
+    onClose();
+  };
+
   return (
     <BottomSheet
       visible={open}
@@ -78,22 +89,13 @@ export function ContestFilterSheet({ open, value, onClose, onApply }: ContestFil
       sheetStyle={styles.sheet}
       contentStyle={styles.content}
       headerAction={
-        <Pressable onPress={reset} style={styles.resetButton}>
+        <Pressable onPress={reset} accessibilityRole="button" style={styles.resetButton}>
           <Text variant="caption" color="textMuted">
             전체 초기화
           </Text>
         </Pressable>
       }
-      footer={
-        <Button
-          label="적용하기"
-          onPress={() => {
-            onApply(draft);
-            onClose();
-          }}
-          style={styles.applyButton}
-        />
-      }
+      footer={<Button label="적용하기" onPress={apply} style={styles.applyButton} />}
     >
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollBody}>
         <View style={styles.sectionHeader}>
@@ -144,6 +146,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: space[1],
+    minHeight: 44,
     paddingVertical: space[1],
   },
   badge: {

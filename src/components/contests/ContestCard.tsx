@@ -1,13 +1,105 @@
-import { memo } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
-import Animated from 'react-native-reanimated';
+import { memo, useEffect } from 'react';
+import { Pressable, StyleSheet, View, type TextStyle } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 import { AnimatedBookmarkIcon, EyeIcon, TeamIcon } from '@/components/icons';
-import { Odometer, Press, Text } from '@/components/ui';
+import { Press, Text } from '@/components/ui';
 import { ddayLabel, formatDeadline, type Contest } from '@/screens/contests/contest';
-import { color, radius, space, text, useMotion } from '@/theme';
+import { color, radius, space, text, useMotion, type ColorToken, type TextVariant } from '@/theme';
 
 const FIRST_SCREEN_ITEM_COUNT = 6;
+const DIGITS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+const ROLL_DIGITS = [...DIGITS, 0];
+
+function Odometer({
+  value,
+  variant = 'meta',
+  color: textColor = 'textFaint',
+}: {
+  value: number;
+  variant?: TextVariant;
+  color?: ColorToken;
+}) {
+  const { reduced } = useMotion();
+  const characters = value.toLocaleString().split('');
+  const lineHeight = (text[variant] as TextStyle).lineHeight ?? 16;
+
+  return (
+    <View style={styles.odometerRow} accessible accessibilityLabel={value.toLocaleString()}>
+      {characters.map((character, index) => {
+        const digit = Number(character);
+
+        if (Number.isNaN(digit)) {
+          return (
+            <Text key={`character-${index}`} variant={variant} color={textColor}>
+              {character}
+            </Text>
+          );
+        }
+
+        return (
+          <DigitColumn
+            key={`digit-${index}`}
+            digit={digit}
+            variant={variant}
+            color={textColor}
+            lineHeight={lineHeight}
+            duration={500 + (characters.length - index) * 120}
+            roll={!reduced}
+          />
+        );
+      })}
+    </View>
+  );
+}
+
+function DigitColumn({
+  digit,
+  variant,
+  color: textColor,
+  lineHeight,
+  duration,
+  roll,
+}: {
+  digit: number;
+  variant: TextVariant;
+  color: ColorToken;
+  lineHeight: number;
+  duration: number;
+  roll: boolean;
+}) {
+  const targetIndex = roll && digit === 0 ? DIGITS.length : digit;
+  const translateY = useSharedValue(roll ? 0 : -targetIndex * lineHeight);
+  const { easing } = useMotion();
+
+  useEffect(() => {
+    translateY.value = withTiming(-targetIndex * lineHeight, {
+      duration: roll ? duration : 0,
+      easing: easing.out,
+    });
+  }, [duration, easing.out, lineHeight, roll, targetIndex, translateY]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: translateY.value }],
+  }));
+
+  return (
+    <View style={{ height: lineHeight, overflow: 'hidden' }}>
+      <Animated.View style={animatedStyle}>
+        {ROLL_DIGITS.map((number, index) => (
+          <Text
+            key={`${number}-${index}`}
+            variant={variant}
+            color={textColor}
+            style={{ height: lineHeight }}
+          >
+            {number}
+          </Text>
+        ))}
+      </Animated.View>
+    </View>
+  );
+}
 
 export type ContestCardProps = {
   contest: Contest;
@@ -33,7 +125,9 @@ function ScrapButton({ saved, count, onPress }: ScrapButtonProps) {
       style={styles.scrapButton}
     >
       <AnimatedBookmarkIcon saved={saved} />
-      <Odometer value={count} roll={false} />
+      <Text variant="meta" color="textFaint">
+        {count.toLocaleString()}
+      </Text>
     </Pressable>
   );
 }
@@ -45,7 +139,12 @@ function ContestCardBase({ contest, saved, index = 0, onPress, onToggleSave }: C
 
   return (
     <Animated.View entering={index < FIRST_SCREEN_ITEM_COUNT ? enter.fadeUp(index) : undefined}>
-      <Press onPress={() => onPress(contest)} style={styles.row}>
+      <Press
+        onPress={() => onPress(contest)}
+        accessibilityRole="button"
+        accessibilityHint="공모전 상세 화면으로 이동합니다"
+        style={styles.row}
+      >
         <View style={styles.body}>
           <Text variant="caption" color="ink">
             {contest.org}
@@ -94,7 +193,16 @@ function ContestCardBase({ contest, saved, index = 0, onPress, onToggleSave }: C
   );
 }
 
-export const ContestCard = memo(ContestCardBase);
+function areContestCardPropsEqual(previous: ContestCardProps, next: ContestCardProps) {
+  return (
+    previous.contest === next.contest &&
+    previous.saved === next.saved &&
+    previous.onPress === next.onPress &&
+    previous.onToggleSave === next.onToggleSave
+  );
+}
+
+export const ContestCard = memo(ContestCardBase, areContestCardPropsEqual);
 
 const styles = StyleSheet.create({
   row: {
@@ -114,6 +222,7 @@ const styles = StyleSheet.create({
   teamWrap: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   teamCount: { fontFamily: 'Pretendard-Bold' },
   viewsWrap: { flexDirection: 'row', alignItems: 'center', gap: 3 },
+  odometerRow: { flexDirection: 'row', alignItems: 'center' },
   scrapButton: {
     width: 44,
     minHeight: 56,

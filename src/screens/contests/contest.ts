@@ -150,7 +150,8 @@ export function formatDeadline(iso: string, today = startOfToday()): string {
 
 export function ddayLabel(iso: string, today = startOfToday()): string {
   const days = daysUntil(iso, today);
-  if (days <= 0) return '오늘 마감';
+  if (days < 0) return '마감';
+  if (days === 0) return '오늘 마감';
   if (days === 1) return '내일 마감';
   return '';
 }

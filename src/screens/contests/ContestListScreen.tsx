@@ -1,19 +1,20 @@
-import { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Easing as RNEasing,
   FlatList,
   Pressable,
   Animated as RNAnimated,
+  Easing as RNEasing,
   ScrollView,
   StyleSheet,
   View,
+  type ListRenderItemInfo,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { CheckIcon, ChevronIcon, PlusIcon } from '@/components/icons';
 import { ContestCard } from '@/components/contests/ContestCard';
+import { CheckIcon, ChevronIcon, PlusIcon } from '@/components/icons';
 import {
   AppHeader,
   BottomNavigationHeightContext,
@@ -21,6 +22,7 @@ import {
   Press,
   Text,
 } from '../../components/ui';
+import { color, radius, shadow, space, useMotion } from '../../theme';
 import {
   ACTIVITY_LABEL,
   ACTIVITY_TABS,
@@ -32,7 +34,6 @@ import {
   type ContestFilter,
 } from './contest';
 import { ContestFilterButton, ContestFilterSheet } from './ContestFilter';
-import { color, radius, shadow, space, useMotion } from '../../theme';
 
 const SORTS = [
   { key: 'deadline', label: '마감 임박 순' },
@@ -44,9 +45,10 @@ type SortKey = (typeof SORTS)[number]['key'];
 
 const EMPTY_PATH_X = [0, -34, -20, 4, 0];
 const EMPTY_PATH_Y = [0, 8, 34, 22, 0];
+const NOOP_CONTEST = (_contest: Contest) => undefined;
 
 function EmptyContests({ title }: { title: string }) {
-  const { reduced } = useMotion();
+  const { reduced } = useMotion(); // 동작 줄이기 설정 시 애니메이션 중지
   const [progress] = useState(() => new RNAnimated.Value(0));
 
   useEffect(() => {
@@ -75,7 +77,7 @@ function EmptyContests({ title }: { title: string }) {
 
   return (
     <View style={emptyStyles.wrap}>
-      <View style={emptyStyles.art} accessible accessibilityLabel="공모전을 찾는 중">
+      <View style={emptyStyles.art} accessible={false}>
         <View style={emptyStyles.cardBack} />
         <View style={emptyStyles.cardFront}>
           <View style={[emptyStyles.line, emptyStyles.lineTint]} />
@@ -103,7 +105,6 @@ function EmptyContests({ title }: { title: string }) {
 
 export type ContestListScreenProps = {
   contests: Contest[];
-  /** 스크랩한 공모전 id */
   savedIds?: string[];
   onPressHome?: () => void;
   onToggleSave?: (c: Contest) => void;
@@ -128,6 +129,7 @@ export function ContestListScreen({
   const saved = useMemo(() => new Set(savedIds), [savedIds]);
 
   const list = useMemo(() => {
+    // 공모전 데이터나 필터, 정렬이 바뀔 때만 목록 계산
     const out = contests.filter((c) => {
       if (filter.activityType && c.activityType !== filter.activityType) return false;
       if (filter.categories.length && !filter.categories.includes(c.category)) return false;
@@ -148,7 +150,6 @@ export function ContestListScreen({
     return [...out].sort(by[sort]);
   }, [contests, filter, sort]);
 
-  // FAB은 아래로 스크롤하면 글자를 접고 동그래진다.
   const [fabWidth] = useState(() => new RNAnimated.Value(1));
   const lastY = useRef(0);
   const mini = useRef(false);
@@ -170,6 +171,18 @@ export function ContestListScreen({
 
   const filterCount = countFilters(filter);
   const sortLabel = SORTS.find((x) => x.key === sort)!.label;
+  const renderContest = useCallback(
+    ({ item, index }: ListRenderItemInfo<Contest>) => (
+      <ContestCard
+        contest={item}
+        index={index}
+        saved={saved.has(item.id)}
+        onPress={onPressContest ?? NOOP_CONTEST}
+        onToggleSave={onToggleSave ?? NOOP_CONTEST}
+      />
+    ),
+    [onPressContest, onToggleSave, saved],
+  );
 
   return (
     <View style={[screenStyles.screen, { paddingTop: insets.top }]}>
@@ -226,7 +239,11 @@ export function ContestListScreen({
               총 <Text variant="bodyStrong">{list.length}</Text>건
             </Text>
             <View style={screenStyles.controls}>
-              <Pressable onPress={() => setSortOpen(true)} style={screenStyles.control}>
+              <Pressable
+                onPress={() => setSortOpen(true)}
+                accessibilityRole="button"
+                style={screenStyles.control}
+              >
                 <Text variant="bodyStrong">{sortLabel}</Text>
                 <ChevronIcon size={13} />
               </Pressable>
@@ -236,15 +253,7 @@ export function ContestListScreen({
           </View>
         }
         ItemSeparatorComponent={() => <View style={screenStyles.sepLine} />}
-        renderItem={({ item, index }) => (
-          <ContestCard
-            contest={item}
-            index={index}
-            saved={saved.has(item.id)}
-            onPress={(c) => onPressContest?.(c)}
-            onToggleSave={(c) => onToggleSave?.(c)}
-          />
-        )}
+        renderItem={renderContest}
         ListEmptyComponent={
           <EmptyContests
             title={contests.length === 0 ? '아직 공모전이 없어요' : '해당 조건의 공고가 없어요'}
@@ -264,6 +273,7 @@ export function ContestListScreen({
         <Press
           onPress={onPressCreate}
           style={screenStyles.fabInner}
+          accessibilityRole="button"
           accessibilityLabel="공모전 등록"
         >
           <PlusIcon />
@@ -299,6 +309,8 @@ export function ContestListScreen({
           {SORTS.map((option) => (
             <Pressable
               key={option.key}
+              accessibilityRole="radio"
+              accessibilityState={{ selected: sort === option.key }}
               onPress={() => {
                 setSort(option.key);
                 setSortOpen(false);
@@ -346,7 +358,13 @@ const screenStyles = StyleSheet.create({
     paddingBottom: 0,
   },
   controls: { flexDirection: 'row', alignItems: 'center', gap: space[3] },
-  control: { flexDirection: 'row', alignItems: 'center', gap: space[1], paddingVertical: space[1] },
+  control: {
+    minHeight: 44,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space[1],
+    paddingVertical: space[1],
+  },
   sep: { width: 1, height: space[3], backgroundColor: color.line },
   sepLine: { height: 1, backgroundColor: color.lineSoft, marginHorizontal: space[5] },
   emptyListContent: { flexGrow: 1 },

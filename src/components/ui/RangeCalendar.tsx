@@ -8,6 +8,7 @@ import { Text } from './Text';
 
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 const CELL_SIZE = 36;
+const CELL_TOUCH_SIZE = 44;
 
 type CalendarCell =
   { key: string; day: number; iso: string; timestamp: number } | { key: string; day: null };
@@ -26,6 +27,11 @@ function toIsoDay(date: Date): string {
 function toTimestamp(iso: string): number {
   const [year, month, day] = iso.split('-').map(Number);
   return new Date(year, month - 1, day).getTime();
+}
+
+function formatAccessibilityDate(iso: string): string {
+  const [year, month, day] = iso.split('-').map(Number);
+  return `${year}년 ${month}월 ${day}일`;
 }
 
 function getMonthCells(base: Date): CalendarCell[] {
@@ -80,6 +86,7 @@ export function RangeCalendar({ from, to, onChange }: RangeCalendarProps) {
       <View style={styles.header}>
         <Pressable
           onPress={() => setMonthOffset((current) => current - 1)}
+          accessibilityRole="button"
           accessibilityLabel="이전 달"
           style={styles.navigationButton}
         >
@@ -88,6 +95,7 @@ export function RangeCalendar({ from, to, onChange }: RangeCalendarProps) {
         <Text variant="label">{`${base.getFullYear()}년 ${base.getMonth() + 1}월`}</Text>
         <Pressable
           onPress={() => setMonthOffset((current) => current + 1)}
+          accessibilityRole="button"
           accessibilityLabel="다음 달"
           style={styles.navigationButton}
         >
@@ -126,14 +134,26 @@ export function RangeCalendar({ from, to, onChange }: RangeCalendarProps) {
           const hasRange = startTimestamp !== null && endTimestamp !== null;
           const hasLeftBand = isInRange || (isEnd && hasRange && !isSingleDay);
           const hasRightBand = isInRange || (isStart && hasRange && !isSingleDay);
+          const selectionLabel = isSingleDay
+            ? '시작일 및 종료일'
+            : isStart
+              ? '시작일'
+              : isEnd
+                ? '종료일'
+                : isInRange
+                  ? '선택 범위 내'
+                  : null;
+          const accessibilityLabel = [formatAccessibilityDate(cell.iso), selectionLabel]
+            .filter(Boolean)
+            .join(', ');
 
           return (
             <Pressable
               key={cell.key}
               onPress={() => selectDay(cell.timestamp, cell.iso)}
               accessibilityRole="button"
-              accessibilityLabel={cell.iso}
-              accessibilityState={{ selected: isSelected }}
+              accessibilityLabel={accessibilityLabel}
+              accessibilityState={{ selected: isSelected || isInRange }}
               style={styles.cell}
             >
               {hasLeftBand && <View style={[styles.band, styles.bandLeft]} />}
@@ -167,13 +187,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: space[1],
     paddingBottom: 18,
   },
-  navigationButton: { padding: 6 },
+  navigationButton: {
+    minWidth: 44,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   weekRow: { flexDirection: 'row', marginBottom: space[4] },
   weekday: { flex: 1, textAlign: 'center' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: space[1] },
   cell: {
     width: `${100 / 7}%`,
-    height: CELL_SIZE,
+    height: CELL_TOUCH_SIZE,
     alignItems: 'center',
     justifyContent: 'center',
   },
