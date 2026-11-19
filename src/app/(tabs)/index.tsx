@@ -1,3 +1,4 @@
+import { CategorySection } from '@/components/home/CategorySection';
 import { DeadlineSection } from '@/components/home/DeadlineSection';
 import { AppHeader } from '@/components/ui';
 import { useBottomNavigationInset } from '@/hooks/useBottomNavigationInset';
@@ -22,6 +23,7 @@ export default function HomeScreen() {
       </View>
       <ScrollView contentContainerStyle={{ paddingBottom: contentPaddingBottom }}>
         <DeadlineSection contests={closingThisWeek} />
+        <CategorySection />
       </ScrollView>
     </View>
   );
