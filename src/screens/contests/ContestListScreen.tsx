@@ -5,7 +5,6 @@ import {
   Animated as RNAnimated,
   Easing as RNEasing,
   ScrollView,
-  StyleSheet,
   View,
   type ListRenderItemInfo,
   type NativeScrollEvent,
@@ -22,7 +21,7 @@ import {
   Press,
   Text,
 } from '../../components/ui';
-import { color, radius, shadow, space, useMotion } from '../../theme';
+import { color, space, useMotion } from '../../theme';
 import {
   ACTIVITY_LABEL,
   ACTIVITY_TABS,
@@ -34,6 +33,7 @@ import {
   type ContestFilter,
 } from './contest';
 import { ContestFilterButton, ContestFilterSheet } from './ContestFilter';
+import { emptyStyles, screenStyles } from './ContestListScreen.styles';
 
 const SORTS = [
   { key: 'deadline', label: '마감 임박 순' },
@@ -328,143 +328,3 @@ export function ContestListScreen({
     </View>
   );
 }
-
-const screenStyles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: color.surface },
-  header: {
-    borderBottomWidth: 0,
-  },
-  tabsWrap: {
-    flexGrow: 0,
-    borderBottomWidth: 1,
-    borderBottomColor: color.lineSoft,
-  },
-  tabs: { paddingHorizontal: space[5], gap: space[5] },
-  tab: {
-    paddingTop: space[3],
-    paddingBottom: space[3],
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-    marginBottom: -1,
-  },
-  tabOn: { borderBottomColor: color.ink },
-  tabOff: { fontFamily: 'Pretendard-Medium' },
-  countRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: space[5],
-    paddingTop: space[4],
-    paddingBottom: 0,
-  },
-  controls: { flexDirection: 'row', alignItems: 'center', gap: space[3] },
-  control: {
-    minHeight: 44,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space[1],
-    paddingVertical: space[1],
-  },
-  sep: { width: 1, height: space[3], backgroundColor: color.line },
-  sepLine: { height: 1, backgroundColor: color.lineSoft, marginHorizontal: space[5] },
-  emptyListContent: { flexGrow: 1 },
-  fab: {
-    position: 'absolute',
-    right: space[5],
-    height: 52,
-    minWidth: 52,
-    borderRadius: radius.full,
-    backgroundColor: color.brand,
-    justifyContent: 'center',
-    ...shadow.brand,
-  },
-  fabInner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 52,
-  },
-  sortContent: {
-    gap: space[4],
-    paddingHorizontal: space[5],
-    paddingBottom: space[8],
-  },
-  sortOptions: { marginHorizontal: -space[2], marginTop: -6 },
-  sortRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: space[3],
-    paddingHorizontal: space[2],
-    borderRadius: radius.lg,
-  },
-});
-
-const emptyStyles = StyleSheet.create({
-  wrap: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: space[8],
-  },
-  art: { width: 150, height: 120 },
-  cardBack: {
-    position: 'absolute',
-    left: 28,
-    top: 18,
-    width: 96,
-    height: 86,
-    borderRadius: radius.lg,
-    backgroundColor: color.surfaceSunken,
-    transform: [{ rotate: '-7deg' }],
-  },
-  cardFront: {
-    position: 'absolute',
-    left: space[6],
-    top: space[3],
-    width: 100,
-    height: 90,
-    borderRadius: radius.lg,
-    backgroundColor: color.surface,
-    borderWidth: 1.5,
-    borderColor: color.line,
-    paddingVertical: space[4],
-    paddingHorizontal: space[4],
-    gap: space[2],
-    ...shadow.card,
-  },
-  line: { width: '100%', height: 7, borderRadius: radius.full, backgroundColor: color.lineSoft },
-  lineTint: { width: 34, backgroundColor: color.brandTint },
-  lineShort: { width: '70%' },
-  lineLast: { width: 28, height: 9, marginTop: 'auto', backgroundColor: color.brandTint },
-  lens: { position: 'absolute', right: 10, top: 6, width: 46, height: 46 },
-  lensGlass: {
-    width: space[8],
-    height: space[8],
-    borderRadius: radius.xl,
-    borderWidth: 2.4,
-    borderColor: color.brand,
-    backgroundColor: 'rgba(255,255,255,0.55)',
-  },
-  lensShine: {
-    position: 'absolute',
-    left: 6,
-    top: space[2],
-    width: 10,
-    height: 2.2,
-    borderRadius: radius.full,
-    backgroundColor: color.brand,
-    transform: [{ rotate: '-35deg' }],
-  },
-  lensHandle: {
-    position: 'absolute',
-    left: 27,
-    top: 28,
-    width: 13,
-    height: 3.4,
-    borderRadius: radius.full,
-    backgroundColor: color.brand,
-    transform: [{ rotate: '45deg' }],
-  },
-  title: { marginTop: space[5], textAlign: 'center' },
-});
