@@ -131,6 +131,7 @@ export function ContestListScreen({
   const list = useMemo(() => {
     // 공모전 데이터나 필터, 정렬이 바뀔 때만 목록 계산
     const out = contests.filter((c) => {
+      if (c.status === 'CLOSED' || daysUntil(c.deadline) < 0) return false;
       if (filter.activityType && c.activityType !== filter.activityType) return false;
       if (filter.categories.length && !filter.categories.includes(c.category)) return false;
       if (

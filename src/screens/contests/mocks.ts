@@ -1,6 +1,28 @@
 import type { Contest } from './contest';
 
+const formatLocalDate = (date = new Date()) => {
+  const pad = (value: number) => String(value).padStart(2, '0');
+
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+};
+
+const today = formatLocalDate();
+
 export const MOCK_CONTESTS: Contest[] = [
+  {
+    id: '11',
+    org: 'OO청년재단',
+    title: '대학생 서비스 아이디어 공모전',
+    deadline: today,
+    category: 'PLANNING_IDEA',
+    activityType: 'CONTEST',
+    status: 'OPEN',
+    teamCount: 2,
+    views: 760,
+    scraps: 54,
+    activityFrom: today,
+    activityTo: today,
+  },
   {
     id: '01',
     org: 'OO문화재단',

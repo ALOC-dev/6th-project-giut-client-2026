@@ -135,7 +135,6 @@ function ScrapButton({ saved, count, onPress }: ScrapButtonProps) {
 function ContestCardBase({ contest, saved, index = 0, onPress, onToggleSave }: ContestCardProps) {
   const { enter } = useMotion();
   const deadlineLabel = ddayLabel(contest.deadline);
-  const hasTeams = contest.teamCount > 0;
 
   return (
     <Animated.View entering={index < FIRST_SCREEN_ITEM_COUNT ? enter.fadeUp(index) : undefined}>
@@ -167,12 +166,8 @@ function ContestCardBase({ contest, saved, index = 0, onPress, onToggleSave }: C
 
           <View style={styles.metaRow}>
             <View style={styles.teamWrap}>
-              <TeamIcon color={hasTeams ? color.ink : color.textFaint} />
-              <Text
-                variant="caption"
-                color={hasTeams ? 'ink' : 'textFaint'}
-                style={styles.teamCount}
-              >
+              <TeamIcon color={color.ink} />
+              <Text variant="caption" color="ink" style={styles.teamCount}>
                 {contest.teamCount}팀
               </Text>
             </View>
