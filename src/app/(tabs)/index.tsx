@@ -1,10 +1,12 @@
 import { CategorySection } from '@/components/home/CategorySection';
 import { DeadlineSection } from '@/components/home/DeadlineSection';
+import { InterestBanner } from '@/components/home/InterestBanner';
 import { AppHeader } from '@/components/ui';
 import { useBottomNavigationInset } from '@/hooks/useBottomNavigationInset';
 import { CONTESTS } from '@/mocks/contests';
 import { color } from '@/theme';
 import { getDday } from '@/utils/date';
+import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -15,6 +17,7 @@ export default function HomeScreen() {
     const dday = getDday(contest.endDate);
     return dday >= 0 && dday <= 6;
   });
+  const [showBanner, setShowBanner] = useState(true);
 
   return (
     <View style={S.container}>
@@ -24,6 +27,12 @@ export default function HomeScreen() {
       <ScrollView contentContainerStyle={{ paddingBottom: contentPaddingBottom }}>
         <DeadlineSection contests={closingThisWeek} />
         <CategorySection />
+        {showBanner && (
+          <InterestBanner
+            onSubmit={() => setShowBanner(false)}
+            onClose={() => setShowBanner(false)}
+          />
+        )}
       </ScrollView>
     </View>
   );
