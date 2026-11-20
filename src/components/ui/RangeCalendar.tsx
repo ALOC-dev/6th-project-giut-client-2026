@@ -9,6 +9,7 @@ import { Text } from './Text';
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 const CELL_SIZE = 36;
 const CELL_TOUCH_SIZE = 44;
+const RANGE_BAND_INSET = (CELL_TOUCH_SIZE - CELL_SIZE) / 2;
 
 type CalendarCell =
   { key: string; day: number; iso: string; timestamp: number } | { key: string; day: null };
@@ -68,6 +69,21 @@ export function RangeCalendar({ from, to, onChange }: RangeCalendarProps) {
   const endTimestamp = to ? toTimestamp(to) : null;
 
   const selectDay = (timestamp: number, iso: string) => {
+    if (timestamp === startTimestamp && timestamp === endTimestamp) {
+      onChange({ from: null, to: null });
+      return;
+    }
+
+    if (timestamp === startTimestamp) {
+      onChange(to ? { from: to, to: null } : { from: null, to: null });
+      return;
+    }
+
+    if (timestamp === endTimestamp) {
+      onChange({ from, to: null });
+      return;
+    }
+
     if (startTimestamp === null || endTimestamp !== null) {
       onChange({ from: iso, to: null });
       return;
@@ -204,8 +220,8 @@ const styles = StyleSheet.create({
   },
   band: {
     position: 'absolute',
-    top: 0,
-    bottom: 0,
+    top: RANGE_BAND_INSET,
+    bottom: RANGE_BAND_INSET,
     width: '50%',
     backgroundColor: color.brandTint,
   },
