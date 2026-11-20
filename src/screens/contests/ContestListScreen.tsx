@@ -1,15 +1,19 @@
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
-  FlatList,
   Pressable,
   Animated as RNAnimated,
   Easing as RNEasing,
   ScrollView,
   View,
   type ListRenderItemInfo,
-  type NativeScrollEvent,
-  type NativeSyntheticEvent,
 } from 'react-native';
+import Animated, {
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ContestCard } from '@/components/contests/ContestCard';
@@ -155,24 +159,31 @@ export function ContestListScreen({
     return [...out].sort(by[sort]);
   }, [contests, filter, sort]);
 
-  const [fabWidth] = useState(() => new RNAnimated.Value(1));
-  const lastY = useRef(0);
-  const mini = useRef(false);
-  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const y = e.nativeEvent.contentOffset.y;
+  const reducedMotion = useReducedMotion();
+  const fabProgress = useSharedValue(1);
+  const lastY = useSharedValue(0);
+  const mini = useSharedValue(false);
+  const onScroll = useAnimatedScrollHandler((event) => {
+    const y = event.contentOffset.y;
     const next =
-      y > 12 && y > lastY.current ? true : y < lastY.current - 4 || y <= 12 ? false : mini.current;
-    lastY.current = y;
-    if (next !== mini.current) {
-      mini.current = next;
-      RNAnimated.spring(fabWidth, {
-        toValue: next ? 0 : 1,
-        useNativeDriver: false,
-        damping: 18,
-        stiffness: 220,
-      }).start();
+      y > 12 && y > lastY.value ? true : y < lastY.value - 4 || y <= 12 ? false : mini.value;
+    lastY.value = y;
+    if (next !== mini.value) {
+      mini.value = next;
+      const target = next ? 0 : 1;
+      fabProgress.value = reducedMotion
+        ? target
+        : withSpring(target, { damping: 18, stiffness: 220 });
     }
-  };
+  });
+  const fabAnimatedStyle = useAnimatedStyle(() => ({
+    paddingHorizontal: fabProgress.value * 18,
+  }));
+  const fabLabelAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: fabProgress.value,
+    maxWidth: fabProgress.value * 90,
+    marginLeft: fabProgress.value * 6,
+  }));
 
   const filterCount = countFilters(filter);
   const sortLabel = SORTS.find((x) => x.key === sort)!.label;
@@ -231,7 +242,7 @@ export function ContestListScreen({
         </ScrollView>
       </View>
 
-      <FlatList
+      <Animated.FlatList
         data={list}
         keyExtractor={(c) => c.id}
         onScroll={onScroll}
@@ -249,6 +260,7 @@ export function ContestListScreen({
               <Pressable
                 onPress={() => setSortOpen(true)}
                 accessibilityRole="button"
+                accessibilityLabel={`정렬, ${sortLabel}`}
                 style={screenStyles.control}
               >
                 <Text variant="bodyStrong">{sortLabel}</Text>
@@ -268,14 +280,8 @@ export function ContestListScreen({
         }
       />
 
-      <RNAnimated.View
-        style={[
-          screenStyles.fab,
-          {
-            bottom: bottomNavigationHeight + space[2],
-            paddingHorizontal: fabWidth.interpolate({ inputRange: [0, 1], outputRange: [0, 18] }),
-          },
-        ]}
+      <Animated.View
+        style={[screenStyles.fab, { bottom: bottomNavigationHeight + space[2] }, fabAnimatedStyle]}
       >
         <Press
           onPress={onPressCreate}
@@ -284,19 +290,13 @@ export function ContestListScreen({
           accessibilityLabel="공모전 등록"
         >
           <PlusIcon />
-          <RNAnimated.View
-            style={{
-              opacity: fabWidth,
-              maxWidth: fabWidth.interpolate({ inputRange: [0, 1], outputRange: [0, 90] }),
-              marginLeft: fabWidth.interpolate({ inputRange: [0, 1], outputRange: [0, 6] }),
-            }}
-          >
+          <Animated.View style={fabLabelAnimatedStyle}>
             <Text variant="label" color="surface" numberOfLines={1}>
               공모전 등록
             </Text>
-          </RNAnimated.View>
+          </Animated.View>
         </Press>
-      </RNAnimated.View>
+      </Animated.View>
 
       <ContestFilterSheet
         open={sheet}
@@ -312,7 +312,7 @@ export function ContestListScreen({
         contentStyle={screenStyles.sortContent}
       >
         <Text variant="titleLg">정렬</Text>
-        <View style={screenStyles.sortOptions}>
+        <View style={screenStyles.sortOptions} accessibilityRole="radiogroup">
           {SORTS.map((option) => (
             <Pressable
               key={option.key}
