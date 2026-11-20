@@ -33,6 +33,12 @@ export function DeadlineSection({ contests }: DeadlineSectionProps) {
   const lastPage = Math.max(contests.length - 1, 0);
   const currentPage = Math.min(page, lastPage);
 
+  // 스크롤 위치(x)로 지금 보이는 카드 번호를 계산해서 page에 반영해요
+  const syncPage = (x: number) => {
+    const next = Math.round(x / snap);
+    setPage(Math.min(Math.max(next, 0), lastPage));
+  };
+
   // 화면 회전 등으로 카드 너비(snap)가 바뀌면, 보고 있던 카드 위치로 다시 맞춰요
   useEffect(() => {
     scrollRef.current?.scrollTo({ x: currentPage * snap, animated: false });
@@ -78,11 +84,12 @@ export function DeadlineSection({ contests }: DeadlineSectionProps) {
         snapToInterval={snap}
         decelerationRate="fast"
         onScrollBeginDrag={() => setIsDragging(true)}
-        onScrollEndDrag={() => setIsDragging(false)}
-        onMomentumScrollEnd={(e) => {
-          const next = Math.round(e.nativeEvent.contentOffset.x / snap);
-          setPage(Math.min(Math.max(next, 0), lastPage));
+        // 손을 뗄 때도 위치로 page를 맞춰요 (관성 없이 멈추면 onMomentumScrollEnd가 안 불릴 수 있어서)
+        onScrollEndDrag={(e) => {
+          syncPage(e.nativeEvent.contentOffset.x);
+          setIsDragging(false);
         }}
+        onMomentumScrollEnd={(e) => syncPage(e.nativeEvent.contentOffset.x)}
       >
         {contests.map((contest, index) => {
           const hasPoster = !!contest.posterUrl;
@@ -120,7 +127,12 @@ export function DeadlineSection({ contests }: DeadlineSectionProps) {
               )}
 
               {/* 안의 글자들은 위 accessibilityLabel로 대신 읽어요 */}
-              <View style={S.content} importantForAccessibility="no-hide-descendants">
+              {/* Android: importantForAccessibility, iOS: accessibilityElementsHidden */}
+              <View
+                style={S.content}
+                importantForAccessibility="no-hide-descendants"
+                accessibilityElementsHidden
+              >
                 <View style={S.topRow}>
                   <View style={[S.badge, !hasPoster && S.badgeFallback]}>
                     <Text variant="badge" color={accentColor}>
