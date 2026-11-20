@@ -84,6 +84,15 @@ export function usePullToRefresh({
     animateScale(ready ? 1.08 : 1);
   }, [animateScale, ready]);
 
+  const refresh = useCallback(() => {
+    if (!onRefresh || refreshing) return;
+
+    setRefreshing(true);
+    settle(REFRESH_HEIGHT);
+    onRefreshStart?.();
+    onRefresh();
+  }, [onRefresh, onRefreshStart, refreshing, settle]);
+
   const responder = useMemo(
     () =>
       PanResponder.create({
@@ -113,10 +122,7 @@ export function usePullToRefresh({
           const nextHeight = Math.max(0, Math.min(MAX_PULL_DISTANCE, gesture.dy * PULL_DAMPING));
 
           if (nextHeight >= REFRESH_THRESHOLD) {
-            setRefreshing(true);
-            settle(REFRESH_HEIGHT);
-            onRefreshStart?.();
-            onRefresh?.();
+            refresh();
             return;
           }
 
@@ -130,7 +136,7 @@ export function usePullToRefresh({
           setReady(false);
         },
       }),
-    [atTop, height, onRefresh, onRefreshStart, refreshing, settle],
+    [atTop, height, onRefresh, refresh, refreshing, settle],
   );
 
   const done = useCallback(
@@ -151,6 +157,7 @@ export function usePullToRefresh({
   return {
     panHandlers: responder.panHandlers,
     onScroll,
+    refresh,
     done,
     indicator: {
       height,

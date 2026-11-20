@@ -7,6 +7,10 @@ import {
   Platform,
   TextInput,
   View,
+  type AccessibilityActionEvent,
+  type AccessibilityActionInfo,
+  type LayoutChangeEvent,
+  type ListRenderItem,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
 } from 'react-native';
@@ -14,7 +18,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SearchIcon } from '@/components/icons';
 import { Text } from '@/components/ui';
-import { color, shadow } from '@/theme';
+import { color, shadow, space } from '@/theme';
 
 import { HubFilterButton } from './filter/HubFilterButton';
 import { HubFilterSheet } from './filter/HubFilterSheet';
@@ -41,6 +45,9 @@ type HubScreenProps = {
 };
 
 const PULL_GUIDE_STORAGE_KEY = '@giut/hub/pull-refresh-guide:v2';
+const REFRESH_ACCESSIBILITY_ACTIONS: readonly AccessibilityActionInfo[] = [
+  { name: 'refresh', label: '새로고침' },
+];
 
 export function HubScreen({
   people,
@@ -53,6 +60,7 @@ export function HubScreen({
   const [filter, setFilter] = useState<HubFilter>(EMPTY_HUB_FILTER);
   const [filterVisible, setFilterVisible] = useState(false);
   const [compactHeader, setCompactHeader] = useState(false);
+  const [expandedHeaderHeight, setExpandedHeaderHeight] = useState(0);
   const [cardGeneration, setCardGeneration] = useState(0);
   const [showPullGuide, setShowPullGuide] = useState(false);
   const refreshStartedWithCards = useRef(false);
@@ -66,6 +74,7 @@ export function HubScreen({
   const {
     panHandlers,
     onScroll: handlePullScroll,
+    refresh: refreshPeople,
     done: finishRefresh,
     indicator: pullIndicator,
   } = usePullToRefresh({ onRefresh, onRefreshStart: handlePullRefreshStart });
@@ -108,11 +117,36 @@ export function HubScreen({
     finishRefresh(shouldReplayCards ? replayCards : undefined);
   }, [finishRefresh, loading, people.length, replayCards]);
 
-  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+  const handleScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const nextCompact = event.nativeEvent.contentOffset.y > 24;
 
-    if (nextCompact !== compactHeader) setCompactHeader(nextCompact);
-  };
+    setCompactHeader((current) => (current === nextCompact ? current : nextCompact));
+  }, []);
+  const handleListScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      handleScroll(event);
+      handlePullScroll(event);
+    },
+    [handlePullScroll, handleScroll],
+  );
+  const renderPerson = useCallback<ListRenderItem<Person>>(
+    ({ item, index }) => (
+      <CardEnter index={index} generation={cardGeneration}>
+        <PersonCard person={item} onPress={onPressPerson} />
+      </CardEnter>
+    ),
+    [cardGeneration, onPressPerson],
+  );
+  const handleHeaderLayout = useCallback((event: LayoutChangeEvent) => {
+    const nextHeight = event.nativeEvent.layout.height;
+    setExpandedHeaderHeight((current) => Math.max(current, nextHeight));
+  }, []);
+  const handleAccessibilityAction = useCallback(
+    (event: AccessibilityActionEvent) => {
+      if (event.nativeEvent.actionName === 'refresh') refreshPeople();
+    },
+    [refreshPeople],
+  );
 
   return (
     <View style={styles.screen}>
@@ -120,16 +154,16 @@ export function HubScreen({
         <FlatList
           data={filteredPeople}
           numColumns={2}
+          accessibilityActions={refreshAvailable ? REFRESH_ACCESSIBILITY_ACTIONS : undefined}
+          onAccessibilityAction={refreshAvailable ? handleAccessibilityAction : undefined}
+          style={expandedHeaderHeight === 0 ? styles.measuringList : undefined}
           keyExtractor={(person) => person.id}
-          onScroll={(event) => {
-            handleScroll(event);
-            handlePullScroll(event);
-          }}
+          onScroll={handleListScroll}
           scrollEventThrottle={16}
           columnWrapperStyle={styles.column}
           contentContainerStyle={[
             styles.content,
-            { paddingTop: insets.top + 126 },
+            { paddingTop: expandedHeaderHeight + space[3] },
             filteredPeople.length === 0 && styles.emptyContent,
           ]}
           keyboardShouldPersistTaps="handled"
@@ -139,11 +173,7 @@ export function HubScreen({
               {showPullGuide ? <PullRefreshGuide onDismiss={dismissPullGuide} /> : null}
             </>
           }
-          renderItem={({ item, index }) => (
-            <CardEnter index={index} generation={cardGeneration}>
-              <PersonCard person={item} onPress={onPressPerson} />
-            </CardEnter>
-          )}
+          renderItem={renderPerson}
           ListEmptyComponent={
             loading ? (
               <HubLoading />
@@ -164,6 +194,7 @@ export function HubScreen({
         filterCount={filterCount}
         onOpenFilter={() => setFilterVisible(true)}
         topInset={insets.top}
+        onLayout={handleHeaderLayout}
       />
 
       <HubFilterSheet
@@ -184,6 +215,7 @@ type HubHeaderProps = {
   filterCount: number;
   onOpenFilter: () => void;
   topInset: number;
+  onLayout: (event: LayoutChangeEvent) => void;
 };
 
 function HubHeader({
@@ -193,11 +225,12 @@ function HubHeader({
   filterCount,
   onOpenFilter,
   topInset,
+  onLayout,
 }: HubHeaderProps) {
   const supportsLiquidGlass = Platform.OS === 'ios' && isGlassEffectAPIAvailable();
 
   return (
-    <View style={[styles.header, { paddingTop: topInset }]}>
+    <View onLayout={onLayout} style={[styles.header, { paddingTop: topInset }]}>
       {!compact ? (
         <View style={styles.titleRow}>
           <Text variant="displayNumber" color="brand">

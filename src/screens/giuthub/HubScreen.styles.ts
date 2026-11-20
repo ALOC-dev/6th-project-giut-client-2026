@@ -10,6 +10,9 @@ export const styles = StyleSheet.create({
   fill: {
     flex: 1,
   },
+  measuringList: {
+    opacity: 0,
+  },
   content: {
     paddingHorizontal: space[4],
     paddingBottom: space[5],
