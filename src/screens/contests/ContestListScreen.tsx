@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Pressable,
   Animated as RNAnimated,
@@ -18,13 +18,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ContestCard } from '@/components/contests/ContestCard';
 import { CheckIcon, ChevronIcon, PlusIcon } from '@/components/icons';
-import {
-  AppHeader,
-  BottomNavigationHeightContext,
-  BottomSheet,
-  Press,
-  Text,
-} from '../../components/ui';
+import { AppHeader, BottomSheet, Press, Text } from '../../components/ui';
 import { color, space, useMotion } from '../../theme';
 import {
   ACTIVITY_LABEL,
@@ -129,7 +123,6 @@ export function ContestListScreen({
   onPressCreate,
 }: ContestListScreenProps) {
   const insets = useSafeAreaInsets();
-  const bottomNavigationHeight = useContext(BottomNavigationHeightContext);
   const [filter, setFilter] = useState<ContestFilter>(EMPTY_FILTER);
   const [sort, setSort] = useState<SortKey>('deadline');
   const [sheet, setSheet] = useState(false);
@@ -247,10 +240,7 @@ export function ContestListScreen({
         keyExtractor={(c) => c.id}
         onScroll={onScroll}
         scrollEventThrottle={16}
-        contentContainerStyle={[
-          { paddingBottom: bottomNavigationHeight },
-          list.length === 0 && screenStyles.emptyListContent,
-        ]}
+        contentContainerStyle={list.length === 0 ? screenStyles.emptyListContent : undefined}
         ListHeaderComponent={
           <View style={screenStyles.countRow}>
             <Text variant="body" color="textSecondary">
@@ -280,9 +270,7 @@ export function ContestListScreen({
         }
       />
 
-      <Animated.View
-        style={[screenStyles.fab, { bottom: bottomNavigationHeight + space[2] }, fabAnimatedStyle]}
-      >
+      <Animated.View style={[screenStyles.fab, { bottom: space[2] }, fabAnimatedStyle]}>
         <Press
           onPress={onPressCreate}
           style={screenStyles.fabInner}
