@@ -117,7 +117,8 @@ export const emptyStyles = StyleSheet.create({
     borderRadius: radius.xl,
     borderWidth: 2.4,
     borderColor: color.brand,
-    backgroundColor: 'rgba(255,255,255,0.55)',
+    backgroundColor: color.surface,
+    opacity: 0.55,
   },
   lensShine: {
     position: 'absolute',
