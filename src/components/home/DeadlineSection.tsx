@@ -27,19 +27,32 @@ export function DeadlineSection({ contests }: DeadlineSectionProps) {
 
   const scrollRef = useRef<ScrollViewInstance>(null);
   const [page, setPage] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+
+  // 공모전 개수가 줄어서 page가 범위를 벗어나도 마지막 카드 안으로 맞춰요
+  const lastPage = Math.max(contests.length - 1, 0);
+  const currentPage = Math.min(page, lastPage);
+
+  // 화면 회전 등으로 카드 너비(snap)가 바뀌면, 보고 있던 카드 위치로 다시 맞춰요
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ x: currentPage * snap, animated: false });
+    // snap이 바뀔 때만 실행해요 (페이지 이동은 아래 타이머와 손 스크롤이 처리)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [snap]);
 
   // 5초마다 다음 카드로 넘기기. 페이지가 바뀌면(자동이든 손으로든) 타이머를 새로 시작해요.
+  // 손으로 넘기는 중에는 타이머를 멈춰서 제스처와 부딪히지 않게 해요.
   useEffect(() => {
-    if (contests.length <= 1) return;
+    if (contests.length <= 1 || isDragging) return;
 
     const timer = setTimeout(() => {
-      const next = (page + 1) % contests.length;
+      const next = (currentPage + 1) % contests.length;
       scrollRef.current?.scrollTo({ x: next * snap, animated: true });
       setPage(next);
     }, AUTO_SLIDE_MS);
 
     return () => clearTimeout(timer);
-  }, [page, contests.length, snap]);
+  }, [currentPage, contests.length, snap, isDragging]);
 
   // 포스터 없는 카드끼리만 순서를 세서 색을 배정해요.
   // 포스터 카드는 건너뛰므로, 같은 색이 최대한 이어지지 않아요.
@@ -64,7 +77,12 @@ export function DeadlineSection({ contests }: DeadlineSectionProps) {
         contentContainerStyle={S.list}
         snapToInterval={snap}
         decelerationRate="fast"
-        onMomentumScrollEnd={(e) => setPage(Math.round(e.nativeEvent.contentOffset.x / snap))}
+        onScrollBeginDrag={() => setIsDragging(true)}
+        onScrollEndDrag={() => setIsDragging(false)}
+        onMomentumScrollEnd={(e) => {
+          const next = Math.round(e.nativeEvent.contentOffset.x / snap);
+          setPage(Math.min(Math.max(next, 0), lastPage));
+        }}
       >
         {contests.map((contest, index) => {
           const hasPoster = !!contest.posterUrl;
@@ -82,17 +100,27 @@ export function DeadlineSection({ contests }: DeadlineSectionProps) {
                 !hasPoster && { backgroundColor: palette.tint },
               ]}
               onPress={() => router.push({ pathname: '/contest/[id]', params: { id: contest.id } })}
+              // 스크린리더는 카드 전체를 한 번에 읽어요 (D-day 글자 칸을 하나씩 읽지 않도록)
+              accessible
+              accessibilityRole="button"
+              accessibilityLabel={`${contest.title}, ${formatDday(contest.endDate)}, ${formatShortDate(contest.endDate)} 마감`}
             >
               {hasPoster ? (
                 <>
-                  <Image source={contest.posterUrl} style={S.poster} contentFit="cover" />
+                  <Image
+                    source={contest.posterUrl}
+                    style={S.poster}
+                    contentFit="cover"
+                    accessible={false}
+                  />
                   <View style={S.dim} />
                 </>
               ) : (
                 <GiutMark width={200} color={palette.base} style={S.fallbackSymbol} />
               )}
 
-              <View style={S.content}>
+              {/* 안의 글자들은 위 accessibilityLabel로 대신 읽어요 */}
+              <View style={S.content} importantForAccessibility="no-hide-descendants">
                 <View style={S.topRow}>
                   <View style={[S.badge, !hasPoster && S.badgeFallback]}>
                     <Text variant="badge" color={accentColor}>
