@@ -3,7 +3,7 @@ import { SymbolView, type AndroidSymbol, type SFSymbol } from 'expo-symbols';
 import bold from 'expo-symbols/androidWeights/bold';
 import semiBold from 'expo-symbols/androidWeights/semiBold';
 import { CirclesThreeIcon } from 'phosphor-react-native/src/icons/CirclesThree';
-import { useEffect, useRef, useState } from 'react';
+import { createContext, useEffect, useRef, useState } from 'react';
 import {
   Image,
   Platform,
@@ -63,6 +63,8 @@ export type BottomNavigationProps = {
   onChange: (key: string) => void;
   style?: StyleProp<ViewStyle>;
 };
+
+export const BottomNavigationHeightContext = createContext(0);
 
 type BottomNavigationTabProps = {
   item: BottomNavigationItem;
@@ -308,7 +310,10 @@ export function BottomNavigation({ items, value, onChange, style }: BottomNaviga
   );
 
   const handleTabPress = (item: BottomNavigationItem, index: number) => {
-    if (item.key === lastRequestedValue.current) return;
+    if (item.key === lastRequestedValue.current) {
+      onChange(item.key);
+      return;
+    }
 
     const target = index * cellWidth;
     lastRequestedValue.current = item.key;
@@ -340,7 +345,7 @@ export function BottomNavigation({ items, value, onChange, style }: BottomNaviga
         <GlassView
           colorScheme="light"
           glassEffectStyle="regular"
-          tintColor="rgba(255,255,255,0.82)"
+          tintColor={color.surfaceGlass}
           style={styles.glass}
         />
       ) : (
@@ -376,7 +381,7 @@ const styles = StyleSheet.create({
   shell: {
     marginHorizontal: space[3],
     borderRadius: radius['2xl'],
-    backgroundColor: '#FFFFFF',
+    backgroundColor: color.surface,
   },
   glass: {
     position: 'absolute',
@@ -388,7 +393,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   fallback: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: color.surface,
   },
   border: {
     position: 'absolute',
@@ -398,7 +403,7 @@ const styles = StyleSheet.create({
     left: 0,
     borderRadius: radius['2xl'],
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: 'rgba(255,255,255,0.88)',
+    borderColor: color.lineGlass,
   },
   tabs: {
     minHeight: 64,
@@ -412,11 +417,7 @@ const styles = StyleSheet.create({
     bottom: 4,
     left: space[2] + space[1],
     borderRadius: radius.xl,
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#17203A',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.22,
-    shadowRadius: 9,
-    elevation: 4,
+    backgroundColor: color.surface,
+    ...shadow.selection,
   },
 });

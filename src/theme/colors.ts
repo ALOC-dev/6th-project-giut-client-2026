@@ -12,6 +12,7 @@ export const color = {
   textDisabled: '#B0B5BF',
 
   surface: '#FFFFFF',
+  surfaceGlass: 'rgba(255,255,255,0.82)',
   surfaceSunken: '#F5F6FA',
   surfaceMuted: '#F5F6F9',
   surfaceSubtle: '#F8F9FB',
@@ -19,6 +20,7 @@ export const color = {
 
   line: '#E3E5EA',
   lineSoft: '#EEF0F4',
+  lineGlass: 'rgba(255,255,255,0.88)',
 
   roleDev: '#2F5BFF',
   roleDevTint: '#EAF0FF',
