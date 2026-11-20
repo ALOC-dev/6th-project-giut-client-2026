@@ -1,0 +1,207 @@
+import { StyleSheet } from 'react-native';
+
+import { color, radius, space, text } from '@/theme';
+
+export const styles = StyleSheet.create({
+  sheet: {
+    height: '84%',
+  },
+  sheetContent: {
+    flex: 1,
+    marginTop: space[2],
+    borderTopWidth: 1,
+    borderTopColor: color.lineSoft,
+  },
+  reset: {
+    minWidth: 76,
+    minHeight: 44,
+    marginRight: -space[2],
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scroll: {
+    flex: 1,
+  },
+  body: {
+    paddingTop: space[4],
+    paddingBottom: space[2],
+  },
+  group: {
+    gap: space[3],
+  },
+  groupNext: {
+    marginTop: space[5],
+    paddingTop: space[5],
+    borderTopWidth: 1,
+    borderTopColor: color.lineSoft,
+  },
+  roleTiles: {
+    flexDirection: 'row',
+    gap: space[3],
+  },
+  roleTile: {
+    flex: 1,
+    minWidth: 0,
+    alignItems: 'center',
+    gap: space[2],
+  },
+  roleFigure: {
+    width: '100%',
+    aspectRatio: 1,
+    borderRadius: radius['2xl'],
+    borderWidth: 2.5,
+    borderColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  roleFigureSelected: {
+    borderColor: color.brand,
+  },
+  roleCheck: {
+    position: 'absolute',
+    top: space[2],
+    right: space[2],
+    width: 20,
+    height: 20,
+    borderRadius: radius.full,
+    backgroundColor: color.brand,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  roleAvatar: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+  },
+  gradeControl: {
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderColor: color.line,
+    borderRadius: radius.lg,
+    overflow: 'hidden',
+  },
+  gradeItem: {
+    flex: 1,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  gradeItemBorder: {
+    borderRightWidth: 1,
+    borderRightColor: color.line,
+  },
+  gradeItemSelected: {
+    backgroundColor: color.brand,
+  },
+  departmentSearch: {
+    height: 46,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space[2],
+    paddingHorizontal: space[4],
+    borderRadius: radius.lg,
+    backgroundColor: color.surfaceMuted,
+  },
+  departmentInput: {
+    flex: 1,
+    minWidth: 0,
+    padding: 0,
+    ...text.label,
+    color: color.ink,
+  },
+  departmentList: {
+    maxHeight: 220,
+    marginHorizontal: -space[2],
+  },
+  departmentRow: {
+    height: 48,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space[3],
+    paddingHorizontal: space[2],
+    borderRadius: radius.lg,
+  },
+  departmentLabel: {
+    flex: 1,
+    minWidth: 0,
+  },
+  squareCheck: {
+    width: 20,
+    height: 20,
+    borderRadius: radius.sm,
+    borderWidth: 1.5,
+    borderColor: color.textFaint,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  squareCheckSelected: {
+    borderColor: color.brand,
+    backgroundColor: color.brand,
+  },
+  noResult: {
+    paddingVertical: space[5],
+    textAlign: 'center',
+  },
+  statusList: {
+    gap: space[3],
+  },
+  statusRow: {
+    minHeight: 68,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space[4],
+    paddingVertical: space[3],
+    paddingHorizontal: space[4],
+    borderRadius: radius.xl,
+    borderWidth: 1.5,
+    borderColor: color.line,
+    backgroundColor: color.surface,
+  },
+  statusRowSelected: {
+    borderColor: color.brand,
+    backgroundColor: color.brandSoft,
+  },
+  statusFigure: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  statusText: {
+    flex: 1,
+    minWidth: 0,
+    gap: space[1],
+  },
+  statusDot: {
+    width: 12,
+    height: 12,
+    borderRadius: radius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  statusRing: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    borderRadius: radius.full,
+  },
+  roundCheck: {
+    width: 22,
+    height: 22,
+    borderRadius: radius.full,
+    borderWidth: 1.5,
+    borderColor: color.textFaint,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  roundCheckSelected: {
+    borderColor: color.brand,
+    backgroundColor: color.brand,
+  },
+});

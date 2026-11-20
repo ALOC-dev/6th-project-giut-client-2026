@@ -19,7 +19,7 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { scheduleOnRN } from 'react-native-worklets';
 
-import { color, radius, space, useMotion } from '@/theme';
+import { color, radius, space, useMotion, type TextVariant } from '@/theme';
 
 import { Text } from './Text';
 
@@ -28,6 +28,7 @@ export type BottomSheetProps = {
   onClose: () => void;
   children: React.ReactNode;
   title?: string;
+  titleVariant?: TextVariant;
   headerAction?: React.ReactNode;
   footer?: React.ReactNode;
   contentStyle?: StyleProp<ViewStyle>;
@@ -61,6 +62,7 @@ function BottomSheetContent({
   onExited,
   children,
   title,
+  titleVariant = 'titleMd',
   headerAction,
   footer,
   contentStyle,
@@ -173,7 +175,7 @@ function BottomSheetContent({
 
           {title || headerAction ? (
             <View style={styles.header}>
-              {title ? <Text variant="titleMd">{title}</Text> : <View />}
+              {title ? <Text variant={titleVariant}>{title}</Text> : <View />}
               {headerAction}
             </View>
           ) : null}

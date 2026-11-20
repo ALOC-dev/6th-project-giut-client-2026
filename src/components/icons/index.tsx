@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, {
   useAnimatedProps,
   useAnimatedStyle,
@@ -18,6 +18,49 @@ type IconProps = {
   size?: number;
   color?: string;
 };
+
+export function SearchIcon({ size = 18, color: iconColor = color.textMuted }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" accessible={false}>
+      <Circle cx={11} cy={11} r={6.5} stroke={iconColor} strokeWidth={2} />
+      <Path d="M16 16l4 4" stroke={iconColor} strokeWidth={2} strokeLinecap="round" />
+    </Svg>
+  );
+}
+
+export function PersonSilhouetteIcon({
+  color: iconColor = color.brand,
+  style,
+}: IconProps & { style?: StyleProp<ViewStyle> }) {
+  return (
+    <View pointerEvents="none" style={[personSilhouetteStyles.container, style]}>
+      <View style={[personSilhouetteStyles.head, { backgroundColor: iconColor }]} />
+      <View style={[personSilhouetteStyles.body, { backgroundColor: iconColor }]} />
+    </View>
+  );
+}
+
+const personSilhouetteStyles = StyleSheet.create({
+  container: {
+    overflow: 'hidden',
+  },
+  head: {
+    position: 'absolute',
+    top: '20%',
+    left: '31%',
+    width: '38%',
+    aspectRatio: 1,
+    borderRadius: 999,
+  },
+  body: {
+    position: 'absolute',
+    bottom: '-36%',
+    left: '14%',
+    width: '72%',
+    aspectRatio: 1,
+    borderRadius: 999,
+  },
+});
 
 export type AnimatedFilterIconProps = IconProps & {
   animationKey?: number;
