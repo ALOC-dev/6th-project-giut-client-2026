@@ -14,6 +14,10 @@ export const space = {
   8: 32,
 } as const;
 
+export const layout = {
+  bottomNavigationMinHeight: 64,
+} as const;
+
 export const radius = {
   xs: 4,
   sm: 6,

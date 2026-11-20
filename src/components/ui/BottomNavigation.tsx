@@ -26,7 +26,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
-import { color, radius, shadow, space, text as typography } from '@/theme';
+import { color, layout, radius, shadow, space, text as typography } from '@/theme';
 
 import { Press } from './Press';
 import { Text } from './Text';
@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
     borderColor: color.lineGlass,
   },
   tabs: {
-    minHeight: 64,
+    minHeight: layout.bottomNavigationMinHeight,
     paddingHorizontal: space[2],
     flexDirection: 'row',
     alignItems: 'stretch',

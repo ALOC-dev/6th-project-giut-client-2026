@@ -5,7 +5,7 @@ import { View, type LayoutChangeEvent } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomNavigation, type BottomNavigationItem } from '@/components/ui';
-import { color, space } from '@/theme';
+import { color, layout, space } from '@/theme';
 
 type TabKey = 'home' | 'team' | 'giuthub' | 'chat' | 'my';
 
@@ -51,8 +51,10 @@ const TAB_PATHS: Record<TabKey, Href> = {
 export default function TabsLayout() {
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
-  const [bottomNavigationHeight, setBottomNavigationHeight] = useState(0);
   const bottomNavigationOffset = Math.max(insets.bottom - space[4], 0);
+  const [bottomNavigationHeight, setBottomNavigationHeight] = useState(
+    layout.bottomNavigationMinHeight + bottomNavigationOffset,
+  );
 
   const handleBottomNavigationLayout = (event: LayoutChangeEvent) => {
     setBottomNavigationHeight(event.nativeEvent.layout.height);
