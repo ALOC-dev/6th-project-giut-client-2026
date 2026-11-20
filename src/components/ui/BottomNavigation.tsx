@@ -26,7 +26,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
-import { color, radius, shadow, space } from '@/theme';
+import { color, radius, shadow, space, text as typography } from '@/theme';
 
 import { Press } from './Press';
 import { Text } from './Text';
@@ -155,7 +155,9 @@ function BottomNavigationTab({ item, selected, onPress }: BottomNavigationTabPro
         variant="badge"
         color={selected ? 'brand' : 'textMuted'}
         maxFontSizeMultiplier={1.5}
-        style={{ fontWeight: selected ? '800' : '700' }}
+        style={{
+          fontWeight: selected ? typography.badge.fontWeight : typography.meta.fontWeight,
+        }}
       >
         {item.label}
       </Text>

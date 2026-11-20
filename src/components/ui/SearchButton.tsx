@@ -9,7 +9,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Circle, Path } from 'react-native-svg';
 
-import { color, useMotion } from '@/theme';
+import { color, radius, useMotion } from '@/theme';
 
 import { Press } from './Press';
 
@@ -109,7 +109,7 @@ export function SearchButton({ onPress, size = 24, tint = color.ink, style }: Se
               top: size * 0.29,
               width: size * 0.21,
               height: 2,
-              borderRadius: 2,
+              borderRadius: radius.full,
               backgroundColor: color.brand,
             },
             glintStyle,
