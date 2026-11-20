@@ -1,5 +1,5 @@
 import { View, ActivityIndicator, type StyleProp, type ViewStyle } from 'react-native';
-import { color, radius } from '@/theme';
+import { color, radius, space } from '@/theme';
 import { Press } from './Press';
 import { Text } from './Text';
 
@@ -53,7 +53,7 @@ export function Button({
   const look = {
     primary: {
       bg: color.brand,
-      fg: '#FFFFFF',
+      fg: color.surface,
       height: 56,
       corner: radius.xl,
       variant: 'button' as const,
@@ -67,7 +67,7 @@ export function Button({
     },
     danger: {
       bg: color.dangerStrong,
-      fg: '#FFFFFF',
+      fg: color.surface,
       height: 52,
       corner: radius.md,
       variant: 'label' as const,
@@ -90,8 +90,8 @@ export function Button({
           alignItems: 'center',
           justifyContent: 'center',
           flexDirection: 'row',
-          gap: 6,
-          paddingHorizontal: 20,
+          gap: space[1.5],
+          paddingHorizontal: space[5],
           alignSelf: full ? 'stretch' : 'flex-start',
         },
         style,
