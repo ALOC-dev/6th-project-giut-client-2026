@@ -3,7 +3,7 @@ import { SymbolView, type AndroidSymbol, type SFSymbol } from 'expo-symbols';
 import bold from 'expo-symbols/androidWeights/bold';
 import semiBold from 'expo-symbols/androidWeights/semiBold';
 import { CirclesThreeIcon } from 'phosphor-react-native/src/icons/CirclesThree';
-import { createContext, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Image,
   Platform,
@@ -26,7 +26,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
-import { color, radius, shadow, space, text as typography } from '@/theme';
+import { color, layout, radius, shadow, space, text as typography } from '@/theme';
 
 import { Press } from './Press';
 import { Text } from './Text';
@@ -63,8 +63,6 @@ export type BottomNavigationProps = {
   onChange: (key: string) => void;
   style?: StyleProp<ViewStyle>;
 };
-
-export const BottomNavigationHeightContext = createContext(0);
 
 type BottomNavigationTabProps = {
   item: BottomNavigationItem;
@@ -408,7 +406,7 @@ const styles = StyleSheet.create({
     borderColor: color.lineGlass,
   },
   tabs: {
-    minHeight: 64,
+    minHeight: layout.bottomNavigationMinHeight,
     paddingHorizontal: space[2],
     flexDirection: 'row',
     alignItems: 'stretch',

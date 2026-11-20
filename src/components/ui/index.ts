@@ -12,7 +12,6 @@ export { SearchButton, type SearchButtonProps } from './SearchButton';
 export { RangeCalendar, type RangeCalendarProps } from './RangeCalendar';
 export {
   BottomNavigation,
-  BottomNavigationHeightContext,
   type BottomNavigationIcon,
   type BottomNavigationItem,
   type BottomNavigationProps,

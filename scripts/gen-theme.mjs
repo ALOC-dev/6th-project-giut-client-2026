@@ -100,6 +100,9 @@ export type TextVariant = keyof typeof text;
 const spaceBody = tokens.spacing.tokens
   .map((t) => `  ${t.name.replace('space-', '')}: ${px(first(t.value))},`)
   .join('\n');
+const layoutBody = tokens.layout.tokens
+  .map((t) => `  ${camel(t.name)}: ${px(first(t.value))},`)
+  .join('\n');
 const radiusBody = tokens.radius.tokens
   .map((t) => {
     const k = t.name.replace('radius-', '');
@@ -112,6 +115,10 @@ writeFileSync(
   resolve(out, 'layout.ts'),
   `${HEADER}export const space = {
 ${spaceBody}
+} as const;
+
+export const layout = {
+${layoutBody}
 } as const;
 
 export const radius = {
@@ -181,5 +188,5 @@ for (const f of ['colors.ts', 'typography.ts', 'layout.ts', 'shadows.ts']) {
   console.log(`  src/theme/${f.padEnd(16)} ${n(f)}줄`);
 }
 console.log(
-  `  색 ${flat.length} · 글자 ${styles.length} · 간격 ${tokens.spacing.tokens.length} · 모서리 ${tokens.radius.tokens.length} · 그림자 ${tokens.shadow.tokens.length}`,
+  `  색 ${flat.length} · 글자 ${styles.length} · 간격 ${tokens.spacing.tokens.length} · 레이아웃 ${tokens.layout.tokens.length} · 모서리 ${tokens.radius.tokens.length} · 그림자 ${tokens.shadow.tokens.length}`,
 );
