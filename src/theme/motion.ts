@@ -47,7 +47,7 @@ export const press = {
 } as const;
 
 export const enter = {
-  fadeUp: (index = 0, step = stagger.card) =>
+  fadeUp: (index = 0, step: number = stagger.card) =>
     new Keyframe({
       0: { opacity: 0, transform: [{ translateY: 10 }] },
       100: { opacity: 1, transform: [{ translateY: 0 }], easing: easing.out },
@@ -55,7 +55,7 @@ export const enter = {
       .duration(duration.d4)
       .delay(delayOf(index, step)),
 
-  fade: (index = 0, step = stagger.tight) =>
+  fade: (index = 0, step: number = stagger.tight) =>
     new Keyframe({
       0: { opacity: 0 },
       100: { opacity: 1, easing: easing.out },
