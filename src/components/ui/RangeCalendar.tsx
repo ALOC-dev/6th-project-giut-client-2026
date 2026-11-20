@@ -164,7 +164,7 @@ export function RangeCalendar({ from, to, onChange }: RangeCalendarProps) {
                     styles.dayText,
                     isSelected && {
                       color: color.surface,
-                      fontFamily: 'Pretendard-ExtraBold',
+                      fontWeight: text.badge.fontWeight,
                     },
                   ]}
                 >
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: space[1],
-    paddingBottom: 18,
+    paddingBottom: space[4.5],
   },
   navigationButton: {
     minWidth: 44,
@@ -219,5 +219,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   circleSelected: { backgroundColor: color.brand },
-  dayText: { ...text.caption, fontFamily: 'Pretendard-Medium', color: color.ink },
+  dayText: { ...text.caption, color: color.ink },
 });

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import { color, radius, useMotion } from '@/theme';
+import { color, radius, space, useMotion } from '@/theme';
 import { Text } from './Text';
 
 export type ToastProps = {
@@ -53,10 +53,10 @@ export function Toast({ message, visible, bottom = 108 }: ToastProps) {
       <Text
         variant="caption"
         style={{
-          color: '#FFFFFF',
+          color: color.surface,
           backgroundColor: color.surfaceInverse,
-          paddingVertical: 10,
-          paddingHorizontal: 16,
+          paddingVertical: space[2.5],
+          paddingHorizontal: space[4],
           borderRadius: radius.full,
           overflow: 'hidden',
         }}
