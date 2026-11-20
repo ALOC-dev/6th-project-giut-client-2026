@@ -9,8 +9,9 @@ import {
   type NativeSyntheticEvent,
   type ScrollViewInstance,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { openBrowserAsync } from 'expo-web-browser';
 
+import { ContestBottomCTA } from '@/components/contest/ContestBottomCTA';
 import { ContestDescription } from '@/components/contest/ContestDescription';
 import {
   ContestDetailPanel,
@@ -29,7 +30,6 @@ type DetailTab = 'detail' | 'teams';
 
 export default function ContestDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const insets = useSafeAreaInsets();
   const [tab, setTab] = useState<DetailTab>('detail');
 
   const scrollRef = useRef<ScrollViewInstance>(null);
@@ -99,7 +99,7 @@ export default function ContestDetailScreen() {
 
       <ScrollView
         ref={scrollRef}
-        contentContainerStyle={[S.content, { paddingBottom: insets.bottom + space[8] }]}
+        contentContainerStyle={S.content}
         stickyHeaderIndices={isTeamable ? [1] : undefined}
         onScroll={isTeamable ? handleScroll : undefined}
         scrollEventThrottle={16}
@@ -151,6 +151,16 @@ export default function ContestDetailScreen() {
           </ContestDetailPanel>
         )}
       </ScrollView>
+
+      {isTeamable ? (
+        // TODO: 팀 구성하기 화면이 생기면 이동 연결
+        <ContestBottomCTA label="팀 구성하기" onPress={() => {}} />
+      ) : (
+        <ContestBottomCTA
+          label="원문에서 신청하기 ↗"
+          onPress={() => openBrowserAsync(contest.sourceUrl)}
+        />
+      )}
     </View>
   );
 }
@@ -162,6 +172,7 @@ const S = StyleSheet.create({
   },
   content: {
     paddingTop: space[2],
+    paddingBottom: space[8], // 하단 버튼이 따로 있어서 기기 아래 여백은 버튼 쪽에서 챙겨요
   },
   notFound: {
     flex: 1,
