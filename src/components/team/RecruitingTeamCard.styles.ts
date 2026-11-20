@@ -41,6 +41,9 @@ export const S = StyleSheet.create({
     paddingVertical: 3,
     borderRadius: radius.sm,
   },
+  closedChip: {
+    backgroundColor: color.surfaceMuted,
+  },
   roleText: {
     fontWeight: '700',
   },
@@ -72,6 +75,9 @@ export const S = StyleSheet.create({
     borderRadius: radius.md,
     borderCurve: 'continuous',
     backgroundColor: color.brand,
+  },
+  applyButtonClosed: {
+    backgroundColor: color.surfaceMuted,
   },
   applyText: {
     fontWeight: '800',

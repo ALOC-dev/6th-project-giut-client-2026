@@ -33,7 +33,7 @@ export function RecruitingTeamList({ teams }: RecruitingTeamListProps) {
       <View style={S.empty}>
         <Text variant="bodyStrong">아직 모집 중인 팀이 없어요</Text>
         <Text variant="caption" color="textMuted">
-          첫 번째로 팀을 만들어보세요
+          팀 구성하기를 눌러 팀을 만들어 보세요
         </Text>
       </View>
     );

@@ -5,6 +5,7 @@ import { Press, Text } from '@/components/ui';
 import { ROLE_LABEL } from '@/constants/team';
 import { color, role } from '@/theme';
 import type { Team } from '@/types/team';
+import { isTeamClosed } from '@/utils/team';
 
 import { NOTCH_RADIUS, RIGHT_WIDTH, S } from './RecruitingTeamCard.styles';
 import { TeamMemberRing } from './TeamMemberRing';
@@ -34,6 +35,8 @@ export function RecruitingTeamCard({
   onPressBookmark,
   onPressApply,
 }: RecruitingTeamCardProps) {
+  const closed = isTeamClosed(team);
+
   return (
     <Press onPress={onPress} scaleOnPress={false} style={S.card}>
       <TicketBackground notchFromRight={RIGHT_WIDTH + 0.5} notchRadius={NOTCH_RADIUS} />
@@ -67,13 +70,22 @@ export function RecruitingTeamCard({
         </View>
 
         <View style={S.roles}>
-          {team.recruitingRoles.map(({ role: key, count }) => (
-            <View key={key} style={[S.roleChip, { backgroundColor: role[key].tint }]}>
-              <Text variant="badge" color={role[key].text} style={S.roleText}>
-                {ROLE_LABEL[key]} {count}명
+          {closed ? (
+            // 마감된 팀은 역할 대신 회색 '모집 완료'
+            <View style={[S.roleChip, S.closedChip]}>
+              <Text variant="badge" color="textFaint" style={S.roleText}>
+                모집 완료
               </Text>
             </View>
-          ))}
+          ) : (
+            team.recruitingRoles.map(({ role: key, count }) => (
+              <View key={key} style={[S.roleChip, { backgroundColor: role[key].tint }]}>
+                <Text variant="badge" color={role[key].text} style={S.roleText}>
+                  {ROLE_LABEL[key]} {count}명
+                </Text>
+              </View>
+            ))
+          )}
         </View>
       </View>
 
@@ -87,9 +99,15 @@ export function RecruitingTeamCard({
       {/* 오른쪽 */}
       <View style={S.right}>
         <TeamMemberRing members={team.members} capacity={team.capacity} />
-        <Press onPress={onPressApply} accessibilityRole="button" style={S.applyButton}>
-          <Text variant="caption" color={color.surface} style={S.applyText}>
-            지원하기
+        <Press
+          onPress={onPressApply}
+          disabled={closed}
+          accessibilityRole="button"
+          accessibilityState={{ disabled: closed }}
+          style={[S.applyButton, closed && S.applyButtonClosed]}
+        >
+          <Text variant="caption" color={closed ? 'textFaint' : color.surface} style={S.applyText}>
+            {closed ? '마감' : '지원하기'}
           </Text>
         </Press>
       </View>
