@@ -8,6 +8,9 @@ import { getDday } from '@/utils/date';
 import { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
+
+import { Button, Text } from '@/components/ui';
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();

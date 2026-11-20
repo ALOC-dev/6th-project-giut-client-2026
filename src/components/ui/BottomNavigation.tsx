@@ -26,7 +26,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
-import { color, radius, shadow, space } from '@/theme';
+import { color, layout, radius, shadow, space, text as typography } from '@/theme';
 
 import { Press } from './Press';
 import { Text } from './Text';
@@ -153,7 +153,9 @@ function BottomNavigationTab({ item, selected, onPress }: BottomNavigationTabPro
         variant="badge"
         color={selected ? 'brand' : 'textMuted'}
         maxFontSizeMultiplier={1.5}
-        style={{ fontWeight: selected ? '800' : '700' }}
+        style={{
+          fontWeight: selected ? typography.badge.fontWeight : typography.meta.fontWeight,
+        }}
       >
         {item.label}
       </Text>
@@ -308,7 +310,10 @@ export function BottomNavigation({ items, value, onChange, style }: BottomNaviga
   );
 
   const handleTabPress = (item: BottomNavigationItem, index: number) => {
-    if (item.key === lastRequestedValue.current) return;
+    if (item.key === lastRequestedValue.current) {
+      onChange(item.key);
+      return;
+    }
 
     const target = index * cellWidth;
     lastRequestedValue.current = item.key;
@@ -340,7 +345,7 @@ export function BottomNavigation({ items, value, onChange, style }: BottomNaviga
         <GlassView
           colorScheme="light"
           glassEffectStyle="regular"
-          tintColor="rgba(255,255,255,0.82)"
+          tintColor={color.surfaceGlass}
           style={styles.glass}
         />
       ) : (
@@ -376,7 +381,7 @@ const styles = StyleSheet.create({
   shell: {
     marginHorizontal: space[3],
     borderRadius: radius['2xl'],
-    backgroundColor: '#FFFFFF',
+    backgroundColor: color.surface,
   },
   glass: {
     position: 'absolute',
@@ -388,7 +393,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   fallback: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: color.surface,
   },
   border: {
     position: 'absolute',
@@ -398,10 +403,10 @@ const styles = StyleSheet.create({
     left: 0,
     borderRadius: radius['2xl'],
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: 'rgba(255,255,255,0.88)',
+    borderColor: color.lineGlass,
   },
   tabs: {
-    minHeight: 64,
+    minHeight: layout.bottomNavigationMinHeight,
     paddingHorizontal: space[2],
     flexDirection: 'row',
     alignItems: 'stretch',
@@ -412,11 +417,7 @@ const styles = StyleSheet.create({
     bottom: 4,
     left: space[2] + space[1],
     borderRadius: radius.xl,
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#17203A',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.22,
-    shadowRadius: 9,
-    elevation: 4,
+    backgroundColor: color.surface,
+    ...shadow.selection,
   },
 });

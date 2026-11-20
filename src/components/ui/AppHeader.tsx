@@ -43,14 +43,9 @@ export function AppHeader({
         accessibilityRole={onPressLogo ? 'button' : undefined}
         accessibilityLabel="홈으로 이동"
         scaleOnPress={!!onPressLogo}
-        style={{ minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 6 }}
+        style={{ minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: space[1.5] }}
       >
-        <Text
-          variant="titleXl"
-          color="brand"
-          maxFontSizeMultiplier={1.5}
-          style={{ fontSize: 28, lineHeight: 34, letterSpacing: -0.8 }}
-        >
+        <Text variant="displayNumber" color="brand" maxFontSizeMultiplier={1.5}>
           기웃
         </Text>
         <Image
@@ -61,7 +56,7 @@ export function AppHeader({
         />
       </Press>
 
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[0.5] }}>
         <BellButton unread={hasUnreadNotification} onPress={onPressNotification} />
         <SearchButton onPress={onPressSearch} />
       </View>
