@@ -9,6 +9,7 @@ mkdirSync(out, { recursive: true });
 
 const tokens = JSON.parse(readFileSync(resolve(root, 'tokens.json'), 'utf8'));
 const BANNER = '';
+const HEADER = BANNER ? `${BANNER}\n` : '';
 
 const camel = (s) => s.replace(/-([a-z0-9])/g, (_, c) => c.toUpperCase());
 const px = (v) => (typeof v === 'string' ? parseFloat(v) : v);
@@ -58,8 +59,7 @@ const roleBody = Object.entries(roles)
 
 writeFileSync(
   resolve(out, 'colors.ts'),
-  `${BANNER}
-export const color = {
+  `${HEADER}export const color = {
 ${colorBody}
 } as const;
 
@@ -87,8 +87,7 @@ const typeBody = styles
 
 writeFileSync(
   resolve(out, 'typography.ts'),
-  `${BANNER}
-import type { TextStyle } from 'react-native';
+  `${HEADER}import type { TextStyle } from 'react-native';
 
 export const text = {
 ${typeBody}
@@ -111,8 +110,7 @@ const radiusBody = tokens.radius.tokens
 
 writeFileSync(
   resolve(out, 'layout.ts'),
-  `${BANNER}
-export const space = {
+  `${HEADER}export const space = {
 ${spaceBody}
 } as const;
 
@@ -163,8 +161,7 @@ const compatBody = shadows
 
 writeFileSync(
   resolve(out, 'shadows.ts'),
-  `${BANNER}
-import type { ViewStyle } from 'react-native';
+  `${HEADER}import type { ViewStyle } from 'react-native';
 
 export const shadow = {
 ${shadowBody}

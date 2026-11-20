@@ -10,7 +10,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Circle, Path } from 'react-native-svg';
 
-import { color, useMotion } from '@/theme';
+import { color, radius, useMotion } from '@/theme';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -210,7 +210,7 @@ const animatedBookmarkStyles = StyleSheet.create({
     position: 'absolute',
     width: 26,
     height: 26,
-    borderRadius: 13,
+    borderRadius: radius.full,
     borderColor: color.brand,
     opacity: 0,
   },
@@ -218,7 +218,7 @@ const animatedBookmarkStyles = StyleSheet.create({
     position: 'absolute',
     width: 5,
     height: 5,
-    borderRadius: 2.5,
+    borderRadius: radius.full,
     backgroundColor: color.brand,
     opacity: 0,
   },
