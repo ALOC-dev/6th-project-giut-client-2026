@@ -25,3 +25,13 @@ export function formatShortDate(value: string) {
   const day = date.getDate();
   return `${month}.${day} (${WEEKDAYS[date.getDay()]})`;
 }
+
+export function formatPeriod(startDate: string, endDate: string) {
+  const start = parseDate(startDate);
+  const end = parseDate(endDate);
+  const pad = (n: number) => String(n).padStart(2, '0');
+
+  const startText = `${start.getFullYear()}.${pad(start.getMonth() + 1)}.${pad(start.getDate())}`;
+  const endText = `${pad(end.getMonth() + 1)}.${pad(end.getDate())}`;
+  return `${startText} ~ ${endText}`;
+}
