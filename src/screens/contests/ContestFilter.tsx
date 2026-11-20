@@ -66,7 +66,7 @@ export function ContestFilterSheet({ open, value, onClose, onApply }: ContestFil
   };
 
   const reset = () => {
-    setDraft({ ...draft, categories: [], from: null, to: null });
+    setDraft((current) => ({ ...current, categories: [], from: null, to: null }));
     toast.show('필터가 초기화되었어요.');
   };
 
@@ -152,8 +152,8 @@ const styles = StyleSheet.create({
   badge: {
     minWidth: 16,
     height: 16,
-    borderRadius: 8,
-    paddingHorizontal: 4,
+    borderRadius: radius.full,
+    paddingHorizontal: space[1],
     backgroundColor: color.brand,
     alignItems: 'center',
     justifyContent: 'center',
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     maxHeight: '84%',
   },
   content: { paddingHorizontal: space[5] },
-  resetButton: { paddingVertical: space[1] },
+  resetButton: { minHeight: 48, justifyContent: 'center' },
   scrollBody: { gap: space[4], paddingBottom: space[2] },
   sectionHeader: { gap: space[1] },
   timeSectionHeader: { marginTop: space[2] },
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   selection: {
     width: 22,
     height: 22,
-    borderRadius: 11,
+    borderRadius: radius.full,
     borderWidth: 1.5,
     borderColor: color.line,
     alignItems: 'center',

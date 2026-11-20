@@ -47,6 +47,10 @@ const EMPTY_PATH_X = [0, -34, -20, 4, 0];
 const EMPTY_PATH_Y = [0, 8, 34, 22, 0];
 const NOOP_CONTEST = (_contest: Contest) => undefined;
 
+function ContestSeparator() {
+  return <View style={screenStyles.sepLine} />;
+}
+
 function EmptyContests({ title }: { title: string }) {
   const { reduced } = useMotion(); // 동작 줄이기 설정 시 애니메이션 중지
   const [progress] = useState(() => new RNAnimated.Value(0));
@@ -198,6 +202,7 @@ export function ContestListScreen({
       <View style={screenStyles.tabsWrap}>
         <ScrollView
           horizontal
+          accessibilityRole="tablist"
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={screenStyles.tabs}
         >
@@ -206,6 +211,7 @@ export function ContestListScreen({
             return (
               <Pressable
                 key={t ?? 'all'}
+                hitSlop={{ left: 8, right: 8 }}
                 accessibilityRole="tab"
                 accessibilityState={{ selected: on }}
                 style={[screenStyles.tab, on && screenStyles.tabOn]}
@@ -253,7 +259,7 @@ export function ContestListScreen({
             </View>
           </View>
         }
-        ItemSeparatorComponent={() => <View style={screenStyles.sepLine} />}
+        ItemSeparatorComponent={ContestSeparator}
         renderItem={renderContest}
         ListEmptyComponent={
           <EmptyContests
