@@ -1,12 +1,72 @@
-import { memo } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { memo, useEffect, useState, type ReactNode } from 'react';
+import { Animated, Easing, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 
 import { Press, Text } from '@/components/ui';
-import { color, radius, space } from '@/theme';
+import { color, radius, space, useMotion } from '@/theme';
 
-import { ROLE_COLOR } from './constants';
-import type { Person } from './types';
+import { ROLE_COLOR, type Person } from './types';
+
+const ENTER_DURATION = 460;
+const ROW_STAGGER_INTERVAL = 110;
+const COLUMN_STAGGER_INTERVAL = 28;
+const COLUMN_COUNT = 2;
+const MAX_STAGGER_ROWS = 4;
+
+type CardEnterProps = {
+  index: number;
+  generation?: number;
+  children: ReactNode;
+};
+
+export function CardEnter({ index, generation = 0, children }: CardEnterProps) {
+  const { reduced } = useMotion();
+  const [progress] = useState(() => new Animated.Value(reduced ? 1 : 0));
+
+  useEffect(() => {
+    if (reduced) {
+      progress.setValue(1);
+      return;
+    }
+
+    progress.setValue(0);
+    const rowIndex = Math.floor(index / COLUMN_COUNT);
+    const columnIndex = index % COLUMN_COUNT;
+    const animation = Animated.timing(progress, {
+      toValue: 1,
+      duration: ENTER_DURATION,
+      delay:
+        Math.min(rowIndex, MAX_STAGGER_ROWS - 1) * ROW_STAGGER_INTERVAL +
+        columnIndex * COLUMN_STAGGER_INTERVAL,
+      easing: Easing.bezier(0.22, 1, 0.36, 1),
+      useNativeDriver: true,
+    });
+
+    animation.start();
+    return () => animation.stop();
+  }, [generation, index, progress, reduced]);
+
+  return (
+    <Animated.View
+      style={[
+        styles.enter,
+        {
+          opacity: progress,
+          transform: [
+            {
+              translateY: progress.interpolate({
+                inputRange: [0, 1],
+                outputRange: [22, 0],
+              }),
+            },
+          ],
+        },
+      ]}
+    >
+      {children}
+    </Animated.View>
+  );
+}
 
 type PersonCardProps = {
   person: Person;
@@ -61,6 +121,10 @@ function PersonCardBase({ person, onPress }: PersonCardProps) {
 export const PersonCard = memo(PersonCardBase);
 
 const styles = StyleSheet.create({
+  enter: {
+    width: '48%',
+    minWidth: 0,
+  },
   card: {
     width: '100%',
     minWidth: 0,
@@ -76,9 +140,9 @@ const styles = StyleSheet.create({
   nameRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    gap: 5,
+    gap: space[1],
     marginTop: space[3],
-    paddingBottom: 7,
+    paddingBottom: space[2],
     borderBottomWidth: 1.5,
     borderBottomColor: color.textFaint,
   },
@@ -92,12 +156,9 @@ const styles = StyleSheet.create({
   },
   bio: {
     minHeight: 36,
-    marginTop: 7,
-    lineHeight: 18,
-    fontFamily: 'Pretendard-Medium',
+    marginTop: space[2],
   },
   tags: {
     marginTop: space[1],
-    fontFamily: 'Pretendard-SemiBold',
   },
 });

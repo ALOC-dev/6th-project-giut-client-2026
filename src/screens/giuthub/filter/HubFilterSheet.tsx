@@ -1,12 +1,27 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { Animated, Easing, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
-import Svg, { Circle, Path } from 'react-native-svg';
+import { Animated, Easing, Pressable, ScrollView, TextInput, View } from 'react-native';
 
+import { CheckIcon, PersonSilhouetteIcon, SearchIcon } from '@/components/icons';
 import { BottomSheet, Button, Text } from '@/components/ui';
-import { color, radius, space, useMotion } from '@/theme';
+import { color, space, useMotion } from '@/theme';
 
-import { ROLE_COLOR, STATUS_DESCRIPTION } from './constants';
-import { EMPTY_HUB_FILTER, GRADES, ROLES, STATUSES, type HubFilter, type Status } from './types';
+import { styles } from './HubFilterSheet.styles';
+
+import {
+  EMPTY_HUB_FILTER,
+  GRADES,
+  ROLES,
+  ROLE_COLOR,
+  STATUSES,
+  type HubFilter,
+  type Status,
+} from '../types';
+
+const STATUS_DESCRIPTION: Record<Status, string> = {
+  '팀 찾는 중': '지금 함께할 팀을 찾고 있어요',
+  '둘러보는 중': '좋은 제안이 오면 생각해볼게요',
+  '팀 있음': '이미 팀에 속해 있어요',
+};
 
 const STATUS_TONE: Record<Status, { dot: string; tint: string }> = {
   '팀 찾는 중': { dot: color.rolePlan, tint: color.rolePlanTint },
@@ -88,7 +103,7 @@ export function HubFilterSheet({
         <Button
           label="적용하기"
           onPress={() => {
-            onApply(draft);
+            onApply({ ...draft, query: value.query });
             setDepartmentQuery('');
             onClose();
           }}
@@ -126,8 +141,7 @@ export function HubFilterSheet({
                       selected && styles.roleFigureSelected,
                     ]}
                   >
-                    <View style={[styles.roleAvatarHead, { backgroundColor: roleColor.main }]} />
-                    <View style={[styles.roleAvatarBody, { backgroundColor: roleColor.main }]} />
+                    <PersonSilhouetteIcon color={roleColor.main} style={styles.roleAvatar} />
                     {selected ? (
                       <View style={styles.roleCheck}>
                         <CheckIcon size={11} />
@@ -176,10 +190,7 @@ export function HubFilterSheet({
 
         <FilterGroup title="학과">
           <View style={styles.departmentSearch}>
-            <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" accessible={false}>
-              <Circle cx={11} cy={11} r={6.5} stroke={color.textMuted} strokeWidth={2} />
-              <Path d="M16 16l4 4" stroke={color.textMuted} strokeWidth={2} strokeLinecap="round" />
-            </Svg>
+            <SearchIcon />
             <TextInput
               value={departmentQuery}
               onChangeText={setDepartmentQuery}
@@ -333,232 +344,3 @@ function StatusDot({ tone, pulsing }: { tone: string; pulsing: boolean }) {
     </View>
   );
 }
-
-function CheckIcon({ size }: { size: number }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 16 16" fill="none" accessible={false}>
-      <Path
-        d="M3.5 8.5l3 3 6-7"
-        stroke={color.surface}
-        strokeWidth={2.4}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </Svg>
-  );
-}
-
-const styles = StyleSheet.create({
-  sheet: {
-    height: '84%',
-  },
-  sheetContent: {
-    flex: 1,
-    marginTop: space[2],
-    borderTopWidth: 1,
-    borderTopColor: color.lineSoft,
-  },
-  reset: {
-    minWidth: 76,
-    minHeight: 44,
-    marginRight: -space[2],
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scroll: {
-    flex: 1,
-  },
-  body: {
-    paddingTop: space[4],
-    paddingBottom: space[2],
-  },
-  group: {
-    gap: 10,
-  },
-  groupNext: {
-    marginTop: 18,
-    paddingTop: 18,
-    borderTopWidth: 1,
-    borderTopColor: color.lineSoft,
-  },
-  roleTiles: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  roleTile: {
-    flex: 1,
-    minWidth: 0,
-    alignItems: 'center',
-    gap: 6,
-  },
-  roleFigure: {
-    width: '100%',
-    aspectRatio: 1,
-    borderRadius: radius['2xl'],
-    borderWidth: 2.5,
-    borderColor: 'transparent',
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
-  roleFigureSelected: {
-    borderColor: color.brand,
-  },
-  roleCheck: {
-    position: 'absolute',
-    top: 6,
-    right: 6,
-    width: 20,
-    height: 20,
-    borderRadius: radius.full,
-    backgroundColor: color.brand,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  roleAvatarHead: {
-    position: 'absolute',
-    top: '20%',
-    left: '31%',
-    width: '38%',
-    aspectRatio: 1,
-    borderRadius: radius.full,
-  },
-  roleAvatarBody: {
-    position: 'absolute',
-    bottom: '-36%',
-    left: '14%',
-    width: '72%',
-    aspectRatio: 1,
-    borderRadius: radius.full,
-  },
-  gradeControl: {
-    flexDirection: 'row',
-    borderWidth: 1,
-    borderColor: color.line,
-    borderRadius: radius.lg,
-    overflow: 'hidden',
-  },
-  gradeItem: {
-    flex: 1,
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  gradeItemBorder: {
-    borderRightWidth: 1,
-    borderRightColor: color.line,
-  },
-  gradeItemSelected: {
-    backgroundColor: color.brand,
-  },
-  departmentSearch: {
-    height: 46,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space[2],
-    paddingHorizontal: space[4],
-    borderRadius: radius.lg,
-    backgroundColor: color.surfaceMuted,
-  },
-  departmentInput: {
-    flex: 1,
-    minWidth: 0,
-    padding: 0,
-    fontFamily: 'Pretendard-Medium',
-    fontSize: 15,
-    color: color.ink,
-  },
-  departmentList: {
-    maxHeight: 220,
-    marginHorizontal: -6,
-  },
-  departmentRow: {
-    height: 48,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space[3],
-    paddingHorizontal: 6,
-    borderRadius: radius.lg,
-  },
-  departmentLabel: {
-    flex: 1,
-    minWidth: 0,
-    fontFamily: 'Pretendard-SemiBold',
-  },
-  squareCheck: {
-    width: 20,
-    height: 20,
-    borderRadius: radius.sm,
-    borderWidth: 1.5,
-    borderColor: color.textFaint,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  squareCheckSelected: {
-    borderColor: color.brand,
-    backgroundColor: color.brand,
-  },
-  noResult: {
-    paddingVertical: space[5],
-    textAlign: 'center',
-  },
-  statusList: {
-    gap: 10,
-  },
-  statusRow: {
-    minHeight: 68,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-    paddingVertical: space[3],
-    paddingHorizontal: 14,
-    borderRadius: radius.xl,
-    borderWidth: 1.5,
-    borderColor: color.line,
-    backgroundColor: color.surface,
-  },
-  statusRowSelected: {
-    borderColor: color.brand,
-    backgroundColor: color.brandSoft,
-  },
-  statusFigure: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  statusText: {
-    flex: 1,
-    minWidth: 0,
-    gap: 3,
-  },
-  statusDot: {
-    width: 12,
-    height: 12,
-    borderRadius: radius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  statusRing: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    borderRadius: radius.full,
-  },
-  roundCheck: {
-    width: 22,
-    height: 22,
-    borderRadius: radius.full,
-    borderWidth: 1.5,
-    borderColor: color.textFaint,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  roundCheckSelected: {
-    borderColor: color.brand,
-    backgroundColor: color.brand,
-  },
-});

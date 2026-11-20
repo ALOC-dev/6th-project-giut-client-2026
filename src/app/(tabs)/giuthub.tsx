@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 
-import { HubScreen, MOCK_PEOPLE } from '@/screens/hub';
+import { HubScreen, MOCK_PEOPLE } from '@/screens/giuthub';
 
 export default function GiutHubScreen() {
   const [initialLoading, setInitialLoading] = useState(true);

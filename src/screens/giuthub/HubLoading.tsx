@@ -3,9 +3,7 @@ import { Animated, Easing, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 
 import { Text } from '@/components/ui';
-import { color, useMotion } from '@/theme';
-
-import { LOADING_CAPTIONS } from './constants';
+import { color, radius, space, useMotion } from '@/theme';
 
 const LOOP_DURATION = 2600;
 const TYPE_INTERVAL = 55;
@@ -15,6 +13,11 @@ const VIEWBOX_HEIGHT = 84;
 const LEFT_ARM_PATH = 'M18 70 C18 46 30 38 40 48 Q45 53.5 50 54';
 const RIGHT_ARM_PATH = 'M82 70 C82 46 70 38 60 48 Q55 53.5 50 54';
 const SPARK_PATH = 'M50 36V28M39 39l-4.5-4.5M61 39l4.5-4.5';
+const LOADING_CAPTIONS = [
+  '함께할 사람들을 찾고 있어요',
+  '관심 분야가 맞는 사람을 고르는 중',
+  '프로필을 정리하고 있어요',
+];
 
 const ARM_X_INPUT = [
   0, 0.06, 0.105, 0.15, 0.195, 0.24, 0.33, 0.42, 0.51, 0.6, 0.69, 0.82, 0.85, 0.88, 0.91, 0.94, 1,
@@ -195,7 +198,7 @@ export function Handshake({
         <Svg width={size} height={height} viewBox={`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}>
           <Path
             d={SPARK_PATH}
-            stroke="#4C8DFF"
+            stroke={color.brandGradientStart}
             strokeWidth={3.2}
             strokeLinecap="round"
             fill="none"
@@ -270,7 +273,7 @@ function Gradient() {
         y2="80"
         gradientUnits="userSpaceOnUse"
       >
-        <Stop offset="0" stopColor="#4C8DFF" />
+        <Stop offset="0" stopColor={color.brandGradientStart} />
         <Stop offset="1" stopColor={color.brandStrong} />
       </LinearGradient>
     </Defs>
@@ -339,7 +342,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 20,
+    gap: space[5],
   },
   layer: {
     position: 'absolute',
@@ -350,12 +353,12 @@ const styles = StyleSheet.create({
     minHeight: 22,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
+    gap: space[1],
   },
   caret: {
     width: 2,
     height: 16,
-    borderRadius: 1,
+    borderRadius: radius.full,
     backgroundColor: color.brand,
   },
 });

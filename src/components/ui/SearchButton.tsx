@@ -7,8 +7,8 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import Svg, { Circle, Path } from 'react-native-svg';
 
+import { SearchIcon } from '@/components/icons';
 import { color, useMotion } from '@/theme';
 
 import { Press } from './Press';
@@ -96,10 +96,7 @@ export function SearchButton({ onPress, size = 24, tint = color.ink, style }: Se
       style={[{ width: 44, height: 44, alignItems: 'center', justifyContent: 'center' }, style]}
     >
       <Animated.View style={[{ width: size, height: size }, lensStyle]}>
-        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-          <Circle cx={11} cy={11} r={7} stroke={tint} strokeWidth={1.8} strokeLinecap="round" />
-          <Path d="m20 20-3.5-3.5" stroke={tint} strokeWidth={1.8} strokeLinecap="round" />
-        </Svg>
+        <SearchIcon size={size} color={tint} />
         <Animated.View
           pointerEvents="none"
           style={[

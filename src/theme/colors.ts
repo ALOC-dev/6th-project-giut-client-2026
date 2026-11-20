@@ -1,8 +1,10 @@
+
 export const color = {
   brand: '#2F5BFF',
   brandStrong: '#1E46E0',
   brandTint: '#EAF0FF',
   brandSoft: '#F5F8FF',
+  brandGradientStart: '#4C8DFF',
 
   ink: '#191B20',
   textBody: '#3A3D45',
@@ -15,6 +17,10 @@ export const color = {
   surfaceSunken: '#F5F6FA',
   surfaceMuted: '#F5F6F9',
   surfaceSubtle: '#F8F9FB',
+  surfaceHeader: 'rgba(255,255,255,0.94)',
+  surfaceGlassTint: 'rgba(255,255,255,0.58)',
+  surfaceGlassFallback: 'rgba(255,255,255,0.78)',
+  surfaceGlassBorder: 'rgba(255,255,255,0.92)',
   surfaceInverse: 'rgba(25,27,32,0.92)',
 
   line: '#E3E5EA',

@@ -5,26 +5,25 @@ import {
   FlatList,
   Image,
   Platform,
-  StyleSheet,
   TextInput,
   View,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Circle, Path } from 'react-native-svg';
 
+import { SearchIcon } from '@/components/icons';
 import { Text } from '@/components/ui';
-import { color, radius, shadow, space } from '@/theme';
+import { color, shadow } from '@/theme';
 
-import { HubFilterSheet } from './HubFilterSheet';
-import { HubFilterButton } from './HubFilterButton';
-import { CardEnter } from './CardEnter';
+import { HubFilterButton } from './filter/HubFilterButton';
+import { HubFilterSheet } from './filter/HubFilterSheet';
+import { styles } from './HubScreen.styles';
 import { HubEmpty } from './HubEmpty';
 import { HubLoading } from './HubLoading';
-import { PersonCard } from './PersonCard';
+import { CardEnter, PersonCard } from './PersonCard';
 import { PullIndicator, PullRefreshGuide, usePullToRefresh } from './PullToRefresh';
-import { DEPARTMENT_NAMES } from './constants';
+import { MOCK_DEPARTMENT_NAMES } from './mocks';
 import {
   EMPTY_HUB_FILTER,
   countHubFilters,
@@ -170,7 +169,7 @@ export function HubScreen({
       <HubFilterSheet
         visible={filterVisible}
         value={filter}
-        departments={DEPARTMENT_NAMES}
+        departments={MOCK_DEPARTMENT_NAMES}
         onClose={() => setFilterVisible(false)}
         onApply={setFilter}
       />
@@ -219,7 +218,7 @@ function HubHeader({
             <GlassView
               colorScheme="light"
               glassEffectStyle="regular"
-              tintColor="rgba(255,255,255,0.58)"
+              tintColor={color.surfaceGlassTint}
               pointerEvents="none"
               style={styles.searchGlass}
             />
@@ -246,105 +245,3 @@ function HubHeader({
     </View>
   );
 }
-
-function SearchIcon() {
-  return (
-    <Svg width={18} height={18} viewBox="0 0 24 24" fill="none" accessible={false}>
-      <Circle cx={11} cy={11} r={6.5} stroke={color.textMuted} strokeWidth={2} />
-      <Path d="M16 16l4 4" stroke={color.textMuted} strokeWidth={2} strokeLinecap="round" />
-    </Svg>
-  );
-}
-
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: color.surface,
-  },
-  fill: {
-    flex: 1,
-  },
-  content: {
-    paddingHorizontal: 14,
-    paddingBottom: space[5],
-  },
-  emptyContent: {
-    flexGrow: 1,
-  },
-  column: {
-    justifyContent: 'space-between',
-    marginBottom: space[6],
-  },
-  header: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    left: 0,
-    zIndex: 10,
-    paddingHorizontal: 14,
-    backgroundColor: 'rgba(255,255,255,0.94)',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: color.lineSoft,
-  },
-  titleRow: {
-    height: 50,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space[2],
-    marginBottom: space[2],
-    justifyContent: 'flex-start',
-  },
-  titleIcon: {
-    width: 30,
-    height: 26,
-  },
-  controls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space[2],
-    paddingBottom: space[3],
-  },
-  search: {
-    flex: 1,
-    minWidth: 0,
-    height: 46,
-    position: 'relative',
-    borderRadius: radius.full,
-  },
-  searchGlass: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    borderRadius: radius.full,
-  },
-  searchFallback: {
-    backgroundColor: 'rgba(255,255,255,0.78)',
-  },
-  searchHighlight: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.92)',
-  },
-  searchContent: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space[2],
-    paddingHorizontal: space[3],
-  },
-  searchInput: {
-    flex: 1,
-    minWidth: 0,
-    padding: 0,
-    fontFamily: 'Pretendard-Medium',
-    fontSize: 15,
-    color: color.ink,
-  },
-});

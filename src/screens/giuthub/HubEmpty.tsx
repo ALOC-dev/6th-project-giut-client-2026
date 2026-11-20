@@ -269,7 +269,6 @@ const styles = StyleSheet.create({
   },
   description: {
     marginTop: space[2],
-    lineHeight: 22,
     textAlign: 'center',
   },
   registerButton: {

@@ -1,5 +1,14 @@
+import { color } from '@/theme';
+
 export const ROLES = ['개발', '디자인', '기획', '마케팅'] as const;
 export type Role = (typeof ROLES)[number];
+
+export const ROLE_COLOR: Record<Role, { main: string; tint: string; text: string }> = {
+  개발: { main: color.roleDev, tint: color.roleDevTint, text: color.roleDevText },
+  디자인: { main: color.roleDesign, tint: color.roleDesignTint, text: color.roleDesignText },
+  기획: { main: color.rolePlan, tint: color.rolePlanTint, text: color.rolePlanText },
+  마케팅: { main: color.roleMkt, tint: color.roleMktTint, text: color.roleMktText },
+};
 
 export const GRADES = ['1학년', '2학년', '3학년', '4학년', '졸업생'] as const;
 export type Grade = (typeof GRADES)[number];

@@ -208,10 +208,7 @@ export function PullIndicator({ height, scale, progress, ready, refreshing }: Pu
         )}
 
         {!refreshing ? (
-          <Text
-            variant="meta"
-            style={[styles.label, { color: ready ? color.brand : color.textMuted }]}
-          >
+          <Text variant="meta" style={{ color: ready ? color.brand : color.textMuted }}>
             {ready ? '놓으면 새로고침' : '당겨서 새로고침'}
           </Text>
         ) : null}
@@ -330,8 +327,8 @@ const styles = StyleSheet.create({
   },
   content: {
     alignItems: 'center',
-    gap: 6,
-    paddingBottom: 2,
+    gap: space[2],
+    paddingBottom: space[1],
   },
   art: {
     width: ART_WIDTH,
@@ -350,9 +347,6 @@ const styles = StyleSheet.create({
     left: 0,
     width: ART_WIDTH,
     height: ART_HEIGHT,
-  },
-  label: {
-    fontFamily: 'Pretendard-SemiBold',
   },
   guide: {
     minHeight: 68,
@@ -377,7 +371,7 @@ const styles = StyleSheet.create({
   guideText: {
     flex: 1,
     minWidth: 0,
-    gap: 2,
+    gap: space[1],
   },
   guideClose: {
     width: 36,
