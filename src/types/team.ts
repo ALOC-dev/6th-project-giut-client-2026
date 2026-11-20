@@ -9,6 +9,11 @@ export type Member = {
   isLeader: boolean;
 };
 
+export type RecruitingRole = {
+  role: RoleKey;
+  count: number;
+};
+
 export type OperationMethod = 'offline' | 'online' | 'both';
 
 export type ActivityFrequency = '주 1회' | '주 2회' | '주 3회' | '주 4회+';
@@ -24,7 +29,7 @@ export type Team = {
   capacity: number;
   recruitEndDate: string;
   members: Member[];
-  recruitingRoles: RoleKey[];
+  recruitingRoles: RecruitingRole[]; // 아직 모집 중인 역할과 인원 (예: 개발 2명)
   description: string;
   operationMethod: OperationMethod;
   activityFrequency: ActivityFrequency;

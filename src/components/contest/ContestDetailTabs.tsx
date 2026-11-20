@@ -1,3 +1,4 @@
+import { CaretRightIcon } from 'phosphor-react-native/src/icons/CaretRight';
 import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 
 import { Press, Text } from '@/components/ui';
@@ -82,6 +83,7 @@ export function ContestDetailPanel({
 type ContestDetailSectionProps = {
   title?: string;
   count?: number;
+  onPressMore?: () => void; // 있으면 제목 오른쪽에 "전체보기 >"를 보여줘요
   onLayout?: (e: LayoutChangeEvent) => void;
   children: React.ReactNode;
 };
@@ -90,20 +92,37 @@ type ContestDetailSectionProps = {
 export function ContestDetailSection({
   title,
   count,
+  onPressMore,
   onLayout,
   children,
 }: ContestDetailSectionProps) {
   return (
     <View onLayout={onLayout} style={title !== undefined && S.section}>
       {title !== undefined && (
-        <Text variant="titleSm" style={S.sectionTitle}>
-          {title}
-          {count !== undefined && (
-            <Text variant="titleSm" color="brand">
-              {` ${count}`}
-            </Text>
+        <View style={S.sectionHeader}>
+          <Text variant="titleSm">
+            {title}
+            {count !== undefined && (
+              <Text variant="titleSm" color="brand">
+                {` ${count}`}
+              </Text>
+            )}
+          </Text>
+          {onPressMore && (
+            <Press
+              onPress={onPressMore}
+              accessibilityRole="button"
+              accessibilityLabel={`${title} 전체보기`}
+              touchSize={20}
+              style={S.more}
+            >
+              <Text variant="caption" color="textMuted">
+                전체보기
+              </Text>
+              <CaretRightIcon size={14} color={color.textMuted} />
+            </Press>
           )}
-        </Text>
+        </View>
       )}
       {children}
     </View>
@@ -167,9 +186,16 @@ const S = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: color.line,
   },
-  sectionTitle: {
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: space[5],
     paddingTop: space[5],
-    paddingBottom: space[1],
+  },
+  more: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
   },
 });

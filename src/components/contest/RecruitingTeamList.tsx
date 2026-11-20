@@ -1,8 +1,10 @@
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { Press, Text } from '@/components/ui';
-import { color, space } from '@/theme';
+import { RecruitingTeamCard } from '@/components/team/RecruitingTeamCard';
+import { Text } from '@/components/ui';
+import { space } from '@/theme';
 import type { Team } from '@/types/team';
 
 type RecruitingTeamListProps = {
@@ -10,8 +12,22 @@ type RecruitingTeamListProps = {
 };
 
 // 모집 중인 팀 목록
-// TODO: 시안 확인 후 팀 카드 UI로 교체 예정. 지금은 이동 확인용 간단한 목록이에요.
 export function RecruitingTeamList({ teams }: RecruitingTeamListProps) {
+  // TODO: API 연결 전까지 화면 안에서만 저장 상태를 기억해요
+  const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
+
+  const toggleBookmark = (teamId: string) => {
+    setBookmarkedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(teamId)) next.delete(teamId);
+      else next.add(teamId);
+      return next;
+    });
+  };
+
+  const goTeam = (teamId: string) =>
+    router.push({ pathname: '/team/[id]', params: { id: teamId } });
+
   if (teams.length === 0) {
     return (
       <View style={S.empty}>
@@ -24,19 +40,17 @@ export function RecruitingTeamList({ teams }: RecruitingTeamListProps) {
   }
 
   return (
-    <View>
-      {teams.map((team, index) => (
-        <Press
+    <View style={S.list}>
+      {teams.map((team) => (
+        <RecruitingTeamCard
           key={team.id}
-          style={[S.row, index === teams.length - 1 && S.rowLast]}
-          onPress={() => router.push({ pathname: '/team/[id]', params: { id: team.id } })}
-          scaleOnPress={false}
-        >
-          <Text variant="bodyStrong">{team.name}</Text>
-          <Text variant="caption" color="textMuted">
-            {team.members.length} / {team.capacity}명
-          </Text>
-        </Press>
+          team={team}
+          bookmarked={bookmarkedIds.has(team.id)}
+          onPress={() => goTeam(team.id)}
+          onPressBookmark={() => toggleBookmark(team.id)}
+          // TODO: 지원하기 화면이 생기면 연결. 지금은 팀 상세로 이동해요.
+          onPressApply={() => goTeam(team.id)}
+        />
       ))}
     </View>
   );
@@ -48,16 +62,8 @@ const S = StyleSheet.create({
     gap: space[1],
     paddingVertical: space[8],
   },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: space[5],
-    paddingVertical: space[4],
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: color.line,
-  },
-  rowLast: {
-    borderBottomWidth: 0,
+  list: {
+    gap: space[3],
+    padding: space[4],
   },
 });

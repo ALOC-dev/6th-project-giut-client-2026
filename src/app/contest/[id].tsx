@@ -136,6 +136,8 @@ export default function ContestDetailScreen() {
             <ContestDetailSection
               title="모집 중인 팀"
               count={teams.length}
+              // TODO: 팀 전체 목록 화면이 생기면 이동 연결
+              onPressMore={teams.length > 0 ? () => {} : undefined}
               onLayout={(e) => {
                 teamsY.current = e.nativeEvent.layout.y;
               }}
