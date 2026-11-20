@@ -61,6 +61,7 @@ const personSilhouetteStyles = StyleSheet.create({
     borderRadius: 999,
   },
 });
+
 export type AnimatedFilterIconProps = IconProps & {
   animationKey?: number;
 };
