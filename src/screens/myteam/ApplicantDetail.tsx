@@ -46,12 +46,28 @@ export function ApplicantDetail({
   const { reduced } = useMotion();
   const scrollRef = useRef<ScrollViewInstance>(null);
   const shownIndexRef = useRef(index);
+  const wasVisibleRef = useRef(false);
   const pendingEntryRef = useRef<{ direction: number; distance: number } | null>(null);
   const entryAnimationRef = useRef<RNAnimated.CompositeAnimation | null>(null);
   const [shownIndex, setShownIndex] = useState(index);
   const [translateX] = useState(() => new RNAnimated.Value(0));
   const [opacity] = useState(() => new RNAnimated.Value(1));
   const applicant = applicants[shownIndex];
+
+  useLayoutEffect(() => {
+    const wasVisible = wasVisibleRef.current;
+    wasVisibleRef.current = visible;
+
+    if (!visible || wasVisible) return;
+
+    entryAnimationRef.current?.stop();
+    pendingEntryRef.current = null;
+    shownIndexRef.current = index;
+    setShownIndex(index);
+    translateX.setValue(0);
+    opacity.setValue(1);
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
+  }, [index, opacity, translateX, visible]);
 
   useLayoutEffect(() => {
     const entry = pendingEntryRef.current;
@@ -78,7 +94,7 @@ export function ApplicantDetail({
   }, [opacity, shownIndex, translateX]);
 
   useEffect(() => {
-    if (index === shownIndexRef.current) return;
+    if (!visible || index === shownIndexRef.current) return;
 
     const direction = index > shownIndexRef.current ? 1 : -1;
     const distance = reduced ? 0 : 24;
@@ -111,7 +127,7 @@ export function ApplicantDetail({
     return () => {
       exitAnimation.stop();
     };
-  }, [index, opacity, reduced, translateX]);
+  }, [index, opacity, reduced, translateX, visible]);
 
   if (!applicant) return null;
 

@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Modal, ScrollView, StyleSheet, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { FlatList, Modal, StyleSheet, View, type ListRenderItemInfo } from 'react-native';
 import Animated, {
   Easing,
   cancelAnimation,
@@ -46,6 +46,9 @@ const FIELD_TONE: Record<string, { base: string; tint: string; text: string }> =
   기획: role.plan,
   마케팅: role.mkt,
 };
+
+const applicantKeyExtractor = (applicant: Applicant) => applicant.id;
+const memberKeyExtractor = (member: Member) => `${member.name}-${member.role}`;
 
 const FILTER_OPTIONS: { id: TeamFilter; label: string; short: string }[] = [
   { id: 'all', label: '전체', short: '전체' },
@@ -292,52 +295,61 @@ export function ApplicantCards({
   applicants: Applicant[];
   onOpen: (index: number) => void;
 }) {
+  const renderApplicant = useCallback(
+    ({ item: applicant, index }: ListRenderItemInfo<Applicant>) => {
+      const tone = FIELD_TONE[applicant.field] ?? role.dev;
+
+      return (
+        <Press
+          onPress={() => onOpen(index)}
+          accessibilityRole="button"
+          accessibilityLabel={`${applicant.name}, ${applicant.position}, 지원서 보기`}
+          style={styles.applicantCard}
+        >
+          <View style={[styles.applicantBand, { backgroundColor: tone.tint }]}>
+            <View style={styles.applicantAvatar}>
+              <PersonSilhouetteIcon color={tone.base} style={styles.applicantPersonIcon} />
+            </View>
+          </View>
+          {index === 0 ? (
+            <View style={styles.newBadge}>
+              <Text variant="micro" style={{ color: color.surface }}>
+                NEW
+              </Text>
+            </View>
+          ) : null}
+          <View style={styles.applicantCopy}>
+            <Text variant="label">{applicant.name}</Text>
+            <Text variant="meta" style={{ color: tone.text }} numberOfLines={1}>
+              {applicant.position}
+            </Text>
+            <Text variant="meta" color="textFaint" style={styles.appliedAt}>
+              {applicant.appliedAt} 지원
+            </Text>
+          </View>
+        </Press>
+      );
+    },
+    [onOpen],
+  );
+
   return (
     <View style={styles.detailSection}>
       <Text variant="titleMd">새로 들어온 지원</Text>
-      <ScrollView
+      <FlatList
+        data={applicants}
+        renderItem={renderApplicant}
+        keyExtractor={applicantKeyExtractor}
         horizontal
         showsHorizontalScrollIndicator={false}
         snapToInterval={158}
         decelerationRate="fast"
         style={styles.edgeScroll}
         contentContainerStyle={styles.applicantList}
-      >
-        {applicants.map((applicant, index) => {
-          const tone = FIELD_TONE[applicant.field] ?? role.dev;
-          return (
-            <Press
-              key={applicant.id}
-              onPress={() => onOpen(index)}
-              accessibilityRole="button"
-              accessibilityLabel={`${applicant.name}, ${applicant.position}, 지원서 보기`}
-              style={styles.applicantCard}
-            >
-              <View style={[styles.applicantBand, { backgroundColor: tone.tint }]}>
-                <View style={styles.applicantAvatar}>
-                  <PersonSilhouetteIcon color={tone.base} style={styles.applicantPersonIcon} />
-                </View>
-              </View>
-              {index === 0 ? (
-                <View style={styles.newBadge}>
-                  <Text variant="micro" style={{ color: color.surface }}>
-                    NEW
-                  </Text>
-                </View>
-              ) : null}
-              <View style={styles.applicantCopy}>
-                <Text variant="label">{applicant.name}</Text>
-                <Text variant="meta" style={{ color: tone.text }} numberOfLines={1}>
-                  {applicant.position}
-                </Text>
-                <Text variant="meta" color="textFaint" style={styles.appliedAt}>
-                  {applicant.appliedAt} 지원
-                </Text>
-              </View>
-            </Press>
-          );
-        })}
-      </ScrollView>
+        initialNumToRender={4}
+        maxToRenderPerBatch={4}
+        windowSize={3}
+      />
     </View>
   );
 }
@@ -440,6 +452,31 @@ export function MemberStrip({
   members: Member[];
   onOpenTeam?: () => void;
 }) {
+  const renderMember = useCallback(({ item: member }: ListRenderItemInfo<Member>) => {
+    const tone = FIELD_TONE[member.field] ?? role.dev;
+
+    return (
+      <View style={styles.memberItem}>
+        {member.isLeader ? (
+          <View style={styles.leaderBadge}>
+            <Text variant="micro" style={{ color: color.surface }}>
+              팀장
+            </Text>
+          </View>
+        ) : null}
+        <View style={[styles.memberAvatar, { backgroundColor: tone.tint }]}>
+          <PersonSilhouetteIcon color={tone.base} style={styles.memberPersonIcon} />
+        </View>
+        <Text variant="caption" numberOfLines={1}>
+          {member.name}
+        </Text>
+        <Text variant="badge" style={{ color: tone.text }} numberOfLines={1}>
+          {member.role}
+        </Text>
+      </View>
+    );
+  }, []);
+
   return (
     <View style={styles.detailSection}>
       <View style={styles.sectionHead}>
@@ -451,36 +488,18 @@ export function MemberStrip({
           </Press>
         ) : null}
       </View>
-      <ScrollView
+      <FlatList
+        data={members}
+        renderItem={renderMember}
+        keyExtractor={memberKeyExtractor}
         horizontal
         showsHorizontalScrollIndicator={false}
         style={styles.edgeScroll}
         contentContainerStyle={styles.memberList}
-      >
-        {members.map((member) => {
-          const tone = FIELD_TONE[member.field] ?? role.dev;
-          return (
-            <View key={`${member.name}-${member.role}`} style={styles.memberItem}>
-              {member.isLeader ? (
-                <View style={styles.leaderBadge}>
-                  <Text variant="micro" style={{ color: color.surface }}>
-                    팀장
-                  </Text>
-                </View>
-              ) : null}
-              <View style={[styles.memberAvatar, { backgroundColor: tone.tint }]}>
-                <PersonSilhouetteIcon color={tone.base} style={styles.memberPersonIcon} />
-              </View>
-              <Text variant="caption" numberOfLines={1}>
-                {member.name}
-              </Text>
-              <Text variant="badge" style={{ color: tone.text }} numberOfLines={1}>
-                {member.role}
-              </Text>
-            </View>
-          );
-        })}
-      </ScrollView>
+        initialNumToRender={5}
+        maxToRenderPerBatch={5}
+        windowSize={3}
+      />
     </View>
   );
 }
