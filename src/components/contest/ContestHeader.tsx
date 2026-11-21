@@ -38,7 +38,6 @@ export function ContestHeader({
           onPress={() => router.back()}
           accessibilityRole="button"
           accessibilityLabel="뒤로 가기"
-          touchSize={40}
           style={S.iconButton}
         >
           <CaretLeftIcon size={24} color={color.ink} />
@@ -51,7 +50,6 @@ export function ContestHeader({
               accessibilityRole="button"
               accessibilityLabel={bookmarked ? '저장 취소' : '저장'}
               accessibilityState={{ selected: bookmarked }}
-              touchSize={40}
               style={S.iconButton}
             >
               <BookmarkSimpleIcon
@@ -66,7 +64,6 @@ export function ContestHeader({
               onPress={onPressShare}
               accessibilityRole="button"
               accessibilityLabel="공유"
-              touchSize={40}
               style={S.iconButton}
             >
               <ExportIcon size={24} color={color.ink} />
@@ -77,6 +74,8 @@ export function ContestHeader({
     </View>
   );
 }
+
+const ICON_BUTTON_SIZE = 44;
 
 const S = StyleSheet.create({
   wrap: {
@@ -98,9 +97,10 @@ const S = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  // 최소 터치 영역 44pt (공통 BellButton·HIT_SLOP_44와 같은 기준)
   iconButton: {
-    width: 40,
-    height: 40,
+    width: ICON_BUTTON_SIZE,
+    height: ICON_BUTTON_SIZE,
     alignItems: 'center',
     justifyContent: 'center',
   },
