@@ -20,6 +20,7 @@ type RecruitingTeamCardProps = {
 };
 
 const DASH_COUNT = 14; // 가운데 점선 조각 개수
+const APPLY_BUTTON_HEIGHT = 32; // 지원하기 버튼 대략 높이 (터치 영역 계산용)
 
 // "A해요. B해요!" → "A해요." (마침표·느낌표·물음표 뒤 공백이나 끝에서 자름)
 function getFirstSentence(text: string) {
@@ -51,7 +52,7 @@ export function RecruitingTeamCard({
             <Press
               onPress={onPressBookmark}
               accessibilityRole="button"
-              accessibilityLabel={bookmarked ? '팀 저장 취소' : '팀 저장'}
+              accessibilityLabel={bookmarked ? `${team.name} 저장 취소` : `${team.name} 저장`}
               accessibilityState={{ selected: bookmarked }}
               touchSize={20}
             >
@@ -100,9 +101,14 @@ export function RecruitingTeamCard({
       <View style={S.right}>
         <TeamMemberRing members={team.members} capacity={team.capacity} />
         <Press
-          onPress={onPressApply}
-          disabled={closed}
+          // 마감이어도 disabled를 쓰지 않아요. disabled면 터치가 바깥 카드로 넘어가서 팀 상세로 이동해버려요.
+          // 대신 터치는 이 버튼이 받고, 마감일 땐 아무것도 하지 않아요.
+          onPress={closed ? undefined : onPressApply}
+          scaleOnPress={!closed}
+          // 버튼 높이가 약 32라서 바깥으로 터치 영역을 넓혀 44를 맞춰요
+          touchSize={APPLY_BUTTON_HEIGHT}
           accessibilityRole="button"
+          accessibilityLabel={closed ? `${team.name} 모집 마감` : `${team.name} 지원하기`}
           accessibilityState={{ disabled: closed }}
           style={[S.applyButton, closed && S.applyButtonClosed]}
         >
