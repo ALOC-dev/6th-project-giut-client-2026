@@ -1,13 +1,11 @@
-import { View } from 'react-native';
-import { router } from 'expo-router';
+import { useMemo } from 'react';
 
-import { Button, Text } from '@/components/ui';
+import { getContestDetails } from '@/screens/contests/detailMocks';
+import { HomeScreen } from '@/screens/home';
 
-export default function HomeScreen() {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text variant="titleLg">홈</Text>
-      <Button label="공모전 목록 보기" onPress={() => router.push('/contest')} />
-    </View>
-  );
+export default function HomeRoute() {
+  // TODO: API 연결 시 서버에서 받아온 목록으로 교체
+  const contests = useMemo(() => getContestDetails(), []);
+
+  return <HomeScreen contests={contests} />;
 }
