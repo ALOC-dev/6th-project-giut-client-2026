@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppHeader } from '@/components/ui';
+import type { ActivityType } from '@/screens/contests/contest';
 import type { ContestDetail } from '@/screens/contests/contestDetail';
 import { color } from '@/theme';
 import { getDday } from '@/utils/date';
@@ -10,17 +11,21 @@ import { getDday } from '@/utils/date';
 import { CategorySection } from './CategorySection';
 import { DeadlineSection } from './DeadlineSection';
 import { InterestBanner } from './InterestBanner';
+import { RecommendationSection } from './RecommendationSection';
+
+// TODO: 로그인·관심 분야 기능이 생기면 실제 사용자 정보로 교체 (지금은 '공모전' 선택 가정)
+const TEMP_USER_NAME = '김민재';
+const TEMP_INTEREST: ActivityType = 'CONTEST';
+const RECOMMEND_COUNT = 3;
 
 type HomeScreenProps = {
   contests: ContestDetail[];
 };
 
-// 홈 화면 (데이터는 라우트 파일 app/(tabs)/index.tsx에서 받아와요)
 export function HomeScreen({ contests }: HomeScreenProps) {
   const insets = useSafeAreaInsets();
   const [showBanner, setShowBanner] = useState(true);
 
-  // 오늘부터 6일 안에 마감되는 공모전
   const closingThisWeek = useMemo(
     () =>
       contests.filter((contest) => {
@@ -30,13 +35,25 @@ export function HomeScreen({ contests }: HomeScreenProps) {
     [contests],
   );
 
+  // 관심 분야 + 마감 전 공모전 중 조회수 순
+  // TODO: 추천 API가 생기면 서버 추천 결과로 교체
+  const recommended = useMemo(
+    () =>
+      contests
+        .filter(
+          (contest) => contest.activityType === TEMP_INTEREST && getDday(contest.deadline) >= 0,
+        )
+        .sort((a, b) => b.views - a.views)
+        .slice(0, RECOMMEND_COUNT),
+    [contests],
+  );
+
   return (
     <View style={S.container}>
       <View style={{ paddingTop: insets.top }}>
         <AppHeader onPressNotification={() => {}} onPressSearch={() => {}} />
       </View>
       <ScrollView>
-        {/* 이번 주 마감 공모전이 없으면 섹션을 숨겨요 */}
         {closingThisWeek.length > 0 && <DeadlineSection contests={closingThisWeek} />}
         <CategorySection />
         {showBanner && (
@@ -44,6 +61,9 @@ export function HomeScreen({ contests }: HomeScreenProps) {
             onSubmit={() => setShowBanner(false)}
             onClose={() => setShowBanner(false)}
           />
+        )}
+        {recommended.length > 0 && (
+          <RecommendationSection userName={TEMP_USER_NAME} contests={recommended} />
         )}
       </ScrollView>
     </View>
