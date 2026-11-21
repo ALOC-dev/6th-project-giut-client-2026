@@ -20,9 +20,10 @@ const RECOMMEND_COUNT = 3;
 
 type HomeScreenProps = {
   contests: ContestDetail[];
+  onPressAllContests: () => void;
 };
 
-export function HomeScreen({ contests }: HomeScreenProps) {
+export function HomeScreen({ contests, onPressAllContests }: HomeScreenProps) {
   const insets = useSafeAreaInsets();
   const [showBanner, setShowBanner] = useState(true);
 
@@ -55,7 +56,7 @@ export function HomeScreen({ contests }: HomeScreenProps) {
       </View>
       <ScrollView>
         {closingThisWeek.length > 0 && <DeadlineSection contests={closingThisWeek} />}
-        <CategorySection />
+        <CategorySection onPressAll={onPressAllContests} />
         {showBanner && (
           <InterestBanner
             onSubmit={() => setShowBanner(false)}

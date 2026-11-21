@@ -5,18 +5,20 @@ import { color, space } from '@/theme';
 
 import { HOME_CATEGORIES } from './categories';
 
-export function CategorySection() {
+type CategorySectionProps = {
+  onPressAll: () => void;
+};
+
+export function CategorySection({ onPressAll }: CategorySectionProps) {
   return (
     <View style={S.section}>
       <View style={S.header}>
         <Text variant="titleLg">분야별로 둘러보기</Text>
-        {/* TODO: 공모전 목록 연결 후 disabled 제거 */}
         <Press
-          disabled
+          onPress={onPressAll}
           touchSize={20}
           accessibilityRole="button"
-          accessibilityLabel="분야 전체 보기"
-          accessibilityState={{ disabled: true }}
+          accessibilityLabel="공모전 전체 보기"
         >
           <Text variant="caption" color="textMuted">
             전체 보기 ›
