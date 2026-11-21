@@ -64,6 +64,7 @@ export function TeamFilterMenu({
   onChange: (filter: TeamFilter) => void;
 }) {
   const insets = useSafeAreaInsets();
+  const reducedMotion = useReducedMotion();
   const [open, setOpen] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
   const current = FILTER_OPTIONS.find((option) => option.id === value) ?? FILTER_OPTIONS[0];
@@ -91,7 +92,12 @@ export function TeamFilterMenu({
         <AnimatedFilterIcon size={22} animationKey={animationKey} />
       </Press>
 
-      <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
+      <Modal
+        visible={open}
+        transparent
+        animationType={reducedMotion ? 'none' : 'fade'}
+        onRequestClose={() => setOpen(false)}
+      >
         <Press
           scaleOnPress={false}
           style={StyleSheet.absoluteFill}

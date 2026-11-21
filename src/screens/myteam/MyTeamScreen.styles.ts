@@ -5,7 +5,6 @@ import { color, radius, space } from '@/theme';
 export const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: color.surfaceSunken },
   content: { paddingHorizontal: space[5], paddingBottom: space[6] },
-  emptyContent: { flexGrow: 1 },
   header: {
     height: 54,
     flexDirection: 'row',
