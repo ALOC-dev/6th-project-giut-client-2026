@@ -11,7 +11,6 @@ export const S = StyleSheet.create({
     flexDirection: 'row',
   },
 
-  // 왼쪽: 팀 이름, 설명, 모집 역할
   left: {
     flex: 1,
     justifyContent: 'center',
@@ -48,7 +47,6 @@ export const S = StyleSheet.create({
     fontWeight: '700',
   },
 
-  // 가운데 점선 (위아래 홈과 겹치지 않게 홈 크기만큼 띄워요)
   dashes: {
     width: 1,
     justifyContent: 'space-evenly',
@@ -61,7 +59,6 @@ export const S = StyleSheet.create({
     backgroundColor: color.line,
   },
 
-  // 오른쪽: 인원 원, 지원하기
   right: {
     width: RIGHT_WIDTH,
     alignItems: 'center',

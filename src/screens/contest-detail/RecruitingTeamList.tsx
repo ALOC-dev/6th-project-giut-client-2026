@@ -11,7 +11,6 @@ type RecruitingTeamListProps = {
   teams: Team[];
 };
 
-// 모집 중인 팀 목록
 export function RecruitingTeamList({ teams }: RecruitingTeamListProps) {
   // TODO: API 연결 전까지 화면 안에서만 저장 상태를 기억해요
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());

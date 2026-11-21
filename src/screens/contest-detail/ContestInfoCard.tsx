@@ -12,7 +12,6 @@ type ContestInfoCardProps = {
   contest: ContestDetail;
 };
 
-// 공모전 상세 상단의 기본 정보 카드
 export function ContestInfoCard({ contest }: ContestInfoCardProps) {
   return (
     <View style={S.card}>
@@ -28,7 +27,6 @@ export function ContestInfoCard({ contest }: ContestInfoCardProps) {
 
       <InfoRow label="접수 기간">
         <Text variant="caption" style={S.valueText}>
-          {/* 접수 시작일이 없으면 마감일만 보여줘요 */}
           {contest.applyFrom
             ? formatPeriod(contest.applyFrom, contest.deadline)
             : `~ ${formatFullDate(contest.deadline)}`}{' '}
@@ -83,7 +81,6 @@ type InfoRowProps = {
   children: React.ReactNode;
 };
 
-// "라벨 ··· 값" 한 줄
 function InfoRow({ label, isLast, children }: InfoRowProps) {
   return (
     <View style={[S.row, isLast && S.rowLast]}>

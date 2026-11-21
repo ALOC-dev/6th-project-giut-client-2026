@@ -14,7 +14,7 @@ import { S } from './DeadlineSection.styles';
 
 const AUTO_SLIDE_MS = 5000;
 
-// 포스터가 없는 카드에 차례대로 칠할 색: 파랑 → 주황 → 초록 → 노랑
+// 포스터 없는 카드 색 순서: 파랑 → 주황 → 초록 → 노랑
 const FALLBACK_ROLES: RoleName[] = ['dev', 'design', 'plan', 'mkt'];
 
 type DeadlineSectionProps = {
@@ -30,25 +30,21 @@ export function DeadlineSection({ contests }: DeadlineSectionProps) {
   const [page, setPage] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
 
-  // 공모전 개수가 줄어서 page가 범위를 벗어나도 마지막 카드 안으로 맞춰요
   const lastPage = Math.max(contests.length - 1, 0);
   const currentPage = Math.min(page, lastPage);
 
-  // 스크롤 위치(x)로 지금 보이는 카드 번호를 계산해서 page에 반영해요
   const syncPage = (x: number) => {
     const next = Math.round(x / snap);
     setPage(Math.min(Math.max(next, 0), lastPage));
   };
 
-  // 화면 회전 등으로 카드 너비(snap)가 바뀌면, 보고 있던 카드 위치로 다시 맞춰요
+  // 카드 너비가 바뀌면(화면 회전 등) 보던 카드 위치로 다시 맞춰요
   useEffect(() => {
     scrollRef.current?.scrollTo({ x: currentPage * snap, animated: false });
-    // snap이 바뀔 때만 실행해요 (페이지 이동은 아래 타이머와 손 스크롤이 처리)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snap]);
 
-  // 5초마다 다음 카드로 넘기기. 페이지가 바뀌면(자동이든 손으로든) 타이머를 새로 시작해요.
-  // 손으로 넘기는 중에는 타이머를 멈춰서 제스처와 부딪히지 않게 해요.
+  // 5초마다 다음 카드로. 손으로 넘기는 중에는 멈춰요
   useEffect(() => {
     if (contests.length <= 1 || isDragging) return;
 
@@ -61,8 +57,7 @@ export function DeadlineSection({ contests }: DeadlineSectionProps) {
     return () => clearTimeout(timer);
   }, [currentPage, contests.length, snap, isDragging]);
 
-  // 포스터 없는 카드끼리만 순서를 세서 색을 배정해요.
-  // 포스터 카드는 건너뛰므로, 같은 색이 최대한 이어지지 않아요.
+  // 포스터 없는 카드끼리만 순서를 세서 같은 색이 이어지지 않게 해요
   let fallbackCount = 0;
   const cardRoles = contests.map((contest) =>
     contest.posterUrl ? null : FALLBACK_ROLES[fallbackCount++ % FALLBACK_ROLES.length],
@@ -85,7 +80,7 @@ export function DeadlineSection({ contests }: DeadlineSectionProps) {
         snapToInterval={snap}
         decelerationRate="fast"
         onScrollBeginDrag={() => setIsDragging(true)}
-        // 손을 뗄 때도 위치로 page를 맞춰요 (관성 없이 멈추면 onMomentumScrollEnd가 안 불릴 수 있어서)
+        // 관성 없이 멈추면 onMomentumScrollEnd가 안 불려서 여기서도 맞춰요
         onScrollEndDrag={(e) => {
           syncPage(e.nativeEvent.contentOffset.x);
           setIsDragging(false);
@@ -108,7 +103,7 @@ export function DeadlineSection({ contests }: DeadlineSectionProps) {
                 !hasPoster && { backgroundColor: palette.tint },
               ]}
               onPress={() => router.push({ pathname: '/contest/[id]', params: { id: contest.id } })}
-              // 스크린리더는 카드 전체를 한 번에 읽어요 (D-day 글자 칸을 하나씩 읽지 않도록)
+              // 스크린리더가 D-day 글자 칸을 하나씩 읽지 않고 카드 전체를 한 번에 읽도록
               accessible
               accessibilityRole="button"
               accessibilityLabel={`${contest.title}, ${formatDday(contest.deadline)}, ${formatShortDate(contest.deadline)} 마감`}
@@ -127,7 +122,6 @@ export function DeadlineSection({ contests }: DeadlineSectionProps) {
                 <GiutMark width={200} color={palette.base} style={S.fallbackSymbol} />
               )}
 
-              {/* 안의 글자들은 위 accessibilityLabel로 대신 읽어요 */}
               {/* Android: importantForAccessibility, iOS: accessibilityElementsHidden */}
               <View
                 style={S.content}

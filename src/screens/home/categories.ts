@@ -1,4 +1,4 @@
-// 아이콘은 하나씩 경로로 가져와요. 패키지 전체를 import 하면 안 쓰는 아이콘까지 번들에 들어갈 수 있어요.
+// 번들 크기를 줄이려고 아이콘을 하나씩 경로로 가져와요
 import { BriefcaseIcon } from 'phosphor-react-native/src/icons/Briefcase';
 import { CodeIcon } from 'phosphor-react-native/src/icons/Code';
 import { FlagIcon } from 'phosphor-react-native/src/icons/Flag';
@@ -16,12 +16,10 @@ export type HomeCategoryLabel =
 export type HomeCategory = {
   label: HomeCategoryLabel;
   Icon: typeof TrophyIcon;
-  // 공모전 목록 필터로 넘길 활동 유형. 맞는 값이 없으면 null
   // TODO: '대외활동'·'인턴'에 맞는 활동 유형이 API에 없어서, 목록 연결 전에 기획과 확인 필요
   activityType: ActivityType | null;
 };
 
-// 분야별 둘러보기, 관심 분야 선택 배너에서 함께 쓰는 분야 목록
 export const HOME_CATEGORIES: HomeCategory[] = [
   { label: '공모전', Icon: TrophyIcon, activityType: 'CONTEST' },
   { label: '대외활동', Icon: FlagIcon, activityType: null },
