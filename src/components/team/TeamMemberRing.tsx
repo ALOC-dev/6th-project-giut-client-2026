@@ -19,19 +19,26 @@ export function TeamMemberRing({ members, capacity, size = 60 }: TeamMemberRingP
   const r = (size - STROKE) / 2;
   const center = size / 2;
   const circumference = 2 * Math.PI * r;
-  const slot = circumference / capacity;
+
+  // API에서 정원이 0·음수·숫자 아님으로 와도 원이 깨지지 않게 막아요
+  const hasValidCapacity = Number.isFinite(capacity) && capacity > 0;
+  // 조각 수: 정원보다 팀원이 많으면(데이터 오류) 팀원 수만큼 그려서 초과분도 보이게 해요
+  const slotCount = Math.max(hasValidCapacity ? Math.floor(capacity) : 0, members.length, 1);
+  const slot = circumference / slotCount;
 
   return (
     <View
       style={{ width: size, height: size }}
       accessible
-      accessibilityLabel={`정원 ${capacity}명 중 ${members.length}명 참여`}
+      accessibilityLabel={
+        hasValidCapacity ? `정원 ${capacity}명 중 ${members.length}명 참여` : '정원 정보 없음'
+      }
     >
       <Svg width={size} height={size}>
         {/* 정원 수만큼 조각을 그려요. 12시 방향부터 시계 방향으로,
             팀원이 있는 조각은 역할 색, 빈자리 조각은 회색이에요. */}
         <G rotation={-90} origin={`${center}, ${center}`}>
-          {Array.from({ length: capacity }, (_, i) => {
+          {Array.from({ length: slotCount }, (_, i) => {
             const member = members[i];
             return (
               <Circle
@@ -52,7 +59,7 @@ export function TeamMemberRing({ members, capacity, size = 60 }: TeamMemberRingP
 
       <View style={S.label} pointerEvents="none">
         <Text variant="caption" style={S.count}>
-          {members.length}/{capacity}
+          {members.length}/{hasValidCapacity ? capacity : '-'}
           <Text variant="micro" color="textSecondary">
             {' 명'}
           </Text>
