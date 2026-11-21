@@ -21,7 +21,7 @@ type IconProps = {
 
 export function SearchIcon({ size = 18, color: iconColor = color.textMuted }: IconProps) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" accessible={false}>
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Circle cx={11} cy={11} r={6.5} stroke={iconColor} strokeWidth={2} />
       <Path d="M16 16l4 4" stroke={iconColor} strokeWidth={2} strokeLinecap="round" />
     </Svg>
