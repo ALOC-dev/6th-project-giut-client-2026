@@ -30,9 +30,13 @@ type DetailTab = 'detail' | 'teams';
 
 // 목표 위치 도착을 못 받았을 때 점프 상태를 강제로 푸는 시간 (스크롤 애니메이션보다 넉넉하게)
 const JUMP_FALLBACK_MS = 1000;
+// 목표 위치 "도착"으로 볼 오차(px). 플랫폼마다 소수점 반올림이 달라서 약간 여유를 둬요.
+const ARRIVE_TOLERANCE = 2;
 
 export default function ContestDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  // 주소 파라미터는 배열이나 undefined로 올 수도 있어서 문자열 하나로 정리해요
+  const params = useLocalSearchParams<{ id?: string | string[] }>();
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const [tab, setTab] = useState<DetailTab>('detail');
 
   const scrollRef = useRef<ScrollViewInstance>(null);
@@ -61,7 +65,8 @@ export default function ContestDetailScreen() {
   // TODO: API 연결 전까지 화면 안에서만 저장 상태를 기억해요
   const [bookmarked, setBookmarked] = useState(false);
 
-  const contest = getContest(id);
+  // TODO: API 연결 시 로딩 중 / 불러오기 실패 화면을 "존재하지 않는 공모전"과 구분해서 추가
+  const contest = id ? getContest(id) : undefined;
 
   if (!contest) {
     return (
@@ -87,10 +92,14 @@ export default function ContestDetailScreen() {
   const handlePressTab = (key: DetailTab) => {
     setTab(key);
 
+    // 아직 영역 위치를 못 쟀으면(첫 렌더 직후) 엉뚱한 곳으로 가지 않게 이동하지 않아요
+    const isMeasured = tabBarHeight.current > 0 && panelY.current > 0 && teamsY.current > 0;
+    if (!isMeasured) return;
+
     // 내용이 짧으면 목표 위치까지 못 가니까, 갈 수 있는 최대 위치로 맞춰요
     const maxY = Math.max(contentHeight.current - viewportHeight.current, 0);
     const target = Math.min(Math.max(scrollYOf(key), 0), maxY);
-    if (Math.abs(scrollY.current - target) < 1) return; // 이미 그 위치
+    if (Math.abs(scrollY.current - target) < ARRIVE_TOLERANCE) return; // 이미 그 위치
 
     // 이전 점프의 타이머가 이번 점프를 먼저 풀지 않도록 새로 시작해요
     endJump();
@@ -106,7 +115,7 @@ export default function ContestDetailScreen() {
 
     if (jumpTarget.current !== null) {
       // 목표에 도착하면 점프 끝. 도착 전에는 탭을 바꾸지 않아요.
-      if (Math.abs(y - jumpTarget.current) < 1) endJump();
+      if (Math.abs(y - jumpTarget.current) < ARRIVE_TOLERANCE) endJump();
       else return;
     }
 
@@ -137,6 +146,8 @@ export default function ContestDetailScreen() {
         scrollEventThrottle={16}
         // 이동 중에 손으로 스크롤하면 점프를 멈추고 손 스크롤을 따라가요
         onScrollBeginDrag={endJump}
+        // 스크롤 애니메이션이 끝났다는 신호를 받으면 그때도 점프를 끝내요 (위치 판단과 함께 이중 안전장치)
+        onMomentumScrollEnd={endJump}
         onLayout={(e) => {
           viewportHeight.current = e.nativeEvent.layout.height;
         }}
