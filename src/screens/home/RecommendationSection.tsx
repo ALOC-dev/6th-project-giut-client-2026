@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { Fragment, useCallback, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { ContestCard } from '@/components/contests/ContestCard';
 import { Press, Text } from '@/components/ui';
@@ -10,9 +10,10 @@ import { color, space } from '@/theme';
 type RecommendationSectionProps = {
   userName: string;
   contests: Contest[];
+  style?: StyleProp<ViewStyle>;
 };
 
-export function RecommendationSection({ userName, contests }: RecommendationSectionProps) {
+export function RecommendationSection({ userName, contests, style }: RecommendationSectionProps) {
   // TODO: API 연결 전까지 화면 안에서만 저장 상태를 기억해요
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
 
@@ -31,9 +32,9 @@ export function RecommendationSection({ userName, contests }: RecommendationSect
   }, []);
 
   return (
-    <View style={S.section}>
+    <View style={[S.section, style]}>
       <View style={S.header}>
-        <Text variant="titleMd">{userName}님을 위한 추천</Text>
+        <Text variant="titleLg">{userName}님을 위한 추천</Text>
         {/* TODO: 공모전 목록 연결 작업 때 관심 분야로 필터된 목록으로 이동 후 disabled 제거 */}
         <Press
           disabled

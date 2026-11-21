@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppHeader } from '@/components/ui';
 import type { ActivityType } from '@/screens/contests/contest';
 import type { ContestDetail } from '@/screens/contests/contestDetail';
-import { color } from '@/theme';
+import { color, space } from '@/theme';
 import { getDday } from '@/utils/date';
 
 import { CategorySection } from './CategorySection';
@@ -63,7 +63,12 @@ export function HomeScreen({ contests }: HomeScreenProps) {
           />
         )}
         {recommended.length > 0 && (
-          <RecommendationSection userName={TEMP_USER_NAME} contests={recommended} />
+          <RecommendationSection
+            userName={TEMP_USER_NAME}
+            contests={recommended}
+            // 배너를 닫으면 분야 섹션과 바로 붙어서 간격을 더 둬요
+            style={!showBanner && S.recommendationSpaced}
+          />
         )}
       </ScrollView>
     </View>
@@ -72,4 +77,5 @@ export function HomeScreen({ contests }: HomeScreenProps) {
 
 const S = StyleSheet.create({
   container: { flex: 1, backgroundColor: color.surface },
+  recommendationSpaced: { marginTop: space[4] },
 });

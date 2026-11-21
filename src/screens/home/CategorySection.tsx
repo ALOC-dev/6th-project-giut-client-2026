@@ -9,7 +9,7 @@ export function CategorySection() {
   return (
     <View style={S.section}>
       <View style={S.header}>
-        <Text variant="titleMd">분야별로 둘러보기</Text>
+        <Text variant="titleLg">분야별로 둘러보기</Text>
         {/* TODO: 공모전 목록 연결 후 disabled 제거 */}
         <Press
           disabled

@@ -5,9 +5,9 @@ import { ScrollView, View, useWindowDimensions, type ScrollViewInstance } from '
 
 import { GiutMark } from '@/components/brand/GiutMark';
 import { Press, Text } from '@/components/ui';
-import { role, space, type RoleName } from '@/theme';
 import { CATEGORY_LABEL } from '@/screens/contests/contest';
 import type { ContestDetail } from '@/screens/contests/contestDetail';
+import { role, space, type RoleName } from '@/theme';
 import { formatDday, formatShortDate } from '@/utils/date';
 
 import { S } from './DeadlineSection.styles';
@@ -66,7 +66,7 @@ export function DeadlineSection({ contests }: DeadlineSectionProps) {
   return (
     <View style={S.section}>
       <View style={S.header}>
-        <Text variant="titleMd">이번 주 마감</Text>
+        <Text variant="titleLg">이번 주 마감</Text>
         <Text variant="caption" color="textMuted">
           더보기 ›
         </Text>
