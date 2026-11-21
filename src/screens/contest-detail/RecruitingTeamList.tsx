@@ -5,7 +5,7 @@ import { StyleSheet, View } from 'react-native';
 import { RecruitingTeamCard } from '@/components/team/RecruitingTeamCard';
 import { Text } from '@/components/ui';
 import { space } from '@/theme';
-import type { Team } from '@/types/team';
+import type { Team } from '@/screens/teams';
 
 type RecruitingTeamListProps = {
   teams: Team[];

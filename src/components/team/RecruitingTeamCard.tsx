@@ -2,10 +2,8 @@ import { BookmarkSimpleIcon } from 'phosphor-react-native/src/icons/BookmarkSimp
 import { View } from 'react-native';
 
 import { Press, Text } from '@/components/ui';
-import { ROLE_LABEL } from '@/constants/team';
 import { color, role } from '@/theme';
-import type { Team } from '@/types/team';
-import { isTeamClosed } from '@/utils/team';
+import { isTeamClosed, ROLE_LABEL, type Team } from '@/screens/teams';
 
 import { NOTCH_RADIUS, RIGHT_WIDTH, S } from './RecruitingTeamCard.styles';
 import { TeamMemberRing } from './TeamMemberRing';

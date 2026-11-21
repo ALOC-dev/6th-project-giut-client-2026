@@ -1,15 +1,15 @@
 import { View } from 'react-native';
 
 import { Press, Text } from '@/components/ui';
-import { PARTICIPATION_LABEL } from '@/constants/contest';
-import type { Contest } from '@/types/contest';
-import { formatDday, formatPeriod } from '@/utils/date';
+import { ACTIVITY_LABEL, CATEGORY_LABEL } from '@/screens/contests/contest';
+import { PARTICIPATION_LABEL, type ContestDetail } from '@/screens/contests/contestDetail';
+import { formatDday, formatFullDate, formatPeriod } from '@/utils/date';
 import { openExternalUrl } from '@/utils/link';
 
 import { S } from './ContestInfoCard.styles';
 
 type ContestInfoCardProps = {
-  contest: Contest;
+  contest: ContestDetail;
 };
 
 // 공모전 상세 상단의 기본 정보 카드
@@ -18,19 +18,22 @@ export function ContestInfoCard({ contest }: ContestInfoCardProps) {
     <View style={S.card}>
       <View style={S.top}>
         <Text variant="caption" color="textMuted">
-          #{contest.category} #{contest.field}
+          #{ACTIVITY_LABEL[contest.activityType]} #{CATEGORY_LABEL[contest.category]}
         </Text>
         <Text variant="titleLg">{contest.title}</Text>
         <Text variant="caption" color="textSecondary" style={S.host}>
-          {contest.host}
+          {contest.org}
         </Text>
       </View>
 
       <InfoRow label="접수 기간">
         <Text variant="caption" style={S.valueText}>
-          {formatPeriod(contest.startDate, contest.endDate)}{' '}
+          {/* 접수 시작일이 없으면 마감일만 보여줘요 */}
+          {contest.applyFrom
+            ? formatPeriod(contest.applyFrom, contest.deadline)
+            : `~ ${formatFullDate(contest.deadline)}`}{' '}
           <Text variant="caption" color="brand" style={S.dday}>
-            {formatDday(contest.endDate)}
+            {formatDday(contest.deadline)}
           </Text>
         </Text>
       </InfoRow>

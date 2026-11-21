@@ -5,22 +5,21 @@ import { View } from 'react-native';
 import Animated, { LinearTransition } from 'react-native-reanimated';
 
 import { Button, Card, Chip, Press, Text } from '@/components/ui';
-import { CATEGORIES } from '@/constants/category';
 import { color, duration, easing, useMotion } from '@/theme';
-import type { ContestCategory } from '@/types/contest';
 
+import { HOME_CATEGORIES, type HomeCategoryLabel } from './categories';
 import { S } from './InterestBanner.styles';
 
 type InterestBannerProps = {
-  onSubmit: (categories: ContestCategory[]) => void;
+  onSubmit: (categories: HomeCategoryLabel[]) => void;
   onClose: () => void;
 };
 
 export function InterestBanner({ onSubmit, onClose }: InterestBannerProps) {
   const [expanded, setExpanded] = useState(false);
-  const [selected, setSelected] = useState<ContestCategory[]>([]);
+  const [selected, setSelected] = useState<HomeCategoryLabel[]>([]);
 
-  const toggle = (label: ContestCategory) => {
+  const toggle = (label: HomeCategoryLabel) => {
     setSelected((prev) =>
       prev.includes(label) ? prev.filter((item) => item !== label) : [...prev, label],
     );
@@ -60,7 +59,7 @@ export function InterestBanner({ onSubmit, onClose }: InterestBannerProps) {
         {expanded && (
           <>
             <View style={S.chips}>
-              {CATEGORIES.map(({ label, Icon }, index) => {
+              {HOME_CATEGORIES.map(({ label, Icon }, index) => {
                 const on = selected.includes(label);
                 return (
                   // 칩이 차례로(40ms 간격) 살짝 올라오며 나타나요
@@ -76,7 +75,7 @@ export function InterestBanner({ onSubmit, onClose }: InterestBannerProps) {
               })}
             </View>
 
-            <Animated.View entering={enter.fadeUp(CATEGORIES.length, stagger.tight)}>
+            <Animated.View entering={enter.fadeUp(HOME_CATEGORIES.length, stagger.tight)}>
               <Button
                 label={
                   selected.length > 0

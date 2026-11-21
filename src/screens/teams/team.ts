@@ -1,4 +1,5 @@
 import type { role } from '@/theme';
+import { getDday } from '@/utils/date';
 
 export type RoleKey = keyof typeof role;
 
@@ -36,3 +37,15 @@ export type Team = {
   activityPlace: ActivityPlace;
   cooperationTools: CooperationTool[];
 };
+
+export const ROLE_LABEL: Record<RoleKey, string> = {
+  dev: '개발',
+  design: '디자인',
+  plan: '기획',
+  mkt: '마케팅',
+};
+
+// 모집 마감: 모집 기간이 지났거나, 정원이 다 찼을 때
+export function isTeamClosed(team: Team) {
+  return getDday(team.recruitEndDate) < 0 || team.members.length >= team.capacity;
+}

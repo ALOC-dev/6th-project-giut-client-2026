@@ -1,8 +1,9 @@
 import { StyleSheet, View } from 'react-native';
 
 import { Press, Text } from '@/components/ui';
-import { CATEGORIES } from '@/constants/category';
 import { color, space } from '@/theme';
+
+import { HOME_CATEGORIES } from './categories';
 
 export function CategorySection() {
   return (
@@ -23,7 +24,7 @@ export function CategorySection() {
         </Press>
       </View>
       <View style={S.grid}>
-        {CATEGORIES.map(({ label, Icon }) => (
+        {HOME_CATEGORIES.map(({ label, Icon }) => (
           // TODO: 공모전 목록 화면(PR #11)이 합쳐지면 해당 분야로 필터해서 이동 연결 후 disabled 제거
           <Press
             key={label}
