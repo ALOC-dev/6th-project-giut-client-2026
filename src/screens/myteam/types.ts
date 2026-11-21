@@ -1,4 +1,4 @@
-import type { ApplicationAnswer, ApplicationCardData } from '@/components/application';
+import type { ApplicationCardData } from '@/components/application';
 
 export type TeamKind = 'pending' | 'leader' | 'member' | 'ended';
 
@@ -16,8 +16,6 @@ export type Team = {
 };
 
 export type TeamFilter = 'all' | 'leader' | 'member' | 'pending';
-
-export type Answer = ApplicationAnswer;
 
 export type Application = ApplicationCardData;
 
