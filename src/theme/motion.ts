@@ -55,7 +55,17 @@ export const enter = {
       .duration(duration.d4)
       .delay(delayOf(index, step)),
 
-  fade: (index = 0, step: number = stagger.tight) =>
+  selectionFadeUp: () =>
+    new Keyframe({
+      0: { opacity: 0, transform: [{ translateY: 10 }] },
+      100: {
+        opacity: 1,
+        transform: [{ translateY: 0 }],
+        easing: Easing.bezierFn(0.25, 0.1, 0.25, 1),
+      },
+    }).duration(duration.d4),
+
+  fade: (index = 0, step = stagger.tight) =>
     new Keyframe({
       0: { opacity: 0 },
       100: { opacity: 1, easing: easing.out },
@@ -131,7 +141,7 @@ export function useMotion() {
   };
 }
 
-export function usePulse(enabled = true) {
+export function usePulse(enabled = true, delay = 0) {
   const reduced = useReducedMotion();
   const p = useSharedValue(0);
 
@@ -140,12 +150,15 @@ export function usePulse(enabled = true) {
       p.value = 0;
       return;
     }
-    p.value = withRepeat(
-      withTiming(1, { duration: ambient.pulse, easing: Easing.out(Easing.quad) }),
-      -1,
-      false,
+    p.value = withDelay(
+      delay,
+      withRepeat(
+        withTiming(1, { duration: ambient.pulse, easing: Easing.out(Easing.quad) }),
+        -1,
+        false,
+      ),
     );
-  }, [enabled, reduced, p]);
+  }, [delay, enabled, reduced, p]);
 
   return useAnimatedStyle(() => ({
     transform: [{ scale: 0.7 + p.value * 0.8 }],

@@ -1,11 +1,22 @@
-import { View } from 'react-native';
+import { router } from 'expo-router';
 
-import { Text } from '@/components/ui';
+import {
+  MOCK_APPLICATION,
+  MOCK_APPLICANTS,
+  MOCK_MEMBERS,
+  MOCK_TEAMS,
+  MyTeamScreen,
+} from '@/screens/myteam';
 
 export default function TeamScreen() {
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text variant="titleLg">팀</Text>
-    </View>
+    <MyTeamScreen
+      teams={MOCK_TEAMS}
+      application={MOCK_APPLICATION}
+      applicants={MOCK_APPLICANTS}
+      members={MOCK_MEMBERS}
+      onBrowseContests={() => router.navigate('/contest')}
+      onOpenTeam={(team) => router.push({ pathname: '/team/[id]', params: { id: team.id } })}
+    />
   );
 }
