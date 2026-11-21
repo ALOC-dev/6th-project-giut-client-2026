@@ -1,10 +1,10 @@
-import { openBrowserAsync } from 'expo-web-browser';
 import { View } from 'react-native';
 
 import { Press, Text } from '@/components/ui';
 import { PARTICIPATION_LABEL } from '@/constants/contest';
 import type { Contest } from '@/types/contest';
 import { formatDday, formatPeriod } from '@/utils/date';
+import { openExternalUrl } from '@/utils/link';
 
 import { S } from './ContestInfoCard.styles';
 
@@ -56,7 +56,7 @@ export function ContestInfoCard({ contest }: ContestInfoCardProps) {
       <InfoRow label="원문" isLast>
         <View style={S.source}>
           <Press
-            onPress={() => openBrowserAsync(contest.sourceUrl)}
+            onPress={() => openExternalUrl(contest.sourceUrl)}
             accessibilityRole="link"
             accessibilityLabel="원문 보기"
             touchSize={20}

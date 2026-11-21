@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from 'expo-router';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ScrollView,
   Share,
@@ -9,7 +9,6 @@ import {
   type NativeSyntheticEvent,
   type ScrollViewInstance,
 } from 'react-native';
-import { openBrowserAsync } from 'expo-web-browser';
 
 import { ContestBottomCTA } from '@/components/contest/ContestBottomCTA';
 import { ContestDescription } from '@/components/contest/ContestDescription';
@@ -25,8 +24,12 @@ import { Text } from '@/components/ui';
 import { getContest } from '@/mocks/contests';
 import { getTeamsByContest } from '@/mocks/teams';
 import { color, space } from '@/theme';
+import { openExternalUrl } from '@/utils/link';
 
 type DetailTab = 'detail' | 'teams';
+
+// 목표 위치 도착을 못 받았을 때 점프 상태를 강제로 푸는 시간 (스크롤 애니메이션보다 넉넉하게)
+const JUMP_FALLBACK_MS = 1000;
 
 export default function ContestDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -37,8 +40,24 @@ export default function ContestDetailScreen() {
   const tabBarHeight = useRef(0);
   const panelY = useRef(0);
   const teamsY = useRef(0);
+  // 스크롤 가능한 최대 위치 계산용
+  const viewportHeight = useRef(0);
+  const contentHeight = useRef(0);
+  const scrollY = useRef(0);
+
   // 탭을 눌러 이동하는 중에는 스크롤 위치로 탭을 바꾸지 않아요 (깜빡임 방지)
-  const isJumping = useRef(false);
+  // 목표 위치에 도착하면 바로 풀고, 혹시 도착 이벤트를 못 받으면 타이머로 풀어요.
+  const jumpTarget = useRef<number | null>(null);
+  const jumpTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const endJump = () => {
+    if (jumpTimer.current) clearTimeout(jumpTimer.current);
+    jumpTimer.current = null;
+    jumpTarget.current = null;
+  };
+
+  // 화면을 나갈 때 남은 타이머 정리
+  useEffect(() => endJump, []);
   // TODO: API 연결 전까지 화면 안에서만 저장 상태를 기억해요
   const [bookmarked, setBookmarked] = useState(false);
 
@@ -67,17 +86,30 @@ export default function ContestDetailScreen() {
 
   const handlePressTab = (key: DetailTab) => {
     setTab(key);
-    isJumping.current = true;
-    scrollRef.current?.scrollTo({ y: scrollYOf(key), animated: true });
-    setTimeout(() => {
-      isJumping.current = false;
-    }, 500);
+
+    // 내용이 짧으면 목표 위치까지 못 가니까, 갈 수 있는 최대 위치로 맞춰요
+    const maxY = Math.max(contentHeight.current - viewportHeight.current, 0);
+    const target = Math.min(Math.max(scrollYOf(key), 0), maxY);
+    if (Math.abs(scrollY.current - target) < 1) return; // 이미 그 위치
+
+    // 이전 점프의 타이머가 이번 점프를 먼저 풀지 않도록 새로 시작해요
+    endJump();
+    jumpTarget.current = target;
+    jumpTimer.current = setTimeout(endJump, JUMP_FALLBACK_MS);
+    scrollRef.current?.scrollTo({ y: target, animated: true });
   };
 
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    if (isJumping.current) return;
     const { contentOffset, layoutMeasurement, contentSize } = e.nativeEvent;
     const y = contentOffset.y;
+    scrollY.current = y;
+
+    if (jumpTarget.current !== null) {
+      // 목표에 도착하면 점프 끝. 도착 전에는 탭을 바꾸지 않아요.
+      if (Math.abs(y - jumpTarget.current) < 1) endJump();
+      else return;
+    }
+
     // 모집 중인 팀 영역이 짧아서 탭바 아래까지 못 올라와도, 맨 아래에 닿으면 팀 탭으로
     const isAtBottom = y + layoutMeasurement.height >= contentSize.height - 1;
     const next: DetailTab = y >= scrollYOf('teams') - 1 || isAtBottom ? 'teams' : 'detail';
@@ -103,6 +135,14 @@ export default function ContestDetailScreen() {
         stickyHeaderIndices={isTeamable ? [1] : undefined}
         onScroll={isTeamable ? handleScroll : undefined}
         scrollEventThrottle={16}
+        // 이동 중에 손으로 스크롤하면 점프를 멈추고 손 스크롤을 따라가요
+        onScrollBeginDrag={endJump}
+        onLayout={(e) => {
+          viewportHeight.current = e.nativeEvent.layout.height;
+        }}
+        onContentSizeChange={(_, height) => {
+          contentHeight.current = height;
+        }}
       >
         <ContestInfoCard contest={contest} />
 
@@ -158,7 +198,7 @@ export default function ContestDetailScreen() {
       ) : (
         <ContestBottomCTA
           label="원문에서 신청하기 ↗"
-          onPress={() => openBrowserAsync(contest.sourceUrl)}
+          onPress={() => openExternalUrl(contest.sourceUrl)}
         />
       )}
     </View>
