@@ -6,7 +6,8 @@ import { ScrollView, View, useWindowDimensions, type ScrollViewInstance } from '
 import { GiutMark } from '@/components/brand/GiutMark';
 import { Press, Text } from '@/components/ui';
 import { role, space, type RoleName } from '@/theme';
-import type { Contest } from '@/types/contest';
+import { CATEGORY_LABEL } from '@/screens/contests/contest';
+import type { ContestDetail } from '@/screens/contests/contestDetail';
 import { formatDday, formatShortDate } from '@/utils/date';
 
 import { S } from './DeadlineSection.styles';
@@ -17,7 +18,7 @@ const AUTO_SLIDE_MS = 5000;
 const FALLBACK_ROLES: RoleName[] = ['dev', 'design', 'plan', 'mkt'];
 
 type DeadlineSectionProps = {
-  contests: Contest[];
+  contests: ContestDetail[];
 };
 
 export function DeadlineSection({ contests }: DeadlineSectionProps) {
@@ -110,7 +111,7 @@ export function DeadlineSection({ contests }: DeadlineSectionProps) {
               // 스크린리더는 카드 전체를 한 번에 읽어요 (D-day 글자 칸을 하나씩 읽지 않도록)
               accessible
               accessibilityRole="button"
-              accessibilityLabel={`${contest.title}, ${formatDday(contest.endDate)}, ${formatShortDate(contest.endDate)} 마감`}
+              accessibilityLabel={`${contest.title}, ${formatDday(contest.deadline)}, ${formatShortDate(contest.deadline)} 마감`}
             >
               {hasPoster ? (
                 <>
@@ -136,7 +137,7 @@ export function DeadlineSection({ contests }: DeadlineSectionProps) {
                 <View style={S.topRow}>
                   <View style={[S.badge, !hasPoster && S.badgeFallback]}>
                     <Text variant="badge" color={accentColor}>
-                      {contest.field}
+                      {CATEGORY_LABEL[contest.category]}
                     </Text>
                   </View>
                   <Text variant="meta" color={subColor}>
@@ -145,7 +146,7 @@ export function DeadlineSection({ contests }: DeadlineSectionProps) {
                 </View>
 
                 <View style={S.ddayRow}>
-                  {formatDday(contest.endDate)
+                  {formatDday(contest.deadline)
                     .split('')
                     .map((char, i) => (
                       <View
@@ -168,7 +169,7 @@ export function DeadlineSection({ contests }: DeadlineSectionProps) {
 
                 <View style={S.bottom}>
                   <Text variant="caption" color={subColor}>
-                    {formatShortDate(contest.endDate)} 마감
+                    {formatShortDate(contest.deadline)} 마감
                   </Text>
                   <Text variant="titleMd" color={textColor} numberOfLines={1}>
                     {contest.title}

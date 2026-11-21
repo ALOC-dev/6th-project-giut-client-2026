@@ -1,10 +1,10 @@
-import type { Team } from '@/types/team';
+import type { Team } from './team';
 
-export const TEAMS: Team[] = [
-  // 공모전 1: 서울시립대 홍보 콘텐츠
+export const MOCK_TEAMS: Team[] = [
+  // 공모전 21: 서울시립대 홍보 콘텐츠
   {
     id: '1',
-    contestId: '1',
+    contestId: '21',
     name: '시립대 숏폼 연구소',
     capacity: 4,
     recruitEndDate: '2026-11-18',
@@ -24,10 +24,10 @@ export const TEAMS: Team[] = [
     cooperationTools: ['디스코드', '노션'],
   },
 
-  // 공모전 2: 스마트 캠퍼스 연구논문 (모집 중인 팀 3)
+  // 공모전 22: 스마트 캠퍼스 연구논문 (모집 중인 팀 3)
   {
     id: '2',
-    contestId: '2',
+    contestId: '22',
     name: '캠퍼스 데이터랩',
     capacity: 10,
     recruitEndDate: '2026-11-20',
@@ -52,7 +52,7 @@ export const TEAMS: Team[] = [
   },
   {
     id: '3',
-    contestId: '2',
+    contestId: '22',
     name: '스마트 강의실 실험연구',
     capacity: 3,
     recruitEndDate: '2026-11-21',
@@ -69,7 +69,7 @@ export const TEAMS: Team[] = [
   },
   {
     id: '4',
-    contestId: '2',
+    contestId: '22',
     name: '에너지 절감 리포트',
     capacity: 5,
     recruitEndDate: '2026-11-23',
@@ -89,12 +89,12 @@ export const TEAMS: Team[] = [
     cooperationTools: ['디스코드', '슬랙', '노션'],
   },
 
-  // 공모전 3: 개인 참가라 팀 없음
+  // 공모전 23: 개인 참가라 팀 없음
 
-  // 공모전 4: 캠퍼스 해커톤
+  // 공모전 24: 캠퍼스 해커톤
   {
     id: '5',
-    contestId: '4',
+    contestId: '24',
     name: '밤샘 코더즈',
     capacity: 4,
     recruitEndDate: '2026-11-20',
@@ -114,7 +114,7 @@ export const TEAMS: Team[] = [
   },
   {
     id: '6',
-    contestId: '4',
+    contestId: '24',
     name: '픽셀 앤 로직',
     capacity: 4,
     recruitEndDate: '2026-11-21',
@@ -131,10 +131,10 @@ export const TEAMS: Team[] = [
     cooperationTools: ['디스코드', '슬랙'],
   },
 
-  // 공모전 5: 로컬 브랜드 서포터즈
+  // 공모전 25: 로컬 브랜드 서포터즈
   {
     id: '7',
-    contestId: '5',
+    contestId: '25',
     name: '동네 브랜드 크루',
     capacity: 3,
     recruitEndDate: '2026-11-30',
@@ -151,12 +151,12 @@ export const TEAMS: Team[] = [
     cooperationTools: ['노션'],
   },
 
-  // 공모전 6: 서비스 디자인 경진대회는 "모집 중인 팀 0" 확인용으로 팀 없음
+  // 공모전 26: 서비스 디자인 경진대회는 "모집 중인 팀 0" 확인용으로 팀 없음
 
-  // 공모전 7: Z세대 브랜드 캠페인 (모집 중인 팀 3)
+  // 공모전 27: Z세대 브랜드 캠페인 (모집 중인 팀 3)
   {
     id: '8',
-    contestId: '7',
+    contestId: '27',
     name: '브랜드 실험실',
     capacity: 4,
     recruitEndDate: '2026-11-19',
@@ -176,7 +176,7 @@ export const TEAMS: Team[] = [
   },
   {
     id: '9',
-    contestId: '7',
+    contestId: '27',
     name: '캠페인 메이커스',
     capacity: 3,
     recruitEndDate: '2026-11-19',
@@ -193,7 +193,7 @@ export const TEAMS: Team[] = [
   },
   {
     id: '10',
-    contestId: '7',
+    contestId: '27',
     name: '숏폼 크리에이터즈',
     capacity: 3,
     recruitEndDate: '2026-11-19',
@@ -209,10 +209,10 @@ export const TEAMS: Team[] = [
     cooperationTools: ['디스코드'],
   },
 
-  // 공모전 8: 생성형 AI 서비스 (모집 중인 팀 2)
+  // 공모전 28: 생성형 AI 서비스 (모집 중인 팀 2)
   {
     id: '11',
-    contestId: '8',
+    contestId: '28',
     name: 'AI 놀이터',
     capacity: 4,
     recruitEndDate: '2026-11-24',
@@ -232,7 +232,7 @@ export const TEAMS: Team[] = [
   },
   {
     id: '12',
-    contestId: '8',
+    contestId: '28',
     name: '프롬프트 크루',
     capacity: 4,
     recruitEndDate: '2026-11-25',
@@ -248,10 +248,10 @@ export const TEAMS: Team[] = [
     cooperationTools: ['슬랙', '노션'],
   },
 
-  // 공모전 9: 공공 사이니지 UX (모집 중인 팀 1)
+  // 공모전 29: 공공 사이니지 UX (모집 중인 팀 1)
   {
     id: '13',
-    contestId: '9',
+    contestId: '29',
     name: '사인 앤 서비스',
     capacity: 3,
     recruitEndDate: '2026-11-28',
@@ -269,9 +269,9 @@ export const TEAMS: Team[] = [
 ];
 
 export function getTeam(id: string): Team | undefined {
-  return TEAMS.find((team) => team.id === id);
+  return MOCK_TEAMS.find((team) => team.id === id);
 }
 
 export function getTeamsByContest(contestId: string): Team[] {
-  return TEAMS.filter((team) => team.contestId === contestId);
+  return MOCK_TEAMS.filter((team) => team.contestId === contestId);
 }

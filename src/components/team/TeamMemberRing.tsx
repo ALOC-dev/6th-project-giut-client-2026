@@ -3,7 +3,7 @@ import Svg, { Circle, G } from 'react-native-svg';
 
 import { Text } from '@/components/ui';
 import { color, role } from '@/theme';
-import type { Member } from '@/types/team';
+import type { Member } from '@/screens/teams';
 
 type TeamMemberRingProps = {
   members: Member[];

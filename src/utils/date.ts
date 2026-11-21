@@ -26,6 +26,13 @@ export function formatShortDate(value: string) {
   return `${month}.${day} (${WEEKDAYS[date.getDay()]})`;
 }
 
+// '2026-11-25' → '2026.11.25'
+export function formatFullDate(value: string) {
+  const date = parseDate(value);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}.${pad(date.getMonth() + 1)}.${pad(date.getDate())}`;
+}
+
 export function formatPeriod(startDate: string, endDate: string) {
   const start = parseDate(startDate);
   const end = parseDate(endDate);
