@@ -5,16 +5,24 @@ import { AppHeader } from '@/components/ui';
 import { CONTESTS } from '@/mocks/contests';
 import { color } from '@/theme';
 import { getDday } from '@/utils/date';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
+
+import { Button, Text } from '@/components/ui';
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const closingThisWeek = CONTESTS.filter((contest) => {
-    const dday = getDday(contest.endDate);
-    return dday >= 0 && dday <= 6;
-  });
+  // TODO: API 연결 시 서버에서 받아온 목록으로 교체하고, 의존성 배열에 그 목록을 넣어요
+  const closingThisWeek = useMemo(
+    () =>
+      CONTESTS.filter((contest) => {
+        const dday = getDday(contest.endDate);
+        return dday >= 0 && dday <= 6;
+      }),
+    [],
+  );
   const [showBanner, setShowBanner] = useState(true);
 
   return (
@@ -23,7 +31,8 @@ export default function HomeScreen() {
         <AppHeader onPressNotification={() => {}} onPressSearch={() => {}} />
       </View>
       <ScrollView>
-        <DeadlineSection contests={closingThisWeek} />
+        {/* 이번 주 마감 공모전이 없으면 섹션을 숨겨요 */}
+        {closingThisWeek.length > 0 && <DeadlineSection contests={closingThisWeek} />}
         <CategorySection />
         {showBanner && (
           <InterestBanner

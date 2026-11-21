@@ -9,13 +9,30 @@ export function CategorySection() {
     <View style={S.section}>
       <View style={S.header}>
         <Text variant="titleMd">분야별로 둘러보기</Text>
-        <Text variant="caption" color="textMuted">
-          전체 보기 ›
-        </Text>
+        {/* TODO: 공모전 목록 화면(PR #11)이 합쳐지면 이동 연결 후 disabled 제거 */}
+        <Press
+          disabled
+          touchSize={20}
+          accessibilityRole="button"
+          accessibilityLabel="분야 전체 보기"
+          accessibilityState={{ disabled: true }}
+        >
+          <Text variant="caption" color="textMuted">
+            전체 보기 ›
+          </Text>
+        </Press>
       </View>
       <View style={S.grid}>
         {CATEGORIES.map(({ label, Icon }) => (
-          <Press key={label} style={S.item} onPress={() => {}}>
+          // TODO: 공모전 목록 화면(PR #11)이 합쳐지면 해당 분야로 필터해서 이동 연결 후 disabled 제거
+          <Press
+            key={label}
+            style={S.item}
+            disabled
+            accessibilityRole="button"
+            accessibilityLabel={label}
+            accessibilityState={{ disabled: true }}
+          >
             <Icon size={24} color={color.ink} />
             <Text variant="caption">{label}</Text>
           </Press>

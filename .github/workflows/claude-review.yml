@@ -1,0 +1,57 @@
+name: Claude PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    # 초안(Draft) PR은 건너뛰고, 포크에서 온 PR은 시크릿이 없으므로 제외한다.
+    if: github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
+            이 Expo(React Native, TypeScript, Expo Router) 앱 PR을 한국어로 리뷰해줘.
+            저장소 루트의 AGENTS.md에 있는 프로젝트 규칙을 먼저 읽고 기준으로 삼아.
+            우선순위는 아래 순서야.
+            1. 버그 가능성: 비동기·상태 처리(useEffect 의존성, 언마운트 뒤 상태 변경, 요청 경쟁),
+               로딩·에러·빈 상태 처리 누락, null/undefined 처리
+            2. 프로젝트 규칙 위반: src/app/에 화면이 아닌 코드, 생성 파일(src/theme/colors.ts,
+               typography.ts, layout.ts, shadows.ts) 직접 수정, ios/·android/ 직접 생성,
+               tokens.json을 거치지 않은 색·간격 하드코딩
+            3. 성능: 긴 목록을 ScrollView + map으로 렌더링, 불필요한 리렌더, 큰 이미지
+            4. 보안: 토큰·키 하드코딩, 민감 정보를 안전하지 않은 저장소에 저장
+            5. iOS·Android 차이와 접근성(터치 영역, accessibilityLabel)
+            포맷은 Prettier·ESLint가 맡으므로 스타일·네이밍 지적은 꼭 필요한 경우에만 해줘.
+            Expo API는 버전마다 바뀌므로, 확신이 없는 API 지적은 단정하지 말고 확인이 필요하다고 써줘.
+            문제가 없으면 "특이사항 없음"이라고 짧게 한 줄로 남겨줘.
+
+            PR 브랜치는 이미 현재 작업 디렉터리에 체크아웃되어 있어.
+            전체 요약은 `gh pr comment`로 한 번만 남기고,
+            특정 코드 줄에 대한 지적은 `mcp__github_inline_comment__create_inline_comment`
+            (confirmed: true)로 남겨줘.
+            GitHub 코멘트 외에 다른 방식으로 결과를 출력하지 마.
+
+          claude_args: |
+            --max-turns 12
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"

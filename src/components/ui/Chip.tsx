@@ -1,5 +1,5 @@
 import { View, type StyleProp, type ViewStyle } from 'react-native';
-import { color, radius, shadow } from '@/theme';
+import { color, radius, shadow, space } from '@/theme';
 import { Press } from './Press';
 import { Text } from './Text';
 
@@ -24,7 +24,7 @@ export function Chip(props: ChipProps) {
       <Text
         variant="caption"
         maxFontSizeMultiplier={1.5}
-        style={{ color: on ? '#FFFFFF' : deletable ? color.ink : color.textBody }}
+        style={{ color: on ? color.surface : deletable ? color.ink : color.textBody }}
       >
         {label}
       </Text>
@@ -35,11 +35,11 @@ export function Chip(props: ChipProps) {
     {
       height: 36,
       borderRadius: radius.full,
-      paddingLeft: icon ? 10 : 14,
-      paddingRight: deletable ? 8 : 14,
+      paddingLeft: icon ? space[2.5] : space[3.5],
+      paddingRight: deletable ? space[2] : space[3.5],
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 6,
+      gap: space[1.5],
       borderWidth: 1,
       backgroundColor: on ? color.brand : color.surface,
       borderColor: on ? color.brand : color.line,
@@ -53,7 +53,7 @@ export function Chip(props: ChipProps) {
       <View style={shell}>
         <Press
           onPress={props.onPress}
-          style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+          style={{ flexDirection: 'row', alignItems: 'center', gap: space[1.5] }}
         >
           {body}
         </Press>

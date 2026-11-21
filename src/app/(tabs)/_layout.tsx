@@ -5,7 +5,7 @@ import { View, type LayoutChangeEvent } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomNavigation, type BottomNavigationItem } from '@/components/ui';
-import { space } from '@/theme';
+import { color, layout, space } from '@/theme';
 
 type TabKey = 'home' | 'team' | 'giuthub' | 'chat' | 'my';
 
@@ -51,9 +51,10 @@ const TAB_PATHS: Record<TabKey, Href> = {
 export default function TabsLayout() {
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
-  const [bottomNavigationHeight, setBottomNavigationHeight] = useState(0);
-  const contentPaddingBottom = bottomNavigationHeight;
   const bottomNavigationOffset = Math.max(insets.bottom - space[4], 0);
+  const [bottomNavigationHeight, setBottomNavigationHeight] = useState(
+    layout.bottomNavigationMinHeight + bottomNavigationOffset,
+  );
 
   const handleBottomNavigationLayout = (event: LayoutChangeEvent) => {
     setBottomNavigationHeight(event.nativeEvent.layout.height);
@@ -63,8 +64,14 @@ export default function TabsLayout() {
     (Object.keys(TAB_PATHS) as TabKey[]).find((key) => TAB_PATHS[key] === pathname) ?? 'home';
 
   return (
-    <Tabs>
-      <View style={{ flex: 1, paddingBottom: contentPaddingBottom }}>
+    <Tabs style={{ flex: 1, backgroundColor: color.surface }}>
+      <View
+        style={{
+          flex: 1,
+          paddingBottom: bottomNavigationHeight,
+          backgroundColor: color.surface,
+        }}
+      >
         <TabSlot />
       </View>
 
@@ -74,6 +81,7 @@ export default function TabsLayout() {
         <TabTrigger name="giuthub" href="/giuthub" />
         <TabTrigger name="chat" href="/chat" />
         <TabTrigger name="my" href="/my" />
+        <TabTrigger name="contest" href="/contest" />
       </TabList>
 
       <View
