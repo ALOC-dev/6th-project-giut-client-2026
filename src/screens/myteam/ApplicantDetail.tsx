@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
   iconButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   headerTitle: { flex: 1 },
   pager: { flexDirection: 'row', alignItems: 'center', gap: space[1] },
-  pagerButton: { width: 36, height: 44, alignItems: 'center', justifyContent: 'center' },
+  pagerButton: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   disabled: { opacity: 0.3 },
   count: {
     minWidth: 42,

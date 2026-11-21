@@ -54,7 +54,8 @@ export function MyTeamScreen({
   const [showAll, setShowAll] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [cancelVisible, setCancelVisible] = useState(false);
-  const [applicantIndex, setApplicantIndex] = useState<number | null>(null);
+  const [applicantIndex, setApplicantIndex] = useState(0);
+  const [applicantVisible, setApplicantVisible] = useState(false);
   const [decisions, setDecisions] = useState<Record<string, ApplicantDecision>>({});
 
   const activeTeams = useMemo(() => teams.filter((team) => team.kind !== 'ended'), [teams]);
@@ -164,7 +165,13 @@ export function MyTeamScreen({
             {selectedTeam.kind === 'leader' ? (
               <>
                 {applicants.length > 0 ? (
-                  <ApplicantCards applicants={applicants} onOpen={setApplicantIndex} />
+                  <ApplicantCards
+                    applicants={applicants}
+                    onOpen={(index) => {
+                      setApplicantIndex(index);
+                      setApplicantVisible(true);
+                    }}
+                  />
                 ) : (
                   <NoApplicants />
                 )}
@@ -182,12 +189,12 @@ export function MyTeamScreen({
       </ScrollView>
 
       <ApplicantDetail
-        visible={applicantIndex !== null}
+        visible={applicantVisible}
         applicants={applicants}
-        index={applicantIndex ?? 0}
+        index={applicantIndex}
         decisions={decisions}
         onIndexChange={setApplicantIndex}
-        onClose={() => setApplicantIndex(null)}
+        onClose={() => setApplicantVisible(false)}
         onDecide={(applicant, decision) =>
           setDecisions((current) => ({ ...current, [applicant.id]: decision }))
         }
