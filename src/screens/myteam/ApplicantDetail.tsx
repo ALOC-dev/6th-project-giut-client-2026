@@ -17,10 +17,10 @@ import Animated, {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ChevronIcon } from '@/components/icons';
+import { ApplicationCard } from '@/components/application';
 import { Button, Press, Text } from '@/components/ui';
 import { color, space, useMotion } from '@/theme';
 
-import { ApplicationCard } from './ApplicationPanel';
 import type { Applicant, ApplicantDecision } from './types';
 
 export function ApplicantDetail({
@@ -118,7 +118,7 @@ export function ApplicantDetail({
   const decision = decisions[applicant.id];
 
   return (
-    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
+    <Modal visible={visible} animationType={reduced ? 'none' : 'slide'} onRequestClose={onClose}>
       <View style={[styles.screen, { paddingTop: insets.top }]}>
         <View style={styles.header}>
           <Press

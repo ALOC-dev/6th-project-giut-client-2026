@@ -8,7 +8,7 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import Svg, { Circle, Path } from 'react-native-svg';
+import Svg, { Circle, Path, Rect } from 'react-native-svg';
 
 import { color, radius, useMotion } from '@/theme';
 
@@ -24,6 +24,39 @@ export function SearchIcon({ size = 18, color: iconColor = color.textMuted }: Ic
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <Circle cx={11} cy={11} r={6.5} stroke={iconColor} strokeWidth={2} />
       <Path d="M16 16l4 4" stroke={iconColor} strokeWidth={2} strokeLinecap="round" />
+    </Svg>
+  );
+}
+
+export function EnvelopeIcon({
+  width = 20,
+  height = 16,
+  color: iconColor = color.ink,
+  strokeWidth = 1.6,
+}: {
+  width?: number;
+  height?: number;
+  color?: string;
+  strokeWidth?: number;
+}) {
+  return (
+    <Svg width={width} height={height} viewBox="0 0 20 16" fill="none">
+      <Rect
+        x={1}
+        y={1}
+        width={18}
+        height={14}
+        rx={3}
+        stroke={iconColor}
+        strokeWidth={strokeWidth}
+      />
+      <Path
+        d="M2 2.6 10 8.5l8-5.9"
+        stroke={iconColor}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </Svg>
   );
 }

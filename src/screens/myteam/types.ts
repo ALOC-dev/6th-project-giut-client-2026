@@ -1,3 +1,5 @@
+import type { ApplicationAnswer, ApplicationCardData } from '@/components/application';
+
 export type TeamKind = 'pending' | 'leader' | 'member' | 'ended';
 
 export type Team = {
@@ -15,20 +17,9 @@ export type Team = {
 
 export type TeamFilter = 'all' | 'leader' | 'member' | 'pending';
 
-export type Answer = {
-  tag: string;
-  question: string;
-  answer: string;
-};
+export type Answer = ApplicationAnswer;
 
-export type Application = {
-  name: string;
-  position: string;
-  field: string;
-  hours: number;
-  availableSlots: number[];
-  answers: Answer[];
-};
+export type Application = ApplicationCardData;
 
 export type Applicant = Application & {
   id: string;

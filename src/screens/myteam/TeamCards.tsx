@@ -13,12 +13,13 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Circle, G, Path, Rect } from 'react-native-svg';
+import Svg, { Circle, G, Path } from 'react-native-svg';
 
 import {
   AnimatedFilterIcon,
   CheckIcon,
   ChevronIcon,
+  EnvelopeIcon,
   PersonSilhouetteIcon,
 } from '@/components/icons';
 import { Button, Press, Text } from '@/components/ui';
@@ -255,16 +256,7 @@ function UnreadMail({ count }: { count: number }) {
   return (
     <View style={styles.mailWrap} accessibilityLabel={`새 지원 ${count}건`}>
       <View>
-        <Svg width={20} height={16} viewBox="0 0 20 16" fill="none">
-          <Rect x={1} y={1} width={18} height={14} rx={3} stroke={color.ink} strokeWidth={1.6} />
-          <Path
-            d="M2 2.6 10 8.5l8-5.9"
-            stroke={color.ink}
-            strokeWidth={1.6}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </Svg>
+        <EnvelopeIcon />
         <Animated.View pointerEvents="none" style={[styles.alertDot, dotStyle]} />
         <Animated.View pointerEvents="none" style={[styles.alertRing, ringStyle]} />
       </View>
@@ -425,24 +417,7 @@ export function NoApplicants() {
           </Animated.View>
           <View style={styles.waitingEnvelopeBadge}>
             <Animated.View style={envelopeStyle}>
-              <Svg width={26} height={20} viewBox="0 0 18 14" fill="none">
-                <Rect
-                  x={1}
-                  y={1}
-                  width={16}
-                  height={12}
-                  rx={2.5}
-                  stroke={color.brand}
-                  strokeWidth={1.5}
-                />
-                <Path
-                  d="M1.8 2.2 9 7.6l7.2-5.4"
-                  stroke={color.brand}
-                  strokeWidth={1.5}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </Svg>
+              <EnvelopeIcon width={26} height={20} color={color.brand} strokeWidth={1.5} />
             </Animated.View>
           </View>
         </View>
