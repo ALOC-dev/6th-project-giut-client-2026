@@ -20,10 +20,11 @@ const RECOMMEND_COUNT = 3;
 
 type HomeScreenProps = {
   contests: ContestDetail[];
-  onPressAllContests: () => void;
+  // 분야를 넘기면 그 분야 탭으로, 안 넘기면 전체 탭으로 공모전 목록을 열어요
+  onOpenContestList: (activityType?: ActivityType) => void;
 };
 
-export function HomeScreen({ contests, onPressAllContests }: HomeScreenProps) {
+export function HomeScreen({ contests, onOpenContestList }: HomeScreenProps) {
   const insets = useSafeAreaInsets();
   const [showBanner, setShowBanner] = useState(true);
 
@@ -56,7 +57,10 @@ export function HomeScreen({ contests, onPressAllContests }: HomeScreenProps) {
       </View>
       <ScrollView>
         {closingThisWeek.length > 0 && <DeadlineSection contests={closingThisWeek} />}
-        <CategorySection onPressAll={onPressAllContests} />
+        <CategorySection
+          onPressAll={() => onOpenContestList()}
+          onPressCategory={onOpenContestList}
+        />
         {showBanner && (
           <InterestBanner
             onSubmit={() => setShowBanner(false)}

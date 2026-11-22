@@ -27,7 +27,7 @@ export type HomeCategoryLabel =
 export type HomeCategory = {
   label: HomeCategoryLabel;
   Icon: typeof TrophyIcon;
-  activityType: ActivityType | null;
+  activityType: ActivityType;
 };
 
 export const HOME_CATEGORIES: HomeCategory[] = [
