@@ -11,11 +11,10 @@ import { color, space } from '@/theme';
 type ContestHeaderProps = {
   title?: string;
   bookmarked?: boolean;
-  onPressBookmark?: () => void; // 없으면 저장 버튼을 숨겨요
-  onPressShare?: () => void; // 없으면 공유 버튼을 숨겨요
+  onPressBookmark?: () => void; // 없으면 버튼 숨김
+  onPressShare?: () => void; // 없으면 버튼 숨김
 };
 
-// 공모전 상세 상단 헤더: 뒤로 가기 / 제목 / 저장 · 공유
 export function ContestHeader({
   title,
   bookmarked = false,
@@ -97,7 +96,7 @@ const S = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  // 최소 터치 영역 44pt (공통 BellButton·HIT_SLOP_44와 같은 기준)
+  // 최소 터치 영역 44pt
   iconButton: {
     width: ICON_BUTTON_SIZE,
     height: ICON_BUTTON_SIZE,

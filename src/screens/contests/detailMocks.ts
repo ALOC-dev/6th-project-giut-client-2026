@@ -23,7 +23,6 @@ const DEFAULT_DETAIL: ContestDetailInfo = {
   description: '상세 내용을 준비하고 있어요.',
 };
 
-// 공모전 id → 상세 정보 (목록 정보는 mocks.ts의 MOCK_CONTESTS)
 const MOCK_CONTEST_DETAILS: Record<string, ContestDetailInfo> = {
   '21': {
     applyFrom: '2026-11-02',
@@ -81,7 +80,6 @@ const MOCK_CONTEST_DETAILS: Record<string, ContestDetailInfo> = {
     sourceName: '데이터디자인포럼',
     description: SAMPLE_DESCRIPTION,
   },
-  // 27~29: 홈 "○○님을 위한 추천" 시안 데이터
   '27': {
     applyFrom: '2026-11-01',
     participationType: 'both',
@@ -111,7 +109,6 @@ const MOCK_CONTEST_DETAILS: Record<string, ContestDetailInfo> = {
   },
 };
 
-// 목록 정보 + 상세 정보를 합쳐서 돌려줘요. 상세 정보가 없으면 기본값을 써요.
 export function getContestDetail(id: string): ContestDetail | undefined {
   const contest = MOCK_CONTESTS.find((item) => item.id === id);
   if (!contest) return undefined;
@@ -122,11 +119,4 @@ export function getContestDetails(): ContestDetail[] {
   return MOCK_CONTESTS.map((contest) => getContestDetail(contest.id)).filter(
     (contest) => contest !== undefined,
   );
-}
-
-// 추천 공모전 (나중에 서버의 추천 결과로 바뀔 자리)
-const RECOMMENDED_IDS = ['27', '28', '29'];
-
-export function getRecommendedContests(): ContestDetail[] {
-  return RECOMMENDED_IDS.map(getContestDetail).filter((contest) => contest !== undefined);
 }

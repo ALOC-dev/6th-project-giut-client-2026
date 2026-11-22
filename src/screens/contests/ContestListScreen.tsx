@@ -1,11 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Pressable,
   Animated as RNAnimated,
   Easing as RNEasing,
   ScrollView,
   View,
+  type LayoutChangeEvent,
   type ListRenderItemInfo,
+  type ScrollViewInstance,
 } from 'react-native';
 import Animated, {
   useAnimatedScrollHandler,
@@ -27,6 +29,7 @@ import {
   countFilters,
   daysUntil,
   overlaps,
+  type ActivityType,
   type Contest,
   type ContestFilter,
 } from './contest';
@@ -105,8 +108,15 @@ function EmptyContests({ title }: { title: string }) {
   );
 }
 
+// 다른 화면에서 특정 탭으로 목록을 열어달라는 요청. key가 바뀔 때마다 한 번 적용해요
+export type ContestActivityRequest = {
+  key: string;
+  activityType: ActivityType | null;
+};
+
 export type ContestListScreenProps = {
   contests: Contest[];
+  activityRequest?: ContestActivityRequest;
   savedIds?: string[];
   onPressHome?: () => void;
   onToggleSave?: (c: Contest) => void;
@@ -116,6 +126,7 @@ export type ContestListScreenProps = {
 
 export function ContestListScreen({
   contests,
+  activityRequest,
   savedIds = [],
   onPressHome,
   onToggleSave,
@@ -124,6 +135,46 @@ export function ContestListScreen({
 }: ContestListScreenProps) {
   const insets = useSafeAreaInsets();
   const [filter, setFilter] = useState<ContestFilter>(EMPTY_FILTER);
+
+  // 새 요청이 오면 필터를 초기화하고 요청한 탭을 선택해요
+  // (탭 화면은 계속 살아 있어서 처음 한 번이 아니라 요청이 올 때마다 적용해야 해요)
+  const [appliedRequestKey, setAppliedRequestKey] = useState<string>();
+  if (activityRequest && activityRequest.key !== appliedRequestKey) {
+    setAppliedRequestKey(activityRequest.key);
+    setFilter({ ...EMPTY_FILTER, activityType: activityRequest.activityType });
+  }
+
+  // 선택된 탭이 화면 밖에 있으면 가운데로 스크롤해요
+  const tabsRef = useRef<ScrollViewInstance>(null);
+  const tabsWidth = useRef(0);
+  const tabsContentWidth = useRef(0);
+  const tabLayouts = useRef<Record<string, { x: number; width: number }>>({});
+  const pendingTabScroll = useRef(false); // 탭 위치를 아직 못 쟀으면 잰 뒤에 스크롤
+  const selectedTabKey = filter.activityType ?? 'all';
+
+  const scrollToTab = useCallback((key: string, animated: boolean) => {
+    const layout = tabLayouts.current[key];
+    if (!layout || tabsWidth.current === 0 || tabsContentWidth.current === 0) return false;
+    // 끝 탭이면 내용 끝을 넘지 않게 최대 위치로 제한해요 (iOS는 넘어가도 그대로 멈춰 있어요)
+    const maxX = Math.max(tabsContentWidth.current - tabsWidth.current, 0);
+    const centered = layout.x - (tabsWidth.current - layout.width) / 2;
+    const x = Math.min(Math.max(centered, 0), maxX);
+    tabsRef.current?.scrollTo({ x, animated });
+    return true;
+  }, []);
+
+  useEffect(() => {
+    pendingTabScroll.current = !scrollToTab(selectedTabKey, true);
+  }, [selectedTabKey, scrollToTab]);
+
+  const handleTabLayout = (key: string, e: LayoutChangeEvent) => {
+    const { x, width } = e.nativeEvent.layout;
+    tabLayouts.current[key] = { x, width };
+    if (pendingTabScroll.current && key === selectedTabKey) {
+      pendingTabScroll.current = !scrollToTab(key, false);
+    }
+  };
+
   const [sort, setSort] = useState<SortKey>('deadline');
   const [sheet, setSheet] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
@@ -205,16 +256,27 @@ export function ContestListScreen({
 
       <View style={screenStyles.tabsWrap}>
         <ScrollView
+          ref={tabsRef}
           horizontal
           accessibilityRole="tablist"
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={screenStyles.tabs}
+          onLayout={(e) => {
+            tabsWidth.current = e.nativeEvent.layout.width;
+          }}
+          onContentSizeChange={(width) => {
+            tabsContentWidth.current = width;
+            if (pendingTabScroll.current) {
+              pendingTabScroll.current = !scrollToTab(selectedTabKey, false);
+            }
+          }}
         >
           {[null, ...ACTIVITY_TABS].map((t) => {
             const on = filter.activityType === t;
             return (
               <Pressable
                 key={t ?? 'all'}
+                onLayout={(e) => handleTabLayout(t ?? 'all', e)}
                 hitSlop={{ left: 8, right: 8 }}
                 accessibilityRole="tab"
                 accessibilityState={{ selected: on }}

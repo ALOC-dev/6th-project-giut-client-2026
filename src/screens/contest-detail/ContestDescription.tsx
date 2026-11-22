@@ -8,7 +8,6 @@ type ContestDescriptionProps = {
   sourceName: string;
 };
 
-// 공모전 상세 내용 (줄바꿈을 그대로 보여줘요) + 맨 아래 출처
 export function ContestDescription({ description, sourceName }: ContestDescriptionProps) {
   return (
     <View style={S.wrap}>

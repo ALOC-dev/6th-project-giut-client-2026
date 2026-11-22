@@ -14,7 +14,6 @@ export const S = StyleSheet.create({
     ...shadow.card,
   },
 
-  // 태그, 제목, 주최
   top: {
     gap: space[1],
     paddingBottom: space[4],
@@ -23,7 +22,6 @@ export const S = StyleSheet.create({
     fontWeight: '700',
   },
 
-  // 정보 줄
   row: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -36,7 +34,7 @@ export const S = StyleSheet.create({
     paddingBottom: 0,
   },
   label: {
-    width: 64, // 라벨 너비를 고정해서 값들이 같은 위치에서 시작해요
+    width: 64,
   },
   value: {
     flex: 1,
@@ -50,7 +48,6 @@ export const S = StyleSheet.create({
     fontWeight: '800',
   },
 
-  // 원문 링크 + 출처
   source: {
     alignItems: 'flex-end',
     gap: 2,

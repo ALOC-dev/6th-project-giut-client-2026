@@ -9,7 +9,6 @@ type ContestBottomCTAProps = {
   onPress: () => void;
 };
 
-// 화면 맨 아래에 고정된 버튼 영역
 export function ContestBottomCTA({ label, onPress }: ContestBottomCTAProps) {
   const insets = useSafeAreaInsets();
 
