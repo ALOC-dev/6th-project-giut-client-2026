@@ -28,15 +28,6 @@ export function HomeScreen({ contests, onOpenContestList }: HomeScreenProps) {
   const insets = useSafeAreaInsets();
   const [showBanner, setShowBanner] = useState(true);
 
-  const closingThisWeek = useMemo(
-    () =>
-      contests.filter((contest) => {
-        const dday = getDday(contest.deadline);
-        return dday >= 0 && dday <= 6;
-      }),
-    [contests],
-  );
-
   // 관심 분야 + 마감 전 공모전 중 조회수 순
   // TODO: 추천 API가 생기면 서버 추천 결과로 교체
   const recommended = useMemo(
@@ -56,7 +47,8 @@ export function HomeScreen({ contests, onOpenContestList }: HomeScreenProps) {
         <AppHeader onPressNotification={() => {}} onPressSearch={() => {}} />
       </View>
       <ScrollView>
-        {closingThisWeek.length > 0 && <DeadlineSection contests={closingThisWeek} />}
+        {/* 이번 주 마감 공모전은 섹션 안에서 고르고, 없으면 섹션이 숨겨져요 */}
+        <DeadlineSection contests={contests} />
         <CategorySection
           onPressAll={() => onOpenContestList()}
           onPressCategory={onOpenContestList}

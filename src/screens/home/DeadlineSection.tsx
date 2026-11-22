@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, View, useWindowDimensions, type ScrollViewInstance } from 'react-native';
 
 import { GiutMark } from '@/components/brand/GiutMark';
@@ -17,13 +17,24 @@ const AUTO_SLIDE_MS = 5000;
 // 포스터 없는 카드 색 순서: 파랑 → 주황 → 초록 → 노랑
 const FALLBACK_ROLES: RoleName[] = ['dev', 'design', 'plan', 'mkt'];
 
+// 오늘(D-DAY)부터 며칠 뒤 마감까지 보여줄지
+const WEEK_RANGE_DAYS = 6;
+
 type DeadlineSectionProps = {
-  contests: ContestDetail[];
+  contests: ContestDetail[]; // 전체 공모전. 이번 주 마감은 여기서 골라요
 };
 
 export function DeadlineSection({ contests: allContests }: DeadlineSectionProps) {
-  // 앱을 켜둔 채 날짜가 바뀌어도 마감된 카드가 남지 않게, 그릴 때마다 다시 걸러요
-  const contests = allContests.filter((contest) => getDday(contest.deadline) >= 0);
+  // 날짜가 바뀔 때만 다시 골라요. 앱을 켜둔 채 날짜가 넘어가도 마감된 카드가 남지 않아요
+  // (섹션이 5초마다 다시 그려져서 날짜 변경을 금방 알아채요)
+  const todayKey = new Date().toDateString();
+  const contests = useMemo(() => {
+    const today = new Date(todayKey);
+    return allContests.filter((contest) => {
+      const dday = getDday(contest.deadline, today);
+      return dday >= 0 && dday <= WEEK_RANGE_DAYS;
+    });
+  }, [allContests, todayKey]);
 
   const { width } = useWindowDimensions();
   const cardWidth = width - space[4] * 2;

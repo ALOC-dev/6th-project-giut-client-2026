@@ -3,8 +3,9 @@ function parseDate(value: string) {
   return new Date(year, month - 1, day);
 }
 
-export function getDday(endDate: string) {
-  const today = new Date();
+// base: 기준 날짜 (기본은 지금)
+export function getDday(endDate: string, base: Date = new Date()) {
+  const today = new Date(base);
   today.setHours(0, 0, 0, 0);
   const diff = parseDate(endDate).getTime() - today.getTime();
   return Math.round(diff / (1000 * 60 * 60 * 24));
