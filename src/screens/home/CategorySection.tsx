@@ -64,8 +64,9 @@ const S = StyleSheet.create({
     rowGap: space[5],
   },
   item: {
-    width: '25%',
+    width: '20%',
     alignItems: 'center',
+    paddingBottom: space[2.5],
     gap: space[2],
   },
 });
