@@ -32,10 +32,11 @@ const ARRIVE_TOLERANCE = 2;
 type ContestDetailScreenProps = {
   contest: ContestDetail;
   teams: Team[];
+  onCreateTeam?: () => void;
 };
 
 // 공모전 상세 화면 (데이터는 라우트 파일 app/contest/[id].tsx에서 받아와요)
-export function ContestDetailScreen({ contest, teams }: ContestDetailScreenProps) {
+export function ContestDetailScreen({ contest, teams, onCreateTeam }: ContestDetailScreenProps) {
   const [tab, setTab] = useState<DetailTab>('detail');
 
   const scrollRef = useRef<ScrollViewInstance>(null);
@@ -190,8 +191,7 @@ export function ContestDetailScreen({ contest, teams }: ContestDetailScreenProps
       </ScrollView>
 
       {isTeamable ? (
-        // TODO: 팀 구성하기 화면이 생기면 이동 연결
-        <ContestBottomCTA label="팀 구성하기" onPress={() => {}} />
+        <ContestBottomCTA label="팀 구성하기" onPress={() => onCreateTeam?.()} />
       ) : (
         <ContestBottomCTA
           label="원문에서 신청하기 ↗"

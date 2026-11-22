@@ -1,4 +1,3 @@
-
 export const space = {
   0.5: 2,
   1: 4,
@@ -11,11 +10,13 @@ export const space = {
   4.5: 18,
   5: 20,
   6: 24,
+  7: 28,
   8: 32,
 } as const;
 
 export const layout = {
   bottomNavigationMinHeight: 64,
+  teamCreateNameBottomPadding: 60,
 } as const;
 
 export const radius = {
@@ -23,6 +24,7 @@ export const radius = {
   sm: 6,
   md: 8,
   lg: 10,
+  card: 14,
   xl: 16,
   '2xl': 20,
   full: 9999,

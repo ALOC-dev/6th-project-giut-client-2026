@@ -1,9 +1,9 @@
-
 export const color = {
   brand: '#2F5BFF',
   brandStrong: '#1E46E0',
   brandTint: '#EAF0FF',
   brandSoft: '#F5F8FF',
+  brandBorder: '#B9C6FF',
   brandGradientStart: '#4C8DFF',
 
   ink: '#191B20',
