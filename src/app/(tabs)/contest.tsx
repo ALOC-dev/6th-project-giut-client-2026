@@ -1,6 +1,6 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { Alert } from 'react-native';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { ContestListScreen } from '@/screens/contests/ContestListScreen';
 import { ACTIVITY_TYPES, type ActivityType, type Contest } from '@/screens/contests/contest';
@@ -23,6 +23,12 @@ export default function ContestListRoute() {
       requestKey ? { key: requestKey, activityType: toActivityType(requestActivity) } : undefined,
     [requestKey, requestActivity],
   );
+
+  // 요청은 목록 화면이 그리는 즉시 적용되니, 적용 후에는 주소에서 지워요
+  // (웹 새로고침·딥링크로 같은 필터가 다시 적용되지 않도록)
+  useEffect(() => {
+    if (requestKey) router.setParams({ activity: undefined, key: undefined });
+  }, [requestKey]);
 
   const toggleBookmark = useCallback((contest: Contest) => {
     setBookmarkedIds((current) =>
