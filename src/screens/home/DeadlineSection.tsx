@@ -8,7 +8,7 @@ import { Press, Text } from '@/components/ui';
 import { CATEGORY_LABEL } from '@/screens/contests/contest';
 import type { ContestDetail } from '@/screens/contests/contestDetail';
 import { role, space, type RoleName } from '@/theme';
-import { formatDday, formatShortDate } from '@/utils/date';
+import { formatDday, formatShortDate, getDday } from '@/utils/date';
 
 import { S } from './DeadlineSection.styles';
 
@@ -21,7 +21,10 @@ type DeadlineSectionProps = {
   contests: ContestDetail[];
 };
 
-export function DeadlineSection({ contests }: DeadlineSectionProps) {
+export function DeadlineSection({ contests: allContests }: DeadlineSectionProps) {
+  // 앱을 켜둔 채 날짜가 바뀌어도 마감된 카드가 남지 않게, 그릴 때마다 다시 걸러요
+  const contests = allContests.filter((contest) => getDday(contest.deadline) >= 0);
+
   const { width } = useWindowDimensions();
   const cardWidth = width - space[4] * 2;
   const snap = cardWidth + space[3];
@@ -62,6 +65,8 @@ export function DeadlineSection({ contests }: DeadlineSectionProps) {
   const cardRoles = contests.map((contest) =>
     contest.posterUrl ? null : FALLBACK_ROLES[fallbackCount++ % FALLBACK_ROLES.length],
   );
+
+  if (contests.length === 0) return null;
 
   return (
     <View style={S.section}>
