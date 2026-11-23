@@ -53,6 +53,7 @@ export function TeamCreateStepRoles({ api }: { api: TeamDraftApi }) {
 
           <View
             style={styles.roleGrid}
+            accessibilityRole="radiogroup"
             onLayout={(event) => setGridWidth(event.nativeEvent.layout.width)}
           >
             {TEAM_ROLES.map((role) => (
@@ -170,8 +171,9 @@ function RoleTile({
   return (
     <Pressable
       onPress={onPress}
-      accessibilityRole="button"
-      accessibilityState={{ selected }}
+      accessibilityRole="radio"
+      accessibilityState={{ checked: selected }}
+      accessibilityLabel={role}
       style={styles.roleTilePressable}
     >
       <Animated.View
