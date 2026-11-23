@@ -42,7 +42,7 @@ export function TeamMemberSection({ team }: TeamMemberSectionProps) {
         <Text variant="titleMd">팀원</Text>
         {closed ? (
           <Text variant="body" color="textMuted">
-            빈자리가 없어요
+            지원할 수 없어요
           </Text>
         ) : (
           vacancies.length > 0 && (

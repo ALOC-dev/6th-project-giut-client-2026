@@ -12,10 +12,11 @@ const FOOTER_WORDS = 5;
 
 type TeamTicketProps = {
   children: ReactNode; // 각 자식이 한 구역. 구역 사이에 홈과 점선이 생겨요
+  closed?: boolean; // 모집 마감이면 GIUT 띠가 회색
 };
 
 // 구역 사이 양옆이 반원으로 파이고, 맨 아래에 GIUT 띠가 있는 세로 티켓 카드
-export function TeamTicket({ children }: TeamTicketProps) {
+export function TeamTicket({ children, closed = false }: TeamTicketProps) {
   const sections = Children.toArray(children);
   const [size, setSize] = useState({ width: 0, height: 0 });
   // 구역 경계(각 구역 아래쪽)의 y 위치
@@ -70,7 +71,7 @@ export function TeamTicket({ children }: TeamTicketProps) {
         </View>
       ))}
 
-      <View style={S.footer} accessible={false}>
+      <View style={[S.footer, closed && S.footerClosed]} accessible={false}>
         {Array.from({ length: FOOTER_WORDS }, (_, i) => (
           <Text key={i} variant="micro" color="surface" style={S.footerText}>
             GIUT
@@ -124,6 +125,9 @@ const S = StyleSheet.create({
     backgroundColor: color.brand,
     borderBottomLeftRadius: CORNER,
     borderBottomRightRadius: CORNER, // SVG 테두리와 모서리 모양이 같도록 borderCurve는 안 써요
+  },
+  footerClosed: {
+    backgroundColor: color.textDisabled,
   },
   footerText: {
     fontWeight: '900',

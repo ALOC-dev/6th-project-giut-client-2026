@@ -10,7 +10,7 @@ import { TeamInfoSection } from './TeamInfoSection';
 import { TeamIntroSection } from './TeamIntroSection';
 import { TeamMemberSection } from './TeamMemberSection';
 import { TeamTicket } from './TeamTicket';
-import type { Team } from './team';
+import { isTeamClosed, type Team } from './team';
 
 type TeamDetailScreenProps = {
   team: Team;
@@ -37,7 +37,7 @@ export function TeamDetailScreen({ team, contestTitle, bottomBar }: TeamDetailSc
       />
 
       <ScrollView contentContainerStyle={S.content}>
-        <TeamTicket>
+        <TeamTicket closed={isTeamClosed(team)}>
           <TeamInfoSection team={team} contestTitle={contestTitle} />
           <TeamMemberSection team={team} />
           <TeamIntroSection description={team.description} />

@@ -2,10 +2,10 @@ import { ArrowRightIcon } from 'phosphor-react-native/src/icons/ArrowRight';
 import { StyleSheet, View } from 'react-native';
 
 import { Text } from '@/components/ui';
-import { color, space } from '@/theme';
+import { color, radius, space } from '@/theme';
 import { formatDday, formatShortDate } from '@/utils/date';
 
-import type { Team } from './team';
+import { isTeamClosed, type Team } from './team';
 
 type TeamInfoSectionProps = {
   team: Team;
@@ -13,9 +13,20 @@ type TeamInfoSectionProps = {
 };
 
 export function TeamInfoSection({ team, contestTitle }: TeamInfoSectionProps) {
+  const closed = isTeamClosed(team);
+  // 기간이 남아도 정원이 차면 마감이라 D-day 대신 '마감'
+  const dday = closed ? '마감' : formatDday(team.recruitEndDate);
+
   return (
     <View style={S.wrap}>
       <View style={S.titles}>
+        {closed && (
+          <View style={S.closedBadge}>
+            <Text variant="meta" color="textMuted">
+              모집이 마감된 팀이에요
+            </Text>
+          </View>
+        )}
         {contestTitle && (
           <Text variant="caption" color="textMuted" numberOfLines={1}>
             {contestTitle}
@@ -36,7 +47,7 @@ export function TeamInfoSection({ team, contestTitle }: TeamInfoSectionProps) {
             현재 인원
           </Text>
           <Text variant="titleMd" color="textMuted">
-            <Text variant="titleLg" color="brand">
+            <Text variant="titleLg" color={closed ? 'ink' : 'brand'}>
               {team.members.length}
             </Text>
             {` / ${team.capacity}명`}
@@ -45,7 +56,7 @@ export function TeamInfoSection({ team, contestTitle }: TeamInfoSectionProps) {
 
         <ArrowRightIcon
           size={24}
-          color={color.brand}
+          color={closed ? color.textDisabled : color.brand}
           weight="bold"
           style={{ marginLeft: space[5] }}
         />
@@ -53,12 +64,12 @@ export function TeamInfoSection({ team, contestTitle }: TeamInfoSectionProps) {
         <View
           style={S.column}
           accessible
-          accessibilityLabel={`모집 마감 ${formatShortDate(team.recruitEndDate)}, ${formatDday(team.recruitEndDate)}`}
+          accessibilityLabel={`모집 마감 ${formatShortDate(team.recruitEndDate)}, ${dday}`}
         >
           <Text variant="caption" color="textMuted">
             모집 마감{' '}
-            <Text variant="caption" color="brand" style={S.dday}>
-              {formatDday(team.recruitEndDate)}
+            <Text variant="caption" color={closed ? 'textMuted' : 'brand'} style={S.dday}>
+              {dday}
             </Text>
           </Text>
           <Text variant="titleLg">{formatShortDate(team.recruitEndDate)}</Text>
@@ -78,6 +89,13 @@ const S = StyleSheet.create({
   titles: {
     alignItems: 'center',
     gap: space[1],
+  },
+  closedBadge: {
+    marginBottom: space[2],
+    paddingVertical: space[1],
+    paddingHorizontal: space[3],
+    borderRadius: radius.full,
+    backgroundColor: color.surfaceMuted,
   },
   center: {
     textAlign: 'center',
