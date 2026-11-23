@@ -1,30 +1,18 @@
 import { useLocalSearchParams } from 'expo-router';
-import { View } from 'react-native';
 
-import { Text } from '@/components/ui';
 import { getContestDetail } from '@/screens/contests/detailMocks';
-import { getTeam } from '@/screens/teams';
+import { getTeam, TeamDetailScreen, TeamNotFoundScreen } from '@/screens/teams';
 
-// TODO: 팀 상세 화면 작업 때 screens/teams/ 아래 TeamDetailScreen으로 분리
 export default function TeamDetailRoute() {
   const params = useLocalSearchParams<{ id?: string | string[] }>();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
-  const team = id ? getTeam(id) : undefined;
 
-  if (!team) {
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <Text variant="titleLg">존재하지 않는 팀이에요.</Text>
-      </View>
-    );
-  }
+  // TODO: API 연결 시 로딩 / 실패 화면 추가
+  const team = id ? getTeam(id) : undefined;
+  if (!team) return <TeamNotFoundScreen />;
+
   const contest = getContestDetail(team.contestId);
 
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      {contest && <Text color="textMuted">{contest.title}</Text>}
-      <Text variant="titleLg">{team.name}</Text>
-      <Text>{team.description}</Text>
-    </View>
-  );
+  // TODO: 하단 버튼 (팀장에게 문의 / 지원하기). 보는 사람(팀장·팀원·지원자)에 따라 여기서 바꿔 넣어요
+  return <TeamDetailScreen team={team} contestTitle={contest?.title} />;
 }
