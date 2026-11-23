@@ -1,7 +1,13 @@
 import { useLocalSearchParams } from 'expo-router';
 
 import { getContestDetail } from '@/screens/contests/detailMocks';
-import { getTeam, TeamDetailScreen, TeamNotFoundScreen } from '@/screens/teams';
+import {
+  getTeam,
+  isTeamClosed,
+  TeamBottomBar,
+  TeamDetailScreen,
+  TeamNotFoundScreen,
+} from '@/screens/teams';
 
 export default function TeamDetailRoute() {
   const params = useLocalSearchParams<{ id?: string | string[] }>();
@@ -13,6 +19,16 @@ export default function TeamDetailRoute() {
 
   const contest = getContestDetail(team.contestId);
 
-  // TODO: 하단 버튼 (팀장에게 문의 / 지원하기). 보는 사람(팀장·팀원·지원자)에 따라 여기서 바꿔 넣어요
-  return <TeamDetailScreen team={team} contestTitle={contest?.title} />;
+  // TODO: 내가 팀장인 팀이면 팀 삭제 / 팀 정보 수정하기 버튼으로 (내 정보 목데이터가 생기면)
+  const bottomBar = (
+    <TeamBottomBar
+      closed={isTeamClosed(team)}
+      // TODO: 채팅 화면이 생기면 팀장과의 대화로 이동
+      onPressInquiry={() => {}}
+      // TODO: 지원하기 화면이 생기면 이동
+      onPressApply={() => {}}
+    />
+  );
+
+  return <TeamDetailScreen team={team} contestTitle={contest?.title} bottomBar={bottomBar} />;
 }
