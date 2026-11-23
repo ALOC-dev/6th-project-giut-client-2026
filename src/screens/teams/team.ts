@@ -30,7 +30,7 @@ export type Team = {
   capacity: number;
   recruitEndDate: string;
   members: Member[];
-  recruitingRoles: RecruitingRole[]; // 아직 모집 중인 역할과 인원 (예: 개발 2명)
+  recruitingRoles: RecruitingRole[];
   description: string;
   operationMethod: OperationMethod;
   activityFrequency: ActivityFrequency;

@@ -30,7 +30,6 @@ export const S = StyleSheet.create({
     ...StyleSheet.absoluteFill,
     backgroundColor: color.overlayDim,
   },
-  // 크기는 GiutMark의 width로 정해요
   fallbackSymbol: {
     position: 'absolute',
     right: -20,

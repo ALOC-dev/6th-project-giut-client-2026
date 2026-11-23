@@ -62,7 +62,6 @@ export function InterestBanner({ onSubmit, onClose }: InterestBannerProps) {
               {HOME_CATEGORIES.map(({ label, Icon }, index) => {
                 const on = selected.includes(label);
                 return (
-                  // 칩이 차례로(40ms 간격) 살짝 올라오며 나타나요
                   <Animated.View key={label} entering={enter.fadeUp(index, stagger.tight)}>
                     <Chip
                       label={label}

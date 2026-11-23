@@ -12,18 +12,16 @@ type TicketBackgroundProps = {
 const CORNER = radius.xl;
 const STROKE = 1;
 
-// 위아래가 반원 모양으로 파인 티켓 모양 배경.
-// 카드 크기를 재서 SVG로 테두리를 그려요. (홈 부분은 실제로 잘려 있어서 뒤 배경이 보여요)
+// 위아래가 반원으로 파인 티켓 모양 테두리 (SVG)
 export function TicketBackground({ notchFromRight, notchRadius = 9 }: TicketBackgroundProps) {
   const [size, setSize] = useState({ width: 0, height: 0 });
   const { width: w, height: h } = size;
 
-  const s = STROKE / 2; // 선이 잘리지 않도록 반 픽셀 안쪽에 그려요
+  const s = STROKE / 2;
   const r = CORNER;
   const n = notchRadius;
   const cx = w - notchFromRight;
 
-  // 시계 방향: 위쪽 → 오른쪽 → 아래쪽 → 왼쪽
   const d = [
     `M ${s + r} ${s}`,
     `H ${cx - n}`,
