@@ -33,6 +33,7 @@ export type Team = {
   recruitEndDate: string;
   members: Member[];
   recruitingRoles: RecruitingRole[];
+  // 최대 1000자
   description: string;
   operationMethod: OperationMethod;
   activityFrequency: ActivityFrequency;
