@@ -20,11 +20,20 @@ export function formatDday(endDate: string) {
 
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
-export function formatShortDate(value: string) {
+// '2026-11-10' → '11.10'
+export function formatMonthDay(value: string) {
   const date = parseDate(value);
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  return `${month}.${day} (${WEEKDAYS[date.getDay()]})`;
+  return `${date.getMonth() + 1}.${date.getDate()}`;
+}
+
+// '2026-11-10' → '화'
+export function formatWeekday(value: string) {
+  return WEEKDAYS[parseDate(value).getDay()];
+}
+
+// '2026-11-10' → '11.10 (화)'
+export function formatShortDate(value: string) {
+  return `${formatMonthDay(value)} (${formatWeekday(value)})`;
 }
 
 // '2026-11-25' → '2026.11.25'

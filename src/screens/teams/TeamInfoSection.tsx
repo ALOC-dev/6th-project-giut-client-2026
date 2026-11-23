@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { Text } from '@/components/ui';
 import { color, radius, space } from '@/theme';
-import { formatDday, formatShortDate } from '@/utils/date';
+import { formatDday, formatMonthDay, formatShortDate, formatWeekday } from '@/utils/date';
 
 import { isTeamClosed, type Team } from './team';
 
@@ -46,20 +46,15 @@ export function TeamInfoSection({ team, contestTitle }: TeamInfoSectionProps) {
           <Text variant="caption" color="textMuted">
             현재 인원
           </Text>
-          <Text variant="titleMd" color="textMuted">
-            <Text variant="titleLg" color={closed ? 'ink' : 'brand'}>
-              {team.members.length}
+          <Text variant="titleLg" color={closed ? 'ink' : 'brand'}>
+            {team.members.length}
+            <Text variant="titleMd" color="textMuted">
+              {` / ${team.capacity}명`}
             </Text>
-            {` / ${team.capacity}명`}
           </Text>
         </View>
 
-        <ArrowRightIcon
-          size={24}
-          color={closed ? color.textDisabled : color.brand}
-          weight="bold"
-          style={{ marginLeft: space[5] }}
-        />
+        <ArrowRightIcon size={24} color={closed ? color.textDisabled : color.brand} weight="bold" />
 
         <View
           style={S.column}
@@ -72,7 +67,12 @@ export function TeamInfoSection({ team, contestTitle }: TeamInfoSectionProps) {
               {dday}
             </Text>
           </Text>
-          <Text variant="titleLg">{formatShortDate(team.recruitEndDate)}</Text>
+          <Text variant="titleLg">
+            {formatMonthDay(team.recruitEndDate)}
+            <Text variant="titleSm" color="textFaint" style={S.weekday}>
+              {` (${formatWeekday(team.recruitEndDate)})`}
+            </Text>
+          </Text>
         </View>
       </View>
     </View>
@@ -100,14 +100,19 @@ const S = StyleSheet.create({
   center: {
     textAlign: 'center',
   },
+  // 양쪽 칸을 같은 폭으로 나눠서 화살표가 정확히 가운데에 오게
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-around',
+    gap: space[6],
   },
   column: {
+    flex: 1,
     alignItems: 'center',
     gap: space[1],
+  },
+  weekday: {
+    fontWeight: '400',
   },
   dday: {
     fontWeight: '800',
