@@ -41,6 +41,12 @@ export type Team = {
   cooperationTools: CooperationTool[];
 };
 
+export const OPERATION_LABEL: Record<OperationMethod, string> = {
+  online: '온라인',
+  offline: '오프라인',
+  both: '온라인 + 오프라인',
+};
+
 export const ROLE_LABEL: Record<RoleKey, string> = {
   dev: '개발',
   design: '디자인',

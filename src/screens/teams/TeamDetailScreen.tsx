@@ -5,6 +5,7 @@ import { DetailHeader } from '@/components/header/DetailHeader';
 import { Text } from '@/components/ui';
 import { color, space } from '@/theme';
 
+import { TeamActivitySection } from './TeamActivitySection';
 import { TeamInfoSection } from './TeamInfoSection';
 import { TeamIntroSection } from './TeamIntroSection';
 import { TeamMemberSection } from './TeamMemberSection';
@@ -40,10 +41,7 @@ export function TeamDetailScreen({ team, contestTitle, bottomBar }: TeamDetailSc
           <TeamInfoSection team={team} contestTitle={contestTitle} />
           <TeamMemberSection team={team} />
           <TeamIntroSection description={team.description} />
-          {/* TODO: 활동 방식 구역 */}
-          <View style={[S.placeholder, S.tall]}>
-            <Text variant="titleMd">활동 방식</Text>
-          </View>
+          <TeamActivitySection team={team} />
         </TeamTicket>
       </ScrollView>
 
@@ -76,12 +74,5 @@ const S = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  placeholder: {
-    padding: space[5],
-    gap: space[2],
-  },
-  tall: {
-    minHeight: 160,
   },
 });
