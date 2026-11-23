@@ -9,8 +9,8 @@ export const MOCK_TEAMS: Team[] = [
     capacity: 4,
     recruitEndDate: '2026-11-18',
     members: [
-      { id: 'm1', name: '김민재', role: 'plan', isLeader: true },
-      { id: 'm2', name: '이서연', role: 'design', isLeader: false },
+      { id: 'm1', name: '김민재', role: 'plan', position: '기획', isLeader: true },
+      { id: 'm2', name: '이서연', role: 'design', position: 'UI/UX', isLeader: false },
     ],
     recruitingRoles: [
       { role: 'design', count: 1 },
@@ -32,11 +32,11 @@ export const MOCK_TEAMS: Team[] = [
     capacity: 10,
     recruitEndDate: '2026-11-20',
     members: [
-      { id: 'm3', name: '박지훈', role: 'dev', isLeader: true },
-      { id: 'm4', name: '최유나', role: 'plan', isLeader: false },
-      { id: 'm25', name: '송현우', role: 'dev', isLeader: false },
-      { id: 'm26', name: '김나래', role: 'design', isLeader: false },
-      { id: 'm27', name: '이준서', role: 'mkt', isLeader: false },
+      { id: 'm3', name: '박지훈', role: 'dev', position: '프론트엔드', isLeader: true },
+      { id: 'm4', name: '최유나', role: 'plan', position: '기획', isLeader: false },
+      { id: 'm25', name: '송현우', role: 'dev', position: '백엔드', isLeader: false },
+      { id: 'm26', name: '김나래', role: 'design', position: 'UI/UX', isLeader: false },
+      { id: 'm27', name: '이준서', role: 'mkt', position: '마케팅', isLeader: false },
     ],
     recruitingRoles: [
       { role: 'dev', count: 2 },
@@ -57,8 +57,8 @@ export const MOCK_TEAMS: Team[] = [
     capacity: 3,
     recruitEndDate: '2026-11-21',
     members: [
-      { id: 'm5', name: '정하늘', role: 'plan', isLeader: true },
-      { id: 'm28', name: '권태양', role: 'dev', isLeader: false },
+      { id: 'm5', name: '정하늘', role: 'plan', position: '기획', isLeader: true },
+      { id: 'm28', name: '권태양', role: 'dev', position: '프론트엔드', isLeader: false },
     ],
     recruitingRoles: [{ role: 'design', count: 1 }],
     description: '출결·조명 IoT 실험을 설계해요. 실험 결과를 보기 좋게 정리해줄 디자이너를 찾아요.',
@@ -74,8 +74,8 @@ export const MOCK_TEAMS: Team[] = [
     capacity: 5,
     recruitEndDate: '2026-11-23',
     members: [
-      { id: 'm6', name: '한도윤', role: 'plan', isLeader: true },
-      { id: 'm7', name: '오수빈', role: 'dev', isLeader: false },
+      { id: 'm6', name: '한도윤', role: 'plan', position: '기획', isLeader: true },
+      { id: 'm7', name: '오수빈', role: 'dev', position: '백엔드', isLeader: false },
     ],
     recruitingRoles: [
       { role: 'dev', count: 1 },
@@ -99,8 +99,8 @@ export const MOCK_TEAMS: Team[] = [
     capacity: 4,
     recruitEndDate: '2026-11-20',
     members: [
-      { id: 'm9', name: '서준호', role: 'dev', isLeader: true },
-      { id: 'm10', name: '임다은', role: 'dev', isLeader: false },
+      { id: 'm9', name: '서준호', role: 'dev', position: '프론트엔드', isLeader: true },
+      { id: 'm10', name: '임다은', role: 'dev', position: '백엔드', isLeader: false },
     ],
     recruitingRoles: [
       { role: 'design', count: 1 },
@@ -119,9 +119,9 @@ export const MOCK_TEAMS: Team[] = [
     capacity: 4,
     recruitEndDate: '2026-11-21',
     members: [
-      { id: 'm11', name: '강예린', role: 'design', isLeader: true },
-      { id: 'm12', name: '조민혁', role: 'dev', isLeader: false },
-      { id: 'm13', name: '신지우', role: 'plan', isLeader: false },
+      { id: 'm11', name: '강예린', role: 'design', position: 'UI/UX', isLeader: true },
+      { id: 'm12', name: '조민혁', role: 'dev', position: '프론트엔드', isLeader: false },
+      { id: 'm13', name: '신지우', role: 'plan', position: '기획', isLeader: false },
     ],
     recruitingRoles: [{ role: 'dev', count: 1 }],
     description: '프론트엔드 개발자 한 분만 더 모시면 완성이에요! React Native 경험자 우대.',
@@ -138,7 +138,7 @@ export const MOCK_TEAMS: Team[] = [
     name: '동네 브랜드 크루',
     capacity: 3,
     recruitEndDate: '2026-11-30',
-    members: [{ id: 'm14', name: '문서윤', role: 'mkt', isLeader: true }],
+    members: [{ id: 'm14', name: '문서윤', role: 'mkt', position: '마케팅', isLeader: true }],
     recruitingRoles: [
       { role: 'mkt', count: 1 },
       { role: 'design', count: 1 },
@@ -161,8 +161,8 @@ export const MOCK_TEAMS: Team[] = [
     capacity: 4,
     recruitEndDate: '2026-11-19',
     members: [
-      { id: 'm15', name: '유하진', role: 'mkt', isLeader: true },
-      { id: 'm16', name: '백승아', role: 'design', isLeader: false },
+      { id: 'm15', name: '유하진', role: 'mkt', position: '마케팅', isLeader: true },
+      { id: 'm16', name: '백승아', role: 'design', position: 'UI/UX', isLeader: false },
     ],
     recruitingRoles: [
       { role: 'plan', count: 1 },
@@ -180,7 +180,7 @@ export const MOCK_TEAMS: Team[] = [
     name: '캠페인 메이커스',
     capacity: 3,
     recruitEndDate: '2026-11-19',
-    members: [{ id: 'm17', name: '남궁민', role: 'plan', isLeader: true }],
+    members: [{ id: 'm17', name: '남궁민', role: 'plan', position: '기획', isLeader: true }],
     recruitingRoles: [
       { role: 'mkt', count: 1 },
       { role: 'design', count: 1 },
@@ -198,8 +198,8 @@ export const MOCK_TEAMS: Team[] = [
     capacity: 3,
     recruitEndDate: '2026-11-19',
     members: [
-      { id: 'm18', name: '전다인', role: 'design', isLeader: true },
-      { id: 'm19', name: '황재민', role: 'mkt', isLeader: false },
+      { id: 'm18', name: '전다인', role: 'design', position: 'UI/UX', isLeader: true },
+      { id: 'm19', name: '황재민', role: 'mkt', position: '마케팅', isLeader: false },
     ],
     recruitingRoles: [{ role: 'plan', count: 1 }],
     description: '영상 위주 캠페인으로 갈 예정이에요. 기획자 한 분 모셔요!',
@@ -217,8 +217,8 @@ export const MOCK_TEAMS: Team[] = [
     capacity: 4,
     recruitEndDate: '2026-11-24',
     members: [
-      { id: 'm20', name: '김도현', role: 'dev', isLeader: true },
-      { id: 'm21', name: '이수아', role: 'plan', isLeader: false },
+      { id: 'm20', name: '김도현', role: 'dev', position: '백엔드', isLeader: true },
+      { id: 'm21', name: '이수아', role: 'plan', position: '기획', isLeader: false },
     ],
     recruitingRoles: [
       { role: 'design', count: 1 },
@@ -236,7 +236,7 @@ export const MOCK_TEAMS: Team[] = [
     name: '프롬프트 크루',
     capacity: 4,
     recruitEndDate: '2026-11-25',
-    members: [{ id: 'm22', name: '박서진', role: 'plan', isLeader: true }],
+    members: [{ id: 'm22', name: '박서진', role: 'plan', position: '기획', isLeader: true }],
     recruitingRoles: [
       { role: 'dev', count: 2 },
       { role: 'design', count: 1 },
@@ -256,8 +256,8 @@ export const MOCK_TEAMS: Team[] = [
     capacity: 3,
     recruitEndDate: '2026-11-28',
     members: [
-      { id: 'm23', name: '최윤서', role: 'design', isLeader: true },
-      { id: 'm24', name: '정민규', role: 'design', isLeader: false },
+      { id: 'm23', name: '최윤서', role: 'design', position: 'UI/UX', isLeader: true },
+      { id: 'm24', name: '정민규', role: 'design', position: 'UI/UX', isLeader: false },
     ],
     recruitingRoles: [{ role: 'plan', count: 1 }],
     description: '버스정류장 안내판 UX를 리서치부터 함께 개선해요.',

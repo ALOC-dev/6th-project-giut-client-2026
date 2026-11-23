@@ -6,6 +6,7 @@ import { Text } from '@/components/ui';
 import { color, space } from '@/theme';
 
 import { TeamInfoSection } from './TeamInfoSection';
+import { TeamMemberSection } from './TeamMemberSection';
 import { TeamTicket } from './TeamTicket';
 import type { Team } from './team';
 
@@ -36,10 +37,7 @@ export function TeamDetailScreen({ team, contestTitle, bottomBar }: TeamDetailSc
       <ScrollView contentContainerStyle={S.content}>
         <TeamTicket>
           <TeamInfoSection team={team} contestTitle={contestTitle} />
-          {/* TODO: 팀원 구역 */}
-          <View style={[S.placeholder, S.tall]}>
-            <Text variant="titleMd">팀원</Text>
-          </View>
+          <TeamMemberSection team={team} />
           {/* TODO: 팀 소개 구역 */}
           <View style={S.placeholder}>
             <Text variant="titleMd">팀 소개</Text>

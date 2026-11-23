@@ -7,6 +7,8 @@ export type Member = {
   id: string;
   name: string;
   role: RoleKey;
+  // 지원할 때 팀이 구하는 포지션 중에서 고른 세부 역할
+  position: string;
   isLeader: boolean;
 };
 

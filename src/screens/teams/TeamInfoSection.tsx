@@ -43,7 +43,12 @@ export function TeamInfoSection({ team, contestTitle }: TeamInfoSectionProps) {
           </Text>
         </View>
 
-        <ArrowRightIcon size={24} color={color.brand} weight="bold" style={{ marginLeft: 20 }} />
+        <ArrowRightIcon
+          size={24}
+          color={color.brand}
+          weight="bold"
+          style={{ marginLeft: space[5] }}
+        />
 
         <View
           style={S.column}
