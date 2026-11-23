@@ -14,7 +14,7 @@ import Svg, { Polygon } from 'react-native-svg';
 import { Text } from '@/components/ui';
 import { layout, space, text } from '@/theme';
 
-import { CREATE_COLOR } from './constants';
+import { CREATE_COLOR, MAX_TEAM_NAME_LENGTH } from './constants';
 import { pingPong, StepBody, TEAM_CREATE_EASING } from './TeamCreateParts';
 import type { TeamDraftApi } from './useTeamDraft';
 
@@ -23,14 +23,14 @@ export function TeamCreateStepName({ api }: { api: TeamDraftApi }) {
   const [keyboardOffset] = useState(() => new Animated.Value(0));
   const name = api.draft.name;
   const [lineLength, setLineLength] = useState(() => countCharacters(name));
-  const atLimit = name.length >= 12;
+  const atLimit = name.length >= MAX_TEAM_NAME_LENGTH;
   const valid = name.trim().length >= 2;
   const hint = atLimit ? '최대 12자까지 입력했어요' : valid ? ' ' : '2자 이상 입력해주세요';
   const hintColor = atLimit ? CREATE_COLOR.body : valid ? CREATE_COLOR.success : CREATE_COLOR.body;
   const lineColor = name ? CREATE_COLOR.brand : CREATE_COLOR.line;
 
   const handleChangeName = (value: string) => {
-    const nextLength = countCharacters(value.slice(0, 12));
+    const nextLength = countCharacters(value.slice(0, MAX_TEAM_NAME_LENGTH));
     setLineLength((current) => (nextLength === 0 ? 0 : Math.max(current, nextLength)));
     api.setName(value);
   };
@@ -76,7 +76,7 @@ export function TeamCreateStepName({ api }: { api: TeamDraftApi }) {
               value={name}
               onChangeText={handleChangeName}
               onEndEditing={() => setLineLength(countCharacters(name))}
-              maxLength={12}
+              maxLength={MAX_TEAM_NAME_LENGTH}
               placeholder="팀 이름 입력"
               placeholderTextColor={CREATE_COLOR.disabled}
               selectionColor={CREATE_COLOR.brand}

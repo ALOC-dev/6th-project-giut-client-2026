@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import {
   DEFAULT_QUESTIONS,
   MAX_RECRUIT,
+  MAX_TEAM_NAME_LENGTH,
   ROLE_OPTIONS,
   TEAM_ROLES,
   type ActivityMode,
@@ -38,6 +39,12 @@ const emptyDraft = (): TeamDraft => ({
 });
 
 export const recruitKey = (role: TeamRole, position: string) => `${role}|${position}`;
+
+export const hasDuplicateQuestions = (questions: string[]) => {
+  const normalizedQuestions = questions.map((question) => question.trim()).filter(Boolean);
+
+  return new Set(normalizedQuestions).size !== normalizedQuestions.length;
+};
 
 export function useTeamDraft() {
   const [draft, setDraft] = useState<TeamDraft>(emptyDraft);
@@ -82,7 +89,11 @@ export function useTeamDraft() {
         if (draft.mode === '오프라인') return Boolean(draft.place);
         return Boolean(draft.place) && draft.tools.length > 0;
       case 5:
-        return draft.description.trim().length > 0;
+        return (
+          draft.description.trim().length > 0 &&
+          draft.questions.every((question) => question.trim().length > 0) &&
+          !hasDuplicateQuestions(draft.questions)
+        );
       default:
         return true;
     }
@@ -91,7 +102,7 @@ export function useTeamDraft() {
   const set = (patch: Partial<TeamDraft>) => setDraft((current) => ({ ...current, ...patch }));
 
   const setName = (name: string) =>
-    setDraft((current) => ({ ...current, name: name.slice(0, 12) }));
+    setDraft((current) => ({ ...current, name: name.slice(0, MAX_TEAM_NAME_LENGTH) }));
 
   const pickMyRole = (role: TeamRole) =>
     setDraft((current) => ({

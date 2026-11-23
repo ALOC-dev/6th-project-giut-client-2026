@@ -89,9 +89,8 @@ export function TeamCreateScreen({ onExit, onSubmit, onDone, onCopyLink }: TeamC
   };
 
   const disableRemovalPrevention = usePreventRemove(
-    (step > 1 || draftChanged) && !allowRemoval,
+    !completed && (step > 1 || draftChanged) && !allowRemoval,
     ({ repeat }) => {
-      if (completed) return;
       if (step > 1) {
         moveTo(step - 1);
         return;
@@ -151,9 +150,15 @@ export function TeamCreateScreen({ onExit, onSubmit, onDone, onCopyLink }: TeamC
     if (step === 5) {
       const draft = {
         ...draftApi.draft,
-        questions: draftApi.draft.questions.filter((question) => question.trim()),
+        name: draftApi.draft.name.trim(),
+        description: draftApi.draft.description.trim(),
+        questions: draftApi.draft.questions.map((question) => question.trim()).filter(Boolean),
       };
-      draftApi.set({ questions: draft.questions });
+      draftApi.set({
+        name: draft.name,
+        description: draft.description,
+        questions: draft.questions,
+      });
       try {
         setSubmitting(true);
         const result = await onSubmit?.(draft);

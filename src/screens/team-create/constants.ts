@@ -72,6 +72,7 @@ export const ACTIVITY_MODES: [ActivityMode, string][] = [
 export const MEETING_PLACES = ['교내', '서울 전체', '수도권', '상관없음'];
 export const COLLABORATION_TOOLS = ['디스코드', '줌', '구글 밋', '노션', '슬랙'];
 export const MAX_RECRUIT = 9;
+export const MAX_TEAM_NAME_LENGTH = 12;
 export const MAX_DESCRIPTION_LENGTH = 1000;
 export const MAX_QUESTION_COUNT = 5;
 export const MAX_QUESTION_LENGTH = 300;

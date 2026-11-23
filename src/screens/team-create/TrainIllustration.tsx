@@ -6,7 +6,7 @@ import Svg, { Circle, Ellipse, Polygon, Rect } from 'react-native-svg';
 import { Text } from '@/components/ui';
 import { radius } from '@/theme';
 
-import { CREATE_COLOR, ROLE_COLOR, type TeamRole } from './constants';
+import { CREATE_COLOR, MAX_RECRUIT, ROLE_COLOR, type TeamRole } from './constants';
 import {
   createSpringCurve,
   linearLoop,
@@ -20,7 +20,6 @@ const TRAIN_TOP = 62;
 const CAR_WIDTH = 68;
 const LOCOMOTIVE_WIDTH = 76;
 const CAR_GAP = 6;
-const MAX_PASSENGERS = 9;
 const EXIT_EASING = Easing.bezier(0.55, 0, 0.8, 0.4);
 const DROP_CURVE = createSpringCurve(0.56, 14.5, 0.6);
 const POP_CURVE = createSpringCurve(0.52, 15, 0.6);
@@ -55,7 +54,7 @@ export function TrainIllustration({
   people: PassengerData[];
 }) {
   const reduced = useReducedMotion();
-  const shown = useMemo(() => people.slice(0, MAX_PASSENGERS), [people]);
+  const shown = useMemo(() => people.slice(0, MAX_RECRUIT), [people]);
   const overflow = people.length - shown.length;
   const carCount = Math.max(1, Math.ceil(shown.length / 3));
   const startX = (width - (LOCOMOTIVE_WIDTH + carCount * (CAR_WIDTH + CAR_GAP))) / 2;

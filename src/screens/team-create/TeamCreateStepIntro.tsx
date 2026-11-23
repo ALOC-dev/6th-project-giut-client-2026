@@ -23,7 +23,7 @@ import {
   QUESTION_SUGGESTIONS,
 } from './constants';
 import { SectionTitle, StepBody } from './TeamCreateParts';
-import type { TeamDraftApi } from './useTeamDraft';
+import { hasDuplicateQuestions, type TeamDraftApi } from './useTeamDraft';
 
 type Props = { api: Pick<TeamDraftApi, 'draft' | 'set'> };
 
@@ -36,6 +36,7 @@ export function TeamCreateStepIntro({ api: { draft, set } }: Props) {
   const viewportHeightRef = useRef(0);
   const suggestions = QUESTION_SUGGESTIONS;
   const questionLimitReached = draft.questions.length >= MAX_QUESTION_COUNT;
+  const duplicateQuestions = hasDuplicateQuestions(draft.questions);
 
   const scrollToQuestion = useCallback((index: number) => {
     const scrollView = scrollViewRef.current;
@@ -190,8 +191,14 @@ export function TeamCreateStepIntro({ api: { draft, set } }: Props) {
               {draft.questions.length}개
             </Text>
           </View>
-          <Text variant="meta" color="textSecondary" style={styles.questionHelper}>
-            지원서에 그대로 나가요. 질문을 누르면 수정할 수 있어요.
+          <Text
+            variant="meta"
+            color={duplicateQuestions ? CREATE_COLOR.danger : 'textSecondary'}
+            style={styles.questionHelper}
+          >
+            {duplicateQuestions
+              ? '중복된 질문이 있어요. 질문을 수정하거나 삭제해주세요.'
+              : '지원서에 그대로 나가요. 질문을 누르면 수정할 수 있어요.'}
           </Text>
 
           <View style={styles.box}>
