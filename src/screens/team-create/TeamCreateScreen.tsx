@@ -1,12 +1,13 @@
-import { useState } from 'react';
-import { Keyboard, KeyboardAvoidingView, Pressable, StyleSheet, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { usePreventRemove } from 'expo-router';
+import { Alert, Keyboard, KeyboardAvoidingView, Pressable, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ChevronIcon } from '@/components/icons';
-import { Text } from '@/components/ui';
+import { Text, Toast, useToast } from '@/components/ui';
 import { color, radius, space } from '@/theme';
 
-import { CREATE_COLOR, STEP_TITLES } from './constants';
+import { CREATE_COLOR, DEFAULT_QUESTIONS, STEP_TITLES } from './constants';
 import { StepTransition } from './TeamCreateParts';
 import { TeamCreateStepActivity } from './TeamCreateStepActivity';
 import { TeamCreateStepDone } from './TeamCreateStepDone';
@@ -17,7 +18,6 @@ import { TeamCreateStepSeats } from './TeamCreateStepSeats';
 import { useTeamDraft, type TeamDraft } from './useTeamDraft';
 
 type TeamCreateScreenProps = {
-  startStep?: 1 | 2 | 3 | 4 | 5 | 6;
   onExit: () => void;
   onSubmit?: (draft: TeamDraft) => Promise<{ shareUrl?: string } | void> | void;
   onDone: (draft: TeamDraft) => void;
@@ -32,23 +32,21 @@ const STEPS = [
   TeamCreateStepIntro,
 ] as const;
 
-export function TeamCreateScreen({
-  startStep = 1,
-  onExit,
-  onSubmit,
-  onDone,
-  onCopyLink,
-}: TeamCreateScreenProps) {
+export function TeamCreateScreen({ onExit, onSubmit, onDone, onCopyLink }: TeamCreateScreenProps) {
   const insets = useSafeAreaInsets();
-  const draftApi = useTeamDraft(startStep);
-  const [step, setStep] = useState(startStep);
+  const toast = useToast();
+  const draftApi = useTeamDraft();
+  const [step, setStep] = useState<1 | 2 | 3 | 4 | 5 | 6>(1);
   const [direction, setDirection] = useState<'right' | 'left'>('right');
   const [submitting, setSubmitting] = useState(false);
   const [shareUrl, setShareUrl] = useState<string>();
+  const [allowRemoval, setAllowRemoval] = useState(false);
+  const exitAlertOpen = useRef(false);
 
   const completed = step === 6;
   const canContinue = draftApi.canContinue(step);
   const Step = STEPS[Math.min(step, 5) - 1];
+  const draftChanged = hasDraftChanges(draftApi.draft);
 
   const moveTo = (nextStep: number) => {
     Keyboard.dismiss();
@@ -56,14 +54,95 @@ export function TeamCreateScreen({
     setStep(nextStep as typeof step);
   };
 
+  const showExitConfirmation = (onConfirm: () => void) => {
+    if (exitAlertOpen.current) return;
+    exitAlertOpen.current = true;
+    Keyboard.dismiss();
+
+    Alert.alert(
+      '팀 만들기를 그만둘까요?',
+      '작성한 내용은 저장되지 않아요.',
+      [
+        {
+          text: '계속 작성하기',
+          style: 'cancel',
+          onPress: () => {
+            exitAlertOpen.current = false;
+          },
+        },
+        {
+          text: '나가기',
+          style: 'destructive',
+          onPress: () => {
+            exitAlertOpen.current = false;
+            onConfirm();
+          },
+        },
+      ],
+      {
+        cancelable: true,
+        onDismiss: () => {
+          exitAlertOpen.current = false;
+        },
+      },
+    );
+  };
+
+  const disableRemovalPrevention = usePreventRemove(
+    (step > 1 || draftChanged) && !allowRemoval,
+    ({ repeat }) => {
+      if (completed) return;
+      if (step > 1) {
+        moveTo(step - 1);
+        return;
+      }
+
+      showExitConfirmation(() => {
+        setAllowRemoval(true);
+        repeat();
+      });
+    },
+  );
+
+  const exitScreen = () => {
+    setAllowRemoval(true);
+    disableRemovalPrevention();
+    onExit();
+  };
+
   const handleBack = () => {
     if (completed) return;
-    if (step > 1) moveTo(step - 1);
-    else onExit();
+    if (step > 1) {
+      moveTo(step - 1);
+      return;
+    }
+
+    if (draftChanged) {
+      showExitConfirmation(exitScreen);
+      return;
+    }
+
+    onExit();
+  };
+
+  const handleCopyLink = async (url: string) => {
+    if (!onCopyLink) {
+      toast.show('링크를 복사하지 못했어요. 잠시 후 다시 시도해주세요.');
+      throw new Error('Copy handler is not available.');
+    }
+
+    try {
+      await onCopyLink(url);
+    } catch (error) {
+      toast.show('링크를 복사하지 못했어요. 잠시 후 다시 시도해주세요.');
+      throw error;
+    }
   };
 
   const handleContinue = async () => {
     if (completed) {
+      setAllowRemoval(true);
+      disableRemovalPrevention();
       onDone(draftApi.draft);
       return;
     }
@@ -80,6 +159,7 @@ export function TeamCreateScreen({
         const result = await onSubmit?.(draft);
         if (result?.shareUrl) setShareUrl(result.shareUrl);
       } catch {
+        toast.show('팀을 등록하지 못했어요. 잠시 후 다시 시도해주세요.');
         return;
       } finally {
         setSubmitting(false);
@@ -139,7 +219,7 @@ export function TeamCreateScreen({
         <View style={styles.body}>
           <StepTransition key={step} direction={direction}>
             {completed ? (
-              <TeamCreateStepDone api={draftApi} shareUrl={shareUrl} onCopyLink={onCopyLink} />
+              <TeamCreateStepDone api={draftApi} shareUrl={shareUrl} onCopyLink={handleCopyLink} />
             ) : (
               <Step api={draftApi} />
             )}
@@ -170,7 +250,29 @@ export function TeamCreateScreen({
           </Text>
         </Pressable>
       </View>
+
+      <Toast {...toast.props} />
     </View>
+  );
+}
+
+function hasDraftChanges(draft: TeamDraft) {
+  const questionsChanged =
+    draft.questions.length !== DEFAULT_QUESTIONS.length ||
+    draft.questions.some((question, index) => question !== DEFAULT_QUESTIONS[index]);
+
+  return (
+    draft.name.trim().length > 0 ||
+    draft.myRole !== null ||
+    draft.myPosition !== null ||
+    draft.recruitRoles.length > 0 ||
+    Object.keys(draft.recruit).length > 0 ||
+    draft.mode !== null ||
+    draft.meetings > 0 ||
+    draft.place !== null ||
+    draft.tools.length > 0 ||
+    draft.description.trim().length > 0 ||
+    questionsChanged
   );
 }
 

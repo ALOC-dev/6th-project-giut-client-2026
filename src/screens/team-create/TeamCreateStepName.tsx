@@ -23,11 +23,11 @@ export function TeamCreateStepName({ api }: { api: TeamDraftApi }) {
   const [keyboardOffset] = useState(() => new Animated.Value(0));
   const name = api.draft.name;
   const [lineLength, setLineLength] = useState(() => countCharacters(name));
-  const full = name.length >= 12;
+  const atLimit = name.length >= 12;
   const valid = name.trim().length >= 2;
-  const hint = full ? '최대 12자까지 입력할 수 있어요' : valid ? ' ' : '2자 이상 입력해주세요';
-  const hintColor = full ? CREATE_COLOR.danger : valid ? CREATE_COLOR.success : CREATE_COLOR.body;
-  const lineColor = full ? CREATE_COLOR.danger : name ? CREATE_COLOR.brand : CREATE_COLOR.line;
+  const hint = atLimit ? '최대 12자까지 입력했어요' : valid ? ' ' : '2자 이상 입력해주세요';
+  const hintColor = atLimit ? CREATE_COLOR.body : valid ? CREATE_COLOR.success : CREATE_COLOR.body;
+  const lineColor = name ? CREATE_COLOR.brand : CREATE_COLOR.line;
 
   const handleChangeName = (value: string) => {
     const nextLength = countCharacters(value.slice(0, 12));

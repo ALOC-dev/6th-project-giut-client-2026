@@ -153,7 +153,13 @@ function CopyRow({ url, onCopy }: { url: string; onCopy?: Props['onCopyLink'] })
   );
 
   const handleCopy = async () => {
-    await onCopy?.(url);
+    try {
+      await onCopy?.(url);
+      if (!onCopy) return;
+    } catch {
+      return;
+    }
+
     setCopied(true);
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => setCopied(false), 1800);

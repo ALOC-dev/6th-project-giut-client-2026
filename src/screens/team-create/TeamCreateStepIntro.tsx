@@ -14,7 +14,14 @@ import Svg, { Rect } from 'react-native-svg';
 import { Text } from '@/components/ui';
 import { radius, space, text } from '@/theme';
 
-import { CREATE_COLOR, INTRO_HINTS, QUESTION_SUGGESTIONS } from './constants';
+import {
+  CREATE_COLOR,
+  INTRO_HINTS,
+  MAX_DESCRIPTION_LENGTH,
+  MAX_QUESTION_COUNT,
+  MAX_QUESTION_LENGTH,
+  QUESTION_SUGGESTIONS,
+} from './constants';
 import { SectionTitle, StepBody } from './TeamCreateParts';
 import type { TeamDraftApi } from './useTeamDraft';
 
@@ -27,7 +34,8 @@ export function TeamCreateStepIntro({ api: { draft, set } }: Props) {
   const activeQuestionRef = useRef(-1);
   const scrollFrameRef = useRef<number | null>(null);
   const viewportHeightRef = useRef(0);
-  const suggestions = QUESTION_SUGGESTIONS.slice(0, 3);
+  const suggestions = QUESTION_SUGGESTIONS;
+  const questionLimitReached = draft.questions.length >= MAX_QUESTION_COUNT;
 
   const scrollToQuestion = useCallback((index: number) => {
     const scrollView = scrollViewRef.current;
@@ -83,20 +91,34 @@ export function TeamCreateStepIntro({ api: { draft, set } }: Props) {
 
   const addQuestion = (question = '') => {
     if (question && draft.questions.includes(question)) return;
-    if (!question) activeQuestionRef.current = draft.questions.length;
+
+    if (!question) {
+      const emptyQuestionIndex = draft.questions.findIndex((item) => !item.trim());
+
+      if (emptyQuestionIndex >= 0) {
+        activeQuestionRef.current = emptyQuestionIndex;
+        setEditingIndex(emptyQuestionIndex);
+        scheduleQuestionScroll(emptyQuestionIndex);
+        return;
+      }
+
+      activeQuestionRef.current = draft.questions.length;
+    }
+
+    if (questionLimitReached) return;
+
     updateQuestions([...draft.questions, question]);
     setEditingIndex(question ? -1 : draft.questions.length);
   };
 
   const appendHint = (hint: string) => {
     const prefix = draft.description ? `${draft.description.replace(/\s*$/, '')}\n` : '';
-    set({ description: `${prefix}${hint}`.slice(0, 1000) });
+    set({ description: `${prefix}${hint}`.slice(0, MAX_DESCRIPTION_LENGTH) });
   };
 
   return (
     <StepBody
       scrollViewRef={scrollViewRef}
-      automaticallyAdjustKeyboardInsets
       keyboardDismissMode="on-drag"
       contentStyle={styles.stepContent}
       onContentSizeChange={() => scheduleQuestionScroll(activeQuestionRef.current)}
@@ -111,8 +133,10 @@ export function TeamCreateStepIntro({ api: { draft, set } }: Props) {
           <View style={styles.box}>
             <TextInput
               value={draft.description}
-              onChangeText={(description) => set({ description: description.slice(0, 1000) })}
-              maxLength={1000}
+              onChangeText={(description) =>
+                set({ description: description.slice(0, MAX_DESCRIPTION_LENGTH) })
+              }
+              maxLength={MAX_DESCRIPTION_LENGTH}
               multiline
               textAlignVertical="top"
               placeholder="어떤 팀인지, 어떤 팀원을 찾는지 적어주세요."
@@ -153,7 +177,7 @@ export function TeamCreateStepIntro({ api: { draft, set } }: Props) {
                 })}
               </ScrollView>
               <Text variant="badge" color="textSecondary">
-                {draft.description.length}/1000
+                {draft.description.length}/{MAX_DESCRIPTION_LENGTH}
               </Text>
             </View>
           </View>
@@ -194,7 +218,10 @@ export function TeamCreateStepIntro({ api: { draft, set } }: Props) {
                     {editing ? (
                       <TextInput
                         value={question}
-                        onChangeText={(value) => updateQuestion(index, value)}
+                        onChangeText={(value) =>
+                          updateQuestion(index, value.slice(0, MAX_QUESTION_LENGTH))
+                        }
+                        maxLength={MAX_QUESTION_LENGTH}
                         onFocus={() => {
                           activeQuestionRef.current = index;
                           scheduleQuestionScroll(index);
@@ -249,12 +276,23 @@ export function TeamCreateStepIntro({ api: { draft, set } }: Props) {
 
             <Pressable
               onPress={() => addQuestion()}
+              disabled={questionLimitReached}
               accessibilityRole="button"
-              accessibilityLabel="질문 직접 추가"
-              style={({ pressed }) => [styles.addButton, pressed && styles.pressed]}
+              accessibilityState={{ disabled: questionLimitReached }}
+              accessibilityLabel={
+                questionLimitReached ? '질문 최대 5개 추가 완료' : '질문 직접 추가'
+              }
+              style={({ pressed }) => [
+                styles.addButton,
+                questionLimitReached && styles.addButtonDisabled,
+                pressed && styles.pressed,
+              ]}
             >
-              <Text variant="bodyStrong" color="brand">
-                + 직접 추가하기
+              <Text
+                variant={questionLimitReached ? 'caption' : 'bodyStrong'}
+                color={questionLimitReached ? 'textDisabled' : 'brand'}
+              >
+                {questionLimitReached ? '질문은 최대 5개까지 추가할 수 있어요' : '+ 직접 추가하기'}
               </Text>
             </Pressable>
           </View>
@@ -266,7 +304,8 @@ export function TeamCreateStepIntro({ api: { draft, set } }: Props) {
               </Text>
               <View style={styles.suggestionList}>
                 {suggestions.map((question) => {
-                  const disabled = draft.questions.includes(question);
+                  const selected = draft.questions.includes(question);
+                  const disabled = selected || questionLimitReached;
                   return (
                     <Pressable
                       key={question}
@@ -285,8 +324,8 @@ export function TeamCreateStepIntro({ api: { draft, set } }: Props) {
                       <Text variant="caption" color="textBody" style={styles.suggestionText}>
                         {question}
                       </Text>
-                      <Text variant="label" color="brand">
-                        {draft.questions.includes(question) ? '✓' : '+'}
+                      <Text variant="label" color={disabled ? 'textDisabled' : 'brand'}>
+                        {selected ? '✓' : '+'}
                       </Text>
                     </Pressable>
                   );
@@ -420,6 +459,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  addButtonDisabled: { backgroundColor: CREATE_COLOR.surfaceMuted },
   suggestionSection: { marginTop: space[3.5] },
   suggestionTitle: { marginBottom: space[2] },
   suggestionList: { gap: space[1.5] },

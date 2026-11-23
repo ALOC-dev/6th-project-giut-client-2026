@@ -37,27 +37,10 @@ const emptyDraft = (): TeamDraft => ({
   questions: [...DEFAULT_QUESTIONS],
 });
 
-const demoDraft = (step: number): Partial<TeamDraft> =>
-  step >= 3
-    ? {
-        name: '데이터한입',
-        myRole: '개발',
-        myPosition: '프론트엔드',
-        recruitRoles: ['개발', '디자인'],
-        recruit: { '개발|백엔드': 1, '디자인|UI/UX': 1 },
-        ...(step >= 5
-          ? { mode: '온·오프 혼합' as ActivityMode, meetings: 2, place: '서울 전체' }
-          : {}),
-      }
-    : {};
-
 export const recruitKey = (role: TeamRole, position: string) => `${role}|${position}`;
 
-export function useTeamDraft(startStep = 1) {
-  const [draft, setDraft] = useState<TeamDraft>(() => ({
-    ...emptyDraft(),
-    ...demoDraft(startStep),
-  }));
+export function useTeamDraft() {
+  const [draft, setDraft] = useState<TeamDraft>(emptyDraft);
   const [warningKey, setWarningKey] = useState(0);
 
   const total = useMemo(
@@ -94,7 +77,10 @@ export function useTeamDraft(startStep = 1) {
           )
         );
       case 4:
-        return Boolean(draft.mode);
+        if (!draft.mode || draft.meetings === 0) return false;
+        if (draft.mode === '온라인') return draft.tools.length > 0;
+        if (draft.mode === '오프라인') return Boolean(draft.place);
+        return Boolean(draft.place) && draft.tools.length > 0;
       case 5:
         return draft.description.trim().length > 0;
       default:

@@ -51,8 +51,8 @@ export const CREATE_COLOR = {
   surfaceMuted: color.surfaceMuted,
   surfaceSubtle: color.surfaceSubtle,
   danger: color.danger,
-  success: role.plan.base,
-  successTint: role.plan.tint,
+  success: color.success,
+  successTint: color.successTint,
 } as const;
 
 export const STEP_TITLES: [string, string][] = [
@@ -72,6 +72,9 @@ export const ACTIVITY_MODES: [ActivityMode, string][] = [
 export const MEETING_PLACES = ['교내', '서울 전체', '수도권', '상관없음'];
 export const COLLABORATION_TOOLS = ['디스코드', '줌', '구글 밋', '노션', '슬랙'];
 export const MAX_RECRUIT = 9;
+export const MAX_DESCRIPTION_LENGTH = 1000;
+export const MAX_QUESTION_COUNT = 5;
+export const MAX_QUESTION_LENGTH = 300;
 
 export const INTRO_HINTS: [string, string][] = [
   ['팀 목표', '· 팀 목표: '],
@@ -83,7 +86,6 @@ export const QUESTION_SUGGESTIONS = [
   '관련 경험이나 포트폴리오를 공유해주세요.',
   '활동 가능한 요일과 시간대를 알려주세요.',
   '이번 공모전에서 기대하는 점은 무엇인가요?',
-  '협업할 때 가장 중요하게 생각하는 것은?',
 ];
 
 export const DEFAULT_QUESTIONS = [

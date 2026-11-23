@@ -297,13 +297,16 @@ function PositionDropdown({
 
       {open ? (
         <FadeUp duration={200}>
-          <View style={styles.dropdownMenu}>
+          <View style={styles.dropdownMenu} accessibilityRole="radiogroup">
             {ROLE_OPTIONS[role].map((position) => {
               const selected = value === position;
               return (
                 <Pressable
                   key={position}
                   onPress={() => onPick(position)}
+                  accessibilityRole="radio"
+                  accessibilityState={{ checked: selected }}
+                  accessibilityLabel={position}
                   style={({ pressed }) => [
                     styles.dropdownItem,
                     selected && { backgroundColor: ROLE_TINT[role] },
