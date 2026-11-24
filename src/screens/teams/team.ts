@@ -7,7 +7,6 @@ export type Member = {
   id: string;
   name: string;
   role: RoleKey;
-  // 지원할 때 팀이 구하는 포지션 중에서 고른 세부 역할
   position: string;
   isLeader: boolean;
 };
@@ -33,7 +32,6 @@ export type Team = {
   recruitEndDate: string;
   members: Member[];
   recruitingRoles: RecruitingRole[];
-  // 최대 1000자
   description: string;
   operationMethod: OperationMethod;
   activityFrequency: ActivityFrequency;
@@ -54,7 +52,6 @@ export const ROLE_LABEL: Record<RoleKey, string> = {
   mkt: '마케팅',
 };
 
-// 모집 마감: 모집 기간이 지났거나, 정원이 다 찼을 때
 export function isTeamClosed(team: Team) {
   return getDday(team.recruitEndDate) < 0 || team.members.length >= team.capacity;
 }

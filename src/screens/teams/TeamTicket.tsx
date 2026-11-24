@@ -6,20 +6,18 @@ import { Text } from '@/components/ui';
 import { color, radius, space } from '@/theme';
 
 const CORNER = radius['2xl'];
-const NOTCH = 10; // 양옆 반원 홈 반지름
+const NOTCH = 10;
 const FOOTER_HEIGHT = 28;
 const FOOTER_WORDS = 5;
 
 type TeamTicketProps = {
-  children: ReactNode; // 각 자식이 한 구역. 구역 사이에 홈과 점선이 생겨요
-  closed?: boolean; // 모집 마감이면 GIUT 띠가 회색
+  children: ReactNode;
+  closed?: boolean;
 };
 
-// 구역 사이 양옆이 반원으로 파이고, 맨 아래에 GIUT 띠가 있는 세로 티켓 카드
 export function TeamTicket({ children, closed = false }: TeamTicketProps) {
   const sections = Children.toArray(children);
   const [size, setSize] = useState({ width: 0, height: 0 });
-  // 구역 경계(각 구역 아래쪽)의 y 위치
   const [sectionBottoms, setSectionBottoms] = useState<number[]>([]);
 
   const setSectionBottom = (index: number, bottom: number) =>
@@ -30,7 +28,6 @@ export function TeamTicket({ children, closed = false }: TeamTicketProps) {
       return next;
     });
 
-  // 마지막 구역 아래는 GIUT 띠라 홈이 없어요
   const notchYs = sectionBottoms.slice(0, sections.length - 1).filter((y) => y > 0);
 
   return (
@@ -82,7 +79,6 @@ export function TeamTicket({ children, closed = false }: TeamTicketProps) {
   );
 }
 
-// 둥근 모서리 + 양옆 홈이 있는 테두리 경로 (시계 방향)
 function ticketPath(w: number, h: number, notchYs: number[]) {
   const r = CORNER;
   const n = NOTCH;
@@ -124,7 +120,7 @@ const S = StyleSheet.create({
     justifyContent: 'space-around',
     backgroundColor: color.brand,
     borderBottomLeftRadius: CORNER,
-    borderBottomRightRadius: CORNER, // SVG 테두리와 모서리 모양이 같도록 borderCurve는 안 써요
+    borderBottomRightRadius: CORNER,
   },
   footerClosed: {
     backgroundColor: color.textDisabled,

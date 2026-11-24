@@ -15,7 +15,6 @@ import { isTeamClosed, type Team } from './team';
 type TeamDetailScreenProps = {
   team: Team;
   contestTitle?: string;
-  // 하단 버튼은 보는 사람(지원자, 팀장 등)에 따라 달라서 라우트에서 넣어줘요
   bottomBar?: ReactNode;
 };
 

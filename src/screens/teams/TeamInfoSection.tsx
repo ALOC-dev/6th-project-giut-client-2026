@@ -100,7 +100,6 @@ const S = StyleSheet.create({
   center: {
     textAlign: 'center',
   },
-  // 양쪽 칸을 같은 폭으로 나눠서 화살표가 정확히 가운데에 오게
   row: {
     flexDirection: 'row',
     alignItems: 'center',

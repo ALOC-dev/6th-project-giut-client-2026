@@ -26,7 +26,6 @@ export function TeamMemberSection({ team }: TeamMemberSectionProps) {
   const members = [...team.members].sort((a, b) => Number(b.isLeader) - Number(a.isLeader));
 
   const closed = isTeamClosed(team);
-  // 마감된 팀은 빈자리를 보여주지 않아요
   const openSlots = closed ? 0 : Math.max(team.capacity - team.members.length, 0);
   const vacancies = team.recruitingRoles
     .flatMap(({ role: key, count }) => Array.from({ length: count }, () => key))
@@ -118,7 +117,6 @@ function VacancyCell({ roleKey, width }: { roleKey: RoleKey; width: CellWidth })
   );
 }
 
-// PersonSilhouetteIcon과 같은 비율의 점선 사람. 몸통 아래는 원 밖으로 잘려요
 function DashedSilhouette({ color: stroke }: { color: string }) {
   const offset = (AVATAR - ICON) / 2;
   const center = AVATAR / 2;

@@ -11,7 +11,6 @@ type TeamBottomBarProps = {
   onPressApply: () => void;
 };
 
-// 지원자가 보는 하단 버튼. 마감된 팀은 지원하기 대신 회색 '모집 마감'
 export function TeamBottomBar({ closed, onPressInquiry, onPressApply }: TeamBottomBarProps) {
   const insets = useSafeAreaInsets();
 
@@ -46,7 +45,6 @@ const S = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: color.line,
   },
-  // 두 버튼 높이와 모서리를 같게
   button: {
     height: 56,
     borderRadius: radius.xl,
