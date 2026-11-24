@@ -1,3 +1,5 @@
+import { ROLE_LABEL, type RoleKey } from '@/screens/teams';
+
 // 내 프로필 조회 API 응답 타입
 // TODO: 전체 코드 목록(enum)과 null 가능 여부가 확인되면 string을 좁히기
 
@@ -45,7 +47,7 @@ export type Profile = {
   primaryRoles: CodeName[]; // 큰 역할 (개발, 디자인 등)
   activityStatusName: string;
   profileImageUrl: string | null;
-  bio: string;
+  bio: string; // 최대 200자
   searchable: boolean;
   roles: CodeName[]; // 세부 포지션
   tags: ProfileTag[];
@@ -71,3 +73,19 @@ export type MyProfile = {
   profile: Profile;
   summary: ProfileSummary;
 };
+
+// TODO: API가 세부 포지션의 큰 역할도 내려주면 제거 (지금은 응답에 없어서 색을 직접 연결)
+const ROLE_KEY_BY_CODE: Record<string, RoleKey | undefined> = {
+  FRONTEND_DEVELOPER: 'dev',
+  BACKEND_DEVELOPER: 'dev',
+  DATA_ANALYST: 'plan',
+};
+
+export function getRoleKey(code: string) {
+  return ROLE_KEY_BY_CODE[code];
+}
+
+export function getPrimaryRoleKey(profile: Profile) {
+  const name = profile.primaryRoles[0]?.name;
+  return (Object.keys(ROLE_LABEL) as RoleKey[]).find((key) => ROLE_LABEL[key] === name);
+}

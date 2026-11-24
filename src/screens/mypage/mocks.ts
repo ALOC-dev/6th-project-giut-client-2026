@@ -26,7 +26,7 @@ export const MOCK_MY_PROFILE: MyProfile = {
     primaryRoles: [{ code: 'DEVELOPMENT', name: '개발' }],
     activityStatusName: '팀 찾는 중',
     profileImageUrl: null,
-    bio: '데이터로 문제를 풀고 쓰기 쉬운 서비스로 만드는 걸 좋아해요. 주로 프론트엔드와 데이터 분석을 맡아요. 끝까지 함께 완주할 팀원을 찾고 있어요!',
+    bio: '데이터로 문제를 풀고 쓰기 쉬운 서비스로 만드는 걸 좋아해요. 주로 프론트엔드와 데이터 분석을 맡아요. 끝까지 함께 완주할 팀원을 찾고 있어요! 그리고 저는 물범을 좋아합니다. 점박이물범을 좋아합니다. ',
     searchable: true,
     roles: [ROLE.frontend, ROLE.data],
     tags: [TAG.python, TAG.sql, TAG.react, TAG.typescript, TAG.pandas, TAG.figma, TAG.git],

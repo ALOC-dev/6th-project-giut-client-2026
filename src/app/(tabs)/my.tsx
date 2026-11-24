@@ -1,11 +1,14 @@
-import { View } from 'react-native';
+import { MOCK_MY_PROFILE, MyPageScreen } from '@/screens/mypage';
 
-import { Text } from '@/components/ui';
-
-export default function MyPageScreen() {
+export default function MyPageRoute() {
+  // TODO: API 연결 시 로딩 / 실패 화면 추가
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text variant="titleLg">마이</Text>
-    </View>
+    <MyPageScreen
+      myProfile={MOCK_MY_PROFILE}
+      // TODO: 메뉴 화면이 생기면 이동
+      onPressMenu={() => {}}
+      // TODO: 프로필 편집 화면이 생기면 이동
+      onPressEditProfile={() => {}}
+    />
   );
 }
