@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 
 import { DetailHeader } from '@/components/header/DetailHeader';
+import { FolderTabBar } from '@/components/tabs/FolderTabBar';
 import { Text } from '@/components/ui';
 import type { ContestDetail } from '@/screens/contests/contestDetail';
 import type { Team } from '@/screens/teams';
@@ -18,7 +19,7 @@ import { openExternalUrl } from '@/utils/link';
 
 import { ContestBottomCTA } from './ContestBottomCTA';
 import { ContestDescription } from './ContestDescription';
-import { ContestDetailPanel, ContestDetailSection, ContestDetailTabBar } from './ContestDetailTabs';
+import { ContestDetailPanel, ContestDetailSection } from './ContestDetailTabs';
 import { ContestInfoCard } from './ContestInfoCard';
 import { RecruitingTeamList } from './RecruitingTeamList';
 
@@ -135,7 +136,7 @@ export function ContestDetailScreen({ contest, teams, onCreateTeam }: ContestDet
         <ContestInfoCard contest={contest} />
 
         {isTeamable && (
-          <ContestDetailTabBar<DetailTab>
+          <FolderTabBar<DetailTab>
             tabs={[
               { key: 'detail', label: '상세 내용' },
               { key: 'teams', label: '모집 중인 팀', count: teams.length },
