@@ -50,6 +50,7 @@ export function TeamCreateScreen({ onExit, onSubmit, onDone, onCopyLink }: TeamC
   const [shareUrl, setShareUrl] = useState<string>();
   const [allowRemoval, setAllowRemoval] = useState(false);
   const exitAlertOpen = useRef(false);
+  const submitLockRef = useRef(false);
 
   const completed = step === 6;
   const canContinue = draftApi.canContinue(step);
@@ -155,7 +156,7 @@ export function TeamCreateScreen({ onExit, onSubmit, onDone, onCopyLink }: TeamC
       onDone(draftApi.draft);
       return;
     }
-    if (!canContinue || submitting) return;
+    if (!canContinue || submitLockRef.current) return;
 
     if (step === 5) {
       const draft = {
@@ -170,10 +171,12 @@ export function TeamCreateScreen({ onExit, onSubmit, onDone, onCopyLink }: TeamC
         questions: draft.questions,
       });
       try {
+        submitLockRef.current = true;
         setSubmitting(true);
         const result = await onSubmit?.(draft);
         if (result?.shareUrl) setShareUrl(result.shareUrl);
       } catch {
+        submitLockRef.current = false;
         toast.show('팀을 등록하지 못했어요. 잠시 후 다시 시도해주세요.');
         return;
       } finally {
@@ -185,6 +188,14 @@ export function TeamCreateScreen({ onExit, onSubmit, onDone, onCopyLink }: TeamC
   };
 
   const ctaEnabled = completed || (canContinue && !submitting);
+  const ctaText = completed
+    ? '내 팀 페이지로 가기'
+    : step === 5
+      ? submitting
+        ? '등록하는 중…'
+        : '팀 등록하기'
+      : '다음';
+  const ctaAccessibilityLabel = submitting ? '팀을 등록하는 중입니다' : ctaText;
 
   return (
     <View style={[styles.screen, { paddingTop: insets.top }]}>
@@ -202,7 +213,6 @@ export function TeamCreateScreen({ onExit, onSubmit, onDone, onCopyLink }: TeamC
               <ChevronIcon dir="left" size={22} />
             </Pressable>
             <Text variant="titleMd">팀 만들기</Text>
-            <View style={styles.headerSpacer} />
           </View>
 
           <View
@@ -253,6 +263,7 @@ export function TeamCreateScreen({ onExit, onSubmit, onDone, onCopyLink }: TeamC
           onPress={handleContinue}
           disabled={!ctaEnabled}
           accessibilityRole="button"
+          accessibilityLabel={ctaAccessibilityLabel}
           accessibilityState={{ disabled: !ctaEnabled, busy: submitting }}
           style={({ pressed }) => [
             styles.cta,
@@ -261,13 +272,7 @@ export function TeamCreateScreen({ onExit, onSubmit, onDone, onCopyLink }: TeamC
           ]}
         >
           <Text variant="button" color={ctaEnabled ? 'surface' : 'textDisabled'}>
-            {completed
-              ? '내 팀 페이지로 가기'
-              : step === 5
-                ? submitting
-                  ? '등록하는 중…'
-                  : '팀 등록하기'
-                : '다음'}
+            {ctaText}
           </Text>
         </Pressable>
       </View>
@@ -303,19 +308,18 @@ const styles = StyleSheet.create({
   header: { paddingTop: space[2], paddingHorizontal: space[5] },
   topBar: {
     height: 44,
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
   backButton: {
+    position: 'absolute',
+    left: -space[3],
     width: 44,
     height: 44,
-    marginLeft: -space[3],
     alignItems: 'center',
     justifyContent: 'center',
   },
   backButtonDisabled: { opacity: 0.4 },
-  headerSpacer: { width: 32 },
   progress: { flexDirection: 'row', gap: space[1], marginTop: space[2] },
   progressSegment: {
     flex: 1,
