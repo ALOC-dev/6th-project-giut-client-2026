@@ -1,3 +1,4 @@
+import { usePreventRemove } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Animated,
@@ -48,6 +49,8 @@ export function TeamApplyScreen({
   const api = useTeamApplyDraft(team, questions);
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [direction, setDirection] = useState<'left' | 'right'>('right');
+  const [leaving, setLeaving] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [sending, setSending] = useState(false);
   const [cardHidden, setCardHidden] = useState(false);
   const [sendFrom, setSendFrom] = useState<{
@@ -61,6 +64,8 @@ export function TeamApplyScreen({
   const submitLock = useRef(false);
   const rootRef = useRef<ViewInstance>(null);
   const cardRef = useRef<ViewInstance>(null);
+
+  const disableRemovalPrevention = usePreventRemove(!completed && !leaving);
 
   const startSendAnimation = useCallback(() => {
     const root = rootRef.current;
@@ -84,11 +89,13 @@ export function TeamApplyScreen({
   };
 
   const handleBack = () => {
-    if (sending) return;
+    if (submitting) return;
     if (step > 1) {
       moveTo((step - 1) as 1 | 2);
       return;
     }
+    setLeaving(true);
+    disableRemovalPrevention();
     onExit();
   };
 
@@ -97,7 +104,7 @@ export function TeamApplyScreen({
       onDone();
       return;
     }
-    if (!api.canContinue(step) || sending || submitLock.current) return;
+    if (!api.canContinue(step) || submitting || submitLock.current) return;
 
     if (step < 3) {
       moveTo((step + 1) as 2 | 3);
@@ -105,11 +112,13 @@ export function TeamApplyScreen({
     }
 
     submitLock.current = true;
+    setSubmitting(true);
     try {
       await onSubmit?.(api.draft);
       startSendAnimation();
     } catch {
       submitLock.current = false;
+      setSubmitting(false);
       toast.show('지원서를 보내지 못했어요. 잠시 후 다시 시도해주세요.');
     }
   };
@@ -117,6 +126,7 @@ export function TeamApplyScreen({
   const handleCardHide = useCallback(() => setCardHidden(true), []);
 
   const handleSendAnimationDone = useCallback(() => {
+    setSubmitting(false);
     setSending(false);
     setCardHidden(false);
     setSendFrom(null);
@@ -132,7 +142,7 @@ export function TeamApplyScreen({
       : step === 2
         ? '지원서 미리보기'
         : '지원서 보내기';
-  const ctaEnabled = completed || (api.canContinue(step) && !sending);
+  const ctaEnabled = completed || (api.canContinue(step) && !submitting);
 
   return (
     <View
@@ -150,12 +160,12 @@ export function TeamApplyScreen({
         <View style={styles.header}>
           <Press
             onPress={handleBack}
-            disabled={sending}
+            disabled={submitting}
             touchSize={44}
             accessibilityRole="button"
             accessibilityLabel={step === 1 ? '팀 지원 화면 닫기' : '이전 단계로 이동'}
-            accessibilityState={{ disabled: sending }}
-            style={[styles.backButton, sending && styles.disabled]}
+            accessibilityState={{ disabled: submitting }}
+            style={[styles.backButton, submitting && styles.disabled]}
           >
             <ChevronIcon dir="left" size={24} />
           </Press>
@@ -202,10 +212,10 @@ export function TeamApplyScreen({
       <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, space[3]) }]}>
         <Press
           onPress={handleContinue}
-          disabled={!ctaEnabled || sending}
+          disabled={!ctaEnabled || submitting}
           accessibilityRole="button"
-          accessibilityLabel={sending ? '지원서를 보내는 중입니다' : ctaLabel}
-          accessibilityState={{ disabled: !ctaEnabled || sending, busy: sending }}
+          accessibilityLabel={submitting ? '지원서를 보내는 중입니다' : ctaLabel}
+          accessibilityState={{ disabled: !ctaEnabled || submitting, busy: submitting }}
           style={[
             styles.cta,
             ctaEnabled ? styles.ctaEnabled : styles.ctaDisabled,

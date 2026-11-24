@@ -64,6 +64,7 @@ export function ApplicationCard({
     ? application.answers
     : application.answers.slice(0, answerLimit);
   const extraAnswerCount = Math.max(0, application.answers.length - answerLimit);
+  const canExpandPreview = preview && application.answers.length > 0;
 
   useEffect(() => {
     chevronProgress.set(
@@ -193,14 +194,14 @@ export function ApplicationCard({
             <Text
               variant="body"
               color="textBody"
-              numberOfLines={preview ? 3 : undefined}
+              numberOfLines={preview && !showAllAnswers ? 3 : undefined}
               style={styles.answerCopy}
             >
               {answer.answer}
             </Text>
           </Animated.View>
         ))}
-        {preview && extraAnswerCount > 0 ? (
+        {canExpandPreview ? (
           <Press
             onPress={() => setShowAllAnswers((current) => !current)}
             scaleOnPress={false}
@@ -209,7 +210,11 @@ export function ApplicationCard({
             style={styles.moreButton}
           >
             <Text variant="caption" color="textSecondary">
-              {showAllAnswers ? '접기' : `질문 ${extraAnswerCount}개 더 보기`}
+              {showAllAnswers
+                ? '접기'
+                : extraAnswerCount > 0
+                  ? `질문 ${extraAnswerCount}개 더 보기`
+                  : '답변 전체 보기'}
             </Text>
             <Animated.View style={chevronStyle}>
               <ChevronIcon size={16} color={color.textSecondary} />

@@ -11,7 +11,7 @@ import {
   type GestureResponderEvent,
   type ViewInstance,
 } from 'react-native';
-import Svg, { Circle, Path, Polygon } from 'react-native-svg';
+import Svg, { Circle, Path } from 'react-native-svg';
 
 import { CheckIcon, ChevronIcon } from '@/components/icons';
 import { ApplicationCard, type ApplicationCardData } from '@/components/application';
@@ -49,8 +49,6 @@ export function TeamApplySeatStep({ api, team }: { api: TeamApplyDraftApi; team:
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.stepContent}>
-      <TeamHero team={team} />
-
       <View>
         <Text variant="titleXl">{'어느 자리에\n지원할까요?'}</Text>
         <Text variant="body" color="textBody" style={styles.headingDescription}>
@@ -80,44 +78,6 @@ export function TeamApplySeatStep({ api, team }: { api: TeamApplyDraftApi; team:
         </View>
       ) : null}
     </ScrollView>
-  );
-}
-
-function TeamHero({ team }: { team: ApplyTeam }) {
-  const filled = team.slots.filter((slot) => slot.filled).length;
-
-  return (
-    <View style={styles.hero}>
-      <View style={[styles.heroDecoration, styles.heroDecorationLarge]} />
-      <View style={[styles.heroDecoration, styles.heroDecorationSmall]} />
-      <View style={styles.heroTitleRow}>
-        <View style={styles.flagBox}>
-          <View style={styles.flagPole} />
-          <Svg width={18} height={14} style={styles.flag}>
-            <Polygon points="0,0 18,0 14,7 18,14 0,14" fill={color.brand} />
-          </Svg>
-        </View>
-        <View style={styles.heroCopy}>
-          <Text variant="titleLg" color="surface" numberOfLines={1}>
-            {team.name}
-          </Text>
-          <Text variant="caption" color={color.brandTint} numberOfLines={1}>
-            {team.contest}
-          </Text>
-        </View>
-      </View>
-      <View style={styles.heroChips}>
-        {[`마감 D-${team.dday}`, `팀원 ${filled} / ${team.slots.length}`, team.activity].map(
-          (label) => (
-            <View key={label} style={styles.heroChip}>
-              <Text variant="meta" color="surface">
-                {label}
-              </Text>
-            </View>
-          ),
-        )}
-      </View>
-    </View>
   );
 }
 
@@ -943,53 +903,6 @@ const styles = StyleSheet.create({
     gap: space[6],
   },
   headingDescription: { marginTop: space[2] },
-  hero: {
-    padding: space[5],
-    overflow: 'hidden',
-    borderRadius: radius['2xl'],
-    backgroundColor: color.brand,
-  },
-  heroDecoration: { position: 'absolute', borderRadius: radius.full },
-  heroDecorationLarge: {
-    width: 130,
-    height: 130,
-    top: -30,
-    right: -30,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-  },
-  heroDecorationSmall: {
-    width: 90,
-    height: 90,
-    right: 30,
-    bottom: -50,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-  },
-  heroTitleRow: { flexDirection: 'row', alignItems: 'center', gap: space[3] },
-  flagBox: {
-    width: 46,
-    height: 46,
-    overflow: 'hidden',
-    borderRadius: radius.card,
-    backgroundColor: color.surface,
-  },
-  flagPole: {
-    position: 'absolute',
-    left: 14,
-    top: 9,
-    width: 3,
-    height: 29,
-    borderRadius: radius.full,
-    backgroundColor: color.ink,
-  },
-  flag: { position: 'absolute', left: 17, top: 10 },
-  heroCopy: { flex: 1, minWidth: 0, gap: space[0.5] },
-  heroChips: { marginTop: space[4], flexDirection: 'row', flexWrap: 'wrap', gap: space[1.5] },
-  heroChip: {
-    paddingVertical: space[1],
-    paddingHorizontal: space[2.5],
-    borderRadius: radius.md,
-    backgroundColor: 'rgba(255,255,255,0.18)',
-  },
   slotList: { gap: space[3] },
   openSlot: {
     minHeight: 76,

@@ -101,6 +101,7 @@ export function WaxSendOverlay({
   onCardHide: () => void;
   onDone: () => void;
 }) {
+  const { reduced } = useMotion();
   const completed = useRef(false);
   const finish = useCallback(() => {
     if (completed.current) return;
@@ -163,6 +164,12 @@ export function WaxSendOverlay({
       easing: EasingFunction,
     ) => Animated.timing(value, { toValue, duration, easing, useNativeDriver: false });
 
+    if (reduced) {
+      onCardHide();
+      schedule(0, finish);
+      return () => timers.forEach(clearTimeout);
+    }
+
     if (from) {
       const foldedHeight = from.h * 0.34;
       const targetWidth = 112;
@@ -188,7 +195,7 @@ export function WaxSendOverlay({
     schedule(1750, () => setFlapFront(true));
     schedule(SEND_END_MS, finish);
     return () => timers.forEach(clearTimeout);
-  }, [envelopeLeft, envelopeTop, finish, from, onCardHide, paper]);
+  }, [envelopeLeft, envelopeTop, finish, from, onCardHide, paper, reduced]);
 
   const flap = (
     <Animated.View
