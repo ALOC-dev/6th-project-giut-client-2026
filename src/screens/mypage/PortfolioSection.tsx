@@ -7,10 +7,11 @@ import { color } from '@/theme';
 import { formatMonthPeriod } from '@/utils/date';
 
 import type { PortfolioItem } from './myProfile';
-import { EDIT_BUTTON_HEIGHT, S } from './PortfolioSection.styles';
+import { S } from './PortfolioSection.styles';
 import { SectionHeader } from './SectionHeader';
 
 const CAPTION_MAX_LINES = 2;
+const HIDDEN_ORDER = Number.MAX_SAFE_INTEGER;
 
 type PortfolioSectionProps = {
   items: PortfolioItem[];
@@ -25,27 +26,16 @@ export function PortfolioSection({
   onPressEdit,
   onPressItem,
 }: PortfolioSectionProps) {
-  const sorted = [...items].sort((a, b) => a.showcaseOrder - b.showcaseOrder);
+  // 공개 순서대로, 숨긴 포트폴리오는 맨 뒤
+  const sorted = [...items].sort(
+    (a, b) => (a.showcaseOrder ?? HIDDEN_ORDER) - (b.showcaseOrder ?? HIDDEN_ORDER),
+  );
   const featured = sorted.find((item) => item.representative);
   const others = sorted.filter((item) => item !== featured);
 
   return (
     <View style={S.section}>
-      <SectionHeader
-        title="포트폴리오"
-        count={count}
-        right={
-          <Press
-            onPress={onPressEdit}
-            touchSize={EDIT_BUTTON_HEIGHT}
-            accessibilityRole="button"
-            accessibilityLabel="포트폴리오 편집"
-            style={S.editButton}
-          >
-            <Text variant="caption">편집</Text>
-          </Press>
-        }
-      />
+      <SectionHeader title="포트폴리오" count={count} onPressEdit={onPressEdit} />
 
       {featured && <FeaturedCard item={featured} onPress={() => onPressItem(featured)} />}
 

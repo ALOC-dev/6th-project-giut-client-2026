@@ -1,4 +1,8 @@
+import { getContestDetail } from '@/screens/contests/detailMocks';
+import { getTeam, isTeamClosed } from '@/screens/teams';
+
 import type { CodeName, MyProfile, ProfileTag } from './myProfile';
+import type { Scrap } from './scrap';
 
 const ROLE = {
   frontend: { code: 'FRONTEND_DEVELOPER', name: '프론트엔드' },
@@ -86,6 +90,33 @@ export const MOCK_MY_PROFILE: MyProfile = {
         startMonth: '2025-03',
         endMonth: '2025-06',
       },
+      {
+        id: 2,
+        category: 'CERTIFICATION',
+        categoryName: '자격증',
+        title: 'SQL 개발자(SQLD)',
+        organization: '한국데이터산업진흥원',
+        startMonth: '2025-09',
+        endMonth: '2025-09',
+      },
+      {
+        id: 3,
+        category: 'EXTERNAL_ACTIVITY',
+        categoryName: '대외활동',
+        title: '공공데이터 청년 서포터즈',
+        organization: 'OO데이터진흥원',
+        startMonth: '2024-07',
+        endMonth: '2024-12',
+      },
+      {
+        id: 4,
+        category: 'CLUB',
+        categoryName: '동아리',
+        title: '교내 개발 동아리 프론트엔드 파트',
+        organization: '서울시립대학교',
+        startMonth: '2024-03',
+        endMonth: '2025-02',
+      },
     ],
   },
   summary: {
@@ -100,3 +131,40 @@ export const MOCK_MY_PROFILE: MyProfile = {
     collaborationCount: 7,
   },
 };
+
+// 기존 공모전·팀 목데이터를 참조해서 카드를 누르면 상세 화면으로 이동할 수 있어요
+function postScrap(contestId: string): Scrap[] {
+  const contest = getContestDetail(contestId);
+  if (!contest) return [];
+  const { activityType, title, org, deadline } = contest;
+  return [{ kind: 'post', contestId, activityType, title, org, deadline }];
+}
+
+function teamScrap(teamId: string): Scrap[] {
+  const team = getTeam(teamId);
+  if (!team) return [];
+  return [
+    {
+      kind: 'team',
+      teamId,
+      name: team.name,
+      contestTitle: getContestDetail(team.contestId)?.title ?? '',
+      memberCount: team.members.length,
+      capacity: team.capacity,
+      closed: isTeamClosed(team),
+    },
+  ];
+}
+
+// 게시물 6 + 팀 3 (summary의 개수와 같아요)
+export const MOCK_SCRAPS: Scrap[] = [
+  ...postScrap('11'),
+  ...teamScrap('12'),
+  ...postScrap('07'),
+  ...postScrap('25'),
+  ...teamScrap('7'),
+  ...postScrap('08'),
+  ...postScrap('26'),
+  ...teamScrap('5'),
+  ...postScrap('04'),
+];

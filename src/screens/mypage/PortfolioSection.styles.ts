@@ -1,24 +1,14 @@
 import { StyleSheet } from 'react-native';
 
-import { color, radius, shadow, space } from '@/theme';
+import { color, radius, space } from '@/theme';
 
 const THUMBNAIL = 52;
 const CARD_RADIUS = radius['2xl'];
 const CARD_BORDER = 1;
 
-export const EDIT_BUTTON_HEIGHT = 36;
-
 export const S = StyleSheet.create({
   section: {
     gap: space[3],
-  },
-  editButton: {
-    ...shadow.control,
-    height: EDIT_BUTTON_HEIGHT,
-    paddingHorizontal: space[3.5],
-    justifyContent: 'center',
-    borderRadius: radius.full,
-    backgroundColor: color.surface,
   },
   card: {
     borderWidth: CARD_BORDER,

@@ -1,16 +1,18 @@
-import { ROLE_LABEL, type RoleKey } from '@/screens/teams';
+import type { RoleKey } from '@/screens/teams';
 
-// 내 프로필 조회 API 응답 타입
-// TODO: 전체 코드 목록(enum)과 null 가능 여부가 확인되면 string을 좁히기
+// 내 프로필 조회 API(GET /api/userprofile/me/profile) 응답 타입
+// 응답 스펙에 null 여부가 없어서, 등록 요청에서 필수가 아닌 값은 null일 수 있다고 봐요
 
 export type CodeName = {
   code: string;
   name: string;
 };
 
+export type ProfileTagType = 'SKILL' | 'INTEREST' | 'EXPERIENCE';
+
 export type ProfileTag = {
   id: number;
-  type: string;
+  type: ProfileTagType;
   name: string;
 };
 
@@ -19,19 +21,22 @@ export type PortfolioItem = {
   imageUrl: string | null;
   title: string;
   caption: string;
-  projectStartDate: string; // 'YYYY-MM-DD'
-  projectEndDate: string; // 'YYYY-MM-DD'
-  teamSize: number;
+  projectStartDate: string | null; // 'YYYY-MM-DD'
+  projectEndDate: string | null; // 'YYYY-MM-DD'
+  teamSize: number | null;
   roles: CodeName[];
   markdownContent: string;
   skillTags: ProfileTag[];
-  showcaseOrder: number;
+  showcaseOrder: number | null; // 공개 프로필에 보이는 순서. null이면 숨김
   representative: boolean;
 };
 
+export type ActivityCategory =
+  'AWARD' | 'EXTERNAL_ACTIVITY' | 'CLUB' | 'INTERNSHIP' | 'CERTIFICATION';
+
 export type ActivityHistory = {
   id: number;
-  category: string;
+  category: ActivityCategory;
   categoryName: string;
   title: string;
   organization: string;
@@ -43,11 +48,11 @@ export type Profile = {
   userId: number;
   nickname: string;
   departmentName: string;
-  grade: number;
+  grade: number; // 1~5
   primaryRoles: CodeName[]; // 큰 역할 (개발, 디자인 등)
   activityStatusName: string;
   profileImageUrl: string | null;
-  bio: string; // 최대 200자
+  bio: string | null; // 최대 200자
   searchable: boolean;
   roles: CodeName[]; // 세부 포지션
   tags: ProfileTag[];
@@ -60,21 +65,21 @@ export type ProfileSummary = {
   showcaseCount: number;
   myTeamCount: number;
   scrapCount: number;
-  competitionScrapCount: number;
+  competitionScrapCount: number; // 마감된 공모전도 포함
   teamScrapCount: number;
   receivedProposalCount: number;
   receivedRecommendationCount: number;
-  collaborationCount: number;
+  collaborationCount: number; // 참여했던 팀의 누적 수 (탈퇴·강퇴한 팀도 포함)
 };
 
 export type MyProfile = {
   profileCompleted: boolean;
   universityVerified: boolean;
-  profile: Profile;
+  profile: Profile | null; // 프로필 미등록이면 null
   summary: ProfileSummary;
 };
 
-// TODO: API가 세부 포지션의 큰 역할도 내려주면 제거 (지금은 응답에 없어서 색을 직접 연결)
+// TODO: API 연결 시 GET /api/profile/roles(대표 역할별 세부 역할)로 교체
 const ROLE_KEY_BY_CODE: Record<string, RoleKey | undefined> = {
   FRONTEND_DEVELOPER: 'dev',
   BACKEND_DEVELOPER: 'dev',
@@ -85,7 +90,14 @@ export function getRoleKey(code: string) {
   return ROLE_KEY_BY_CODE[code];
 }
 
+const PRIMARY_ROLE_KEY: Record<string, RoleKey | undefined> = {
+  DEVELOPMENT: 'dev',
+  DESIGN: 'design',
+  PLANNING: 'plan',
+  MARKETING: 'mkt',
+};
+
 export function getPrimaryRoleKey(profile: Profile) {
-  const name = profile.primaryRoles[0]?.name;
-  return (Object.keys(ROLE_LABEL) as RoleKey[]).find((key) => ROLE_LABEL[key] === name);
+  const code = profile.primaryRoles[0]?.code;
+  return code ? PRIMARY_ROLE_KEY[code] : undefined;
 }

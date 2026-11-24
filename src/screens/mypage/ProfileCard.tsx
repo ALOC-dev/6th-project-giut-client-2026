@@ -22,6 +22,7 @@ type ProfileCardProps = {
 
 export function ProfileCard({ profile, summary, onPressEdit, onPressShare }: ProfileCardProps) {
   const lookingForTeam = profile.activityStatusName === LOOKING_FOR_TEAM;
+  const skills = profile.tags.filter(({ type }) => type === 'SKILL');
 
   return (
     <Card corner="2xl" elevation="raised" padding={space[5]} bordered style={S.card}>
@@ -89,15 +90,15 @@ export function ProfileCard({ profile, summary, onPressEdit, onPressShare }: Pro
         </View>
       )}
 
-      {profile.bio.length > 0 && (
+      {!!profile.bio && (
         <ExpandableText maxLines={BIO_MAX_LINES} label="자기소개">
           {profile.bio}
         </ExpandableText>
       )}
 
-      {profile.tags.length > 0 && (
+      {skills.length > 0 && (
         <View style={S.tags}>
-          {profile.tags.map((tag) => (
+          {skills.map((tag) => (
             <View key={tag.id} style={S.tag}>
               <Text variant="caption" color="textBody">
                 {tag.name}
