@@ -176,10 +176,10 @@ export function TeamCreateScreen({ onExit, onSubmit, onDone, onCopyLink }: TeamC
         const result = await onSubmit?.(draft);
         if (result?.shareUrl) setShareUrl(result.shareUrl);
       } catch {
+        submitLockRef.current = false;
         toast.show('팀을 등록하지 못했어요. 잠시 후 다시 시도해주세요.');
         return;
       } finally {
-        submitLockRef.current = false;
         setSubmitting(false);
       }
     }
