@@ -30,5 +30,12 @@ export default function TeamDetailRoute() {
     />
   );
 
-  return <TeamDetailScreen team={team} contestTitle={contest?.title} bottomBar={bottomBar} />;
+  return (
+    <TeamDetailScreen
+      key={team.id}
+      team={team}
+      contestTitle={contest?.title}
+      bottomBar={bottomBar}
+    />
+  );
 }

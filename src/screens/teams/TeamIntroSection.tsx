@@ -1,33 +1,22 @@
 import { useState } from 'react';
 import { StyleSheet, View, type TextLayoutEvent } from 'react-native';
 
-import { Text } from '@/components/ui';
+import { Press, Text } from '@/components/ui';
 import { space } from '@/theme';
 
 const MAX_LINES = 5;
-// 5번째 줄 끝에서 '... 더보기'가 들어갈 만큼 지우는 글자 수
-const MORE_ROOM = 7;
 
 type TeamIntroSectionProps = {
   description: string;
 };
 
 export function TeamIntroSection({ description }: TeamIntroSectionProps) {
-  const [lines, setLines] = useState<string[] | null>(null);
+  const [isLong, setIsLong] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
-  // 화면에 보이지 않는 전체 글로 줄을 나눠 보고, 5줄이 넘는지 판단해요
   const handleMeasure = (e: TextLayoutEvent) => {
-    setLines(e.nativeEvent.lines.map((line) => line.text));
+    setIsLong(e.nativeEvent.lines.length > MAX_LINES);
   };
-
-  const isLong = lines !== null && lines.length > MAX_LINES;
-  const collapsed = isLong && !expanded;
-
-  const preview = collapsed
-    ? lines.slice(0, MAX_LINES - 1).join('') +
-      lines[MAX_LINES - 1].trimEnd().slice(0, -MORE_ROOM).trimEnd()
-    : description;
 
   return (
     <View style={S.wrap}>
@@ -44,36 +33,24 @@ export function TeamIntroSection({ description }: TeamIntroSectionProps) {
           {description}
         </Text>
 
-        {collapsed ? (
-          <Text
-            color="textBody"
-            numberOfLines={MAX_LINES}
-            accessibilityRole="button"
-            accessibilityHint="두 번 탭하면 팀 소개 전체를 볼 수 있어요"
-            onPress={() => setExpanded(true)}
-          >
-            {preview}
-            {'... '}
-            <Text color="brand" style={S.more}>
-              더보기
-            </Text>
-          </Text>
-        ) : isLong ? (
-          <Text
-            color="textBody"
-            accessibilityRole="button"
-            accessibilityHint="두 번 탭하면 팀 소개를 접어요"
-            onPress={() => setExpanded(false)}
-          >
-            {description}{' '}
-            <Text color="textFaint" style={S.more}>
-              접기
-            </Text>
-          </Text>
-        ) : (
-          <Text color="textBody">{description}</Text>
-        )}
+        <Text color="textBody" numberOfLines={expanded ? undefined : MAX_LINES}>
+          {description}
+        </Text>
       </View>
+
+      {isLong && (
+        <Press
+          onPress={() => setExpanded((prev) => !prev)}
+          accessibilityRole="button"
+          accessibilityLabel={expanded ? '팀 소개 접기' : '팀 소개 더보기'}
+          accessibilityState={{ expanded }}
+          style={S.toggle}
+        >
+          <Text color={expanded ? 'textFaint' : 'brand'} style={S.more}>
+            {expanded ? '접기' : '더보기'}
+          </Text>
+        </Press>
+      )}
     </View>
   );
 }
@@ -83,12 +60,16 @@ const S = StyleSheet.create({
     padding: space[5],
     gap: space[3],
   },
-  // 측정용 글. 실제 글과 같은 폭에서 줄을 나누되 보이지 않게
   measure: {
     position: 'absolute',
     left: 0,
     right: 0,
     opacity: 0,
+  },
+  toggle: {
+    alignSelf: 'flex-start',
+    minHeight: 44,
+    justifyContent: 'center',
   },
   more: {
     fontWeight: '700',
