@@ -87,6 +87,19 @@ type Box = { x: number; y: number; w: number; h: number };
 const ENVELOPE = { width: 132, height: 92, lift: 40 };
 const EASE_CSS = Easing.bezier(0.25, 0.1, 0.25, 1);
 const SEND_END_MS = 4450;
+const ILLUSTRATION_COLOR = {
+  envelopeShell: '#E6ECFA',
+  envelopeFace: '#F6F8FF',
+  envelopePaper: '#F7F9FF',
+  envelopeBorder: '#C9D4F2',
+  envelopeLine: '#DCE4FA',
+  envelopeShadow: '#8FA6E6',
+  envelopeShade: 'rgba(30,60,160,0.10)',
+  wax: '#D64545',
+  waxHighlight: '#DE5555',
+  waxDark: '#B93636',
+  waxShadow: '#961E1E',
+} as const;
 
 export function WaxSendOverlay({
   width,
@@ -220,8 +233,8 @@ export function WaxSendOverlay({
       <Svg width="100%" height="100%" viewBox="0 0 64 30" preserveAspectRatio="none">
         <Path
           d="M1 6 Q1 1 6 1 L58 1 Q63 1 63 6 L63 15 L32 30 L1 15 Z"
-          fill="#F6F8FF"
-          stroke="#C9D4F2"
+          fill={ILLUSTRATION_COLOR.envelopeFace}
+          stroke={ILLUSTRATION_COLOR.envelopeBorder}
           strokeWidth={0.9}
           strokeLinejoin="round"
         />
@@ -272,7 +285,7 @@ export function WaxSendOverlay({
             }),
             backgroundColor: shape.interpolate({
               inputRange: [0, 1],
-              outputRange: [color.brand, '#E6ECFA'],
+              outputRange: [color.brand, ILLUSTRATION_COLOR.envelopeShell],
             }),
             opacity: fly.interpolate({ inputRange: [0, 0.8, 1], outputRange: [1, 1, 0] }),
             transform: [
@@ -328,7 +341,7 @@ export function WaxSendOverlay({
               />
               <Path
                 d="M1.5 14.3 L26 26 L38 26 L62.5 14.3"
-                stroke="#C9D4F2"
+                stroke={ILLUSTRATION_COLOR.envelopeBorder}
                 strokeWidth={0.9}
                 strokeLinejoin="round"
                 fill="none"
@@ -340,12 +353,12 @@ export function WaxSendOverlay({
                 height={44}
                 rx={5}
                 fill="none"
-                stroke="#C9D4F2"
+                stroke={ILLUSTRATION_COLOR.envelopeBorder}
                 strokeWidth={0.9}
               />
               <Path
                 d="M2 44 L26 24 M62 44 L38 24"
-                stroke="#DCE4FA"
+                stroke={ILLUSTRATION_COLOR.envelopeLine}
                 strokeWidth={1}
                 strokeLinecap="round"
               />
@@ -453,7 +466,10 @@ export function FoldingCard({
         {children}
         <Animated.View
           pointerEvents="none"
-          style={[StyleSheet.absoluteFill, { backgroundColor: '#F7F9FF', opacity: crease }]}
+          style={[
+            StyleSheet.absoluteFill,
+            { backgroundColor: ILLUSTRATION_COLOR.envelopePaper, opacity: crease },
+          ]}
         />
         <Animated.View
           pointerEvents="none"
@@ -526,9 +542,9 @@ export function WaxEnvelopeHero() {
         <Svg width={130} height={40}>
           <Defs>
             <RadialGradient id="applyEnvelopeShadow" cx="50%" cy="50%" rx="50%" ry="50%">
-              <Stop offset="0" stopColor="#8FA6E6" stopOpacity={1} />
-              <Stop offset="0.45" stopColor="#8FA6E6" stopOpacity={0.8} />
-              <Stop offset="1" stopColor="#8FA6E6" stopOpacity={0} />
+              <Stop offset="0" stopColor={ILLUSTRATION_COLOR.envelopeShadow} stopOpacity={1} />
+              <Stop offset="0.45" stopColor={ILLUSTRATION_COLOR.envelopeShadow} stopOpacity={0.8} />
+              <Stop offset="1" stopColor={ILLUSTRATION_COLOR.envelopeShadow} stopOpacity={0} />
             </RadialGradient>
           </Defs>
           <Ellipse cx={65} cy={20} rx={65} ry={20} fill="url(#applyEnvelopeShadow)" />
@@ -588,15 +604,22 @@ function WaxSeal({ size = 44, embossOpacity = 1 }: { size?: number; embossOpacit
     <Svg width={size} height={size} viewBox="0 0 40 40" fill="none">
       <Path
         d="M20 2 C27 2 30 6 34 8 C38 12 38 16 37 20 C38 25 36 30 32 33 C29 37 24 38 20 38 C15 38 11 37 8 33 C4 30 2 25 3 20 C2 15 4 10 8 7 C11 4 15 2 20 2 Z"
-        fill="#D64545"
+        fill={ILLUSTRATION_COLOR.wax}
       />
-      <Circle cx={20} cy={20} r={13} fill="#DE5555" stroke="#B93636" strokeWidth={1.6} />
+      <Circle
+        cx={20}
+        cy={20}
+        r={13}
+        fill={ILLUSTRATION_COLOR.waxHighlight}
+        stroke={ILLUSTRATION_COLOR.waxDark}
+        strokeWidth={1.6}
+      />
       <G opacity={embossOpacity}>
-        <Circle cx={15.5} cy={15} r={2.3} fill="#B93636" />
-        <Circle cx={24.5} cy={15} r={2.3} fill="#B93636" />
+        <Circle cx={15.5} cy={15} r={2.3} fill={ILLUSTRATION_COLOR.waxDark} />
+        <Circle cx={24.5} cy={15} r={2.3} fill={ILLUSTRATION_COLOR.waxDark} />
         <Path
           d="M12 27 C12 21 15 19 17.5 21.5 L20 24 L22.5 21.5 C25 19 28 21 28 27"
-          stroke="#B93636"
+          stroke={ILLUSTRATION_COLOR.waxDark}
           strokeWidth={2.6}
           strokeLinecap="round"
         />
@@ -608,27 +631,39 @@ function WaxSeal({ size = 44, embossOpacity = 1 }: { size?: number; embossOpacit
 function ClosedEnvelope({ width = 150, height = 108 }: { width?: number; height?: number }) {
   return (
     <Svg width={width} height={height} viewBox="0 0 64 46" fill="none">
-      <Path d="M6 1 H58 Q63 1 63 6 V40 Q63 45 58 45 H6 Q1 45 1 40 V6 Q1 1 6 1 Z" fill="#E6ECFA" />
+      <Path
+        d="M6 1 H58 Q63 1 63 6 V40 Q63 45 58 45 H6 Q1 45 1 40 V6 Q1 1 6 1 Z"
+        fill={ILLUSTRATION_COLOR.envelopeShell}
+      />
       <Path
         d="M1 14 L26 26 L38 26 L63 14 L63 40 Q63 45 58 45 L6 45 Q1 45 1 40 Z"
         fill={color.surface}
       />
-      <Path d="M1.5 14.3 L26 26 L38 26 L62.5 14.3" stroke="#C9D4F2" strokeWidth={0.8} />
-      <Path d="M2 44 L26 24 M62 44 L38 24" stroke="#DCE4FA" strokeWidth={1} strokeLinecap="round" />
+      <Path
+        d="M1.5 14.3 L26 26 L38 26 L62.5 14.3"
+        stroke={ILLUSTRATION_COLOR.envelopeBorder}
+        strokeWidth={0.8}
+      />
+      <Path
+        d="M2 44 L26 24 M62 44 L38 24"
+        stroke={ILLUSTRATION_COLOR.envelopeLine}
+        strokeWidth={1}
+        strokeLinecap="round"
+      />
       <Path
         d="M6 1 H58 Q63 1 63 6 V40 Q63 45 58 45 H6 Q1 45 1 40 V6 Q1 1 6 1 Z"
-        stroke="#C9D4F2"
+        stroke={ILLUSTRATION_COLOR.envelopeBorder}
         strokeWidth={0.8}
       />
       <Path
         d="M1 6 Q1 1 6 1 L58 1 Q63 1 63 6 L63 15 L32 30 L1 15 Z"
         transform="translate(0 1)"
-        fill="rgba(30,60,160,0.10)"
+        fill={ILLUSTRATION_COLOR.envelopeShade}
       />
       <Path
         d="M1 6 Q1 1 6 1 L58 1 Q63 1 63 6 L63 15 L32 30 L1 15 Z"
-        fill="#F6F8FF"
-        stroke="#C9D4F2"
+        fill={ILLUSTRATION_COLOR.envelopeFace}
+        stroke={ILLUSTRATION_COLOR.envelopeBorder}
         strokeWidth={0.8}
         strokeLinejoin="round"
       />
@@ -658,9 +693,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     zIndex: 2,
     borderWidth: 1,
-    borderColor: '#C9D4F2',
+    borderColor: ILLUSTRATION_COLOR.envelopeBorder,
     borderRadius: radius.md,
-    backgroundColor: '#F7F9FF',
+    backgroundColor: ILLUSTRATION_COLOR.envelopePaper,
     shadowColor: color.brand,
     shadowOpacity: 0.15,
     shadowRadius: 4,
@@ -672,7 +707,7 @@ const styles = StyleSheet.create({
     right: 0,
     top: '50%',
     height: 1,
-    backgroundColor: '#DCE4FA',
+    backgroundColor: ILLUSTRATION_COLOR.envelopeLine,
   },
   wax: {
     position: 'absolute',
@@ -685,7 +720,7 @@ const styles = StyleSheet.create({
     marginTop: -22,
   },
   waxShadow: {
-    shadowColor: '#961E1E',
+    shadowColor: ILLUSTRATION_COLOR.waxShadow,
     shadowOpacity: 0.35,
     shadowRadius: 3,
     shadowOffset: { width: 0, height: 2 },
@@ -705,7 +740,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 2,
-    backgroundColor: '#C9D4F2',
+    backgroundColor: ILLUSTRATION_COLOR.envelopeBorder,
   },
   heroBox: { width: 200, height: 180, alignItems: 'center', justifyContent: 'center' },
   heroShadow: { position: 'absolute', left: 35, bottom: -9, width: 130, height: 40 },

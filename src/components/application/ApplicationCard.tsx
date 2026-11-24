@@ -58,13 +58,26 @@ export function ApplicationCard({
   const { reduced, easing } = useMotion();
   const floatStyle = useFloat(floating, preview ? 0 : 400);
   const [showAllAnswers, setShowAllAnswers] = useState(false);
+  const [overflowingAnswerTags, setOverflowingAnswerTags] = useState<Set<string>>(() => new Set());
   const chevronProgress = useSharedValue(0);
   const answerLimit = preview ? 2 : application.answers.length;
   const visibleAnswers = showAllAnswers
     ? application.answers
     : application.answers.slice(0, answerLimit);
   const extraAnswerCount = Math.max(0, application.answers.length - answerLimit);
-  const canExpandPreview = preview && application.answers.length > 0;
+  const hasTruncatedAnswer = visibleAnswers.some((answer) => overflowingAnswerTags.has(answer.tag));
+  const canExpandPreview = preview && (extraAnswerCount > 0 || hasTruncatedAnswer);
+
+  const updateAnswerOverflow = (tag: string, lineCount: number) => {
+    const overflowing = lineCount > 3;
+    setOverflowingAnswerTags((current) => {
+      if (current.has(tag) === overflowing) return current;
+      const next = new Set(current);
+      if (overflowing) next.add(tag);
+      else next.delete(tag);
+      return next;
+    });
+  };
 
   useEffect(() => {
     chevronProgress.set(
@@ -191,14 +204,31 @@ export function ApplicationCard({
             <Text variant="bodyStrong" style={styles.question}>
               {answer.question}
             </Text>
-            <Text
-              variant="body"
-              color="textBody"
-              numberOfLines={preview && !showAllAnswers ? 3 : undefined}
-              style={styles.answerCopy}
-            >
-              {answer.answer}
-            </Text>
+            <View style={styles.answerCopyWrap}>
+              <Text
+                variant="body"
+                color="textBody"
+                numberOfLines={preview && !showAllAnswers ? 3 : undefined}
+                style={styles.answerCopy}
+              >
+                {answer.answer}
+              </Text>
+              {preview && !showAllAnswers ? (
+                <Text
+                  variant="body"
+                  color="textBody"
+                  accessible={false}
+                  accessibilityElementsHidden
+                  importantForAccessibility="no-hide-descendants"
+                  onTextLayout={(event) =>
+                    updateAnswerOverflow(answer.tag, event.nativeEvent.lines.length)
+                  }
+                  style={[styles.answerCopy, styles.answerMeasure]}
+                >
+                  {answer.answer}
+                </Text>
+              ) : null}
+            </View>
           </Animated.View>
         ))}
         {canExpandPreview ? (
@@ -343,7 +373,9 @@ const styles = StyleSheet.create({
     backgroundColor: color.brand,
   },
   question: { marginTop: space[2] },
+  answerCopyWrap: { position: 'relative' },
   answerCopy: { marginTop: space[2] },
+  answerMeasure: { position: 'absolute', top: 0, left: 0, right: 0, opacity: 0 },
   moreButton: {
     height: 44,
     marginTop: space[2],

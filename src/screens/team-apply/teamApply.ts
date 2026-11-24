@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 
 import { ROLE_LABEL, type RoleKey, type Team } from '@/screens/teams';
-import { getDday } from '@/utils/date';
 
 export const APPLY_DAYS = ['월', '화', '수', '목', '금', '토', '일'] as const;
 export const APPLY_TIMES = ['오전', '오후', '저녁'] as const;
@@ -15,27 +14,16 @@ const POSITION_LABEL: Record<RoleKey, string> = {
   mkt: '마케터',
 };
 
-const OPERATION_LABEL: Record<Team['operationMethod'], string> = {
-  online: '온라인',
-  offline: '오프라인',
-  both: '온·오프 혼합',
-};
-
 export type ApplySlot = {
   id: string;
   role: RoleKey;
   label: string;
   filled: boolean;
-  who?: string;
-  leader?: boolean;
 };
 
 export type ApplyTeam = {
   id: string;
   name: string;
-  contest: string;
-  dday: number;
-  activity: string;
   slots: ApplySlot[];
 };
 
@@ -61,14 +49,12 @@ export const APPLY_QUESTIONS: ApplyQuestion[] = [
   },
 ];
 
-export function createApplyTeam(team: Team, contestTitle: string): ApplyTeam {
+export function createApplyTeam(team: Team): ApplyTeam {
   const filledSlots: ApplySlot[] = team.members.map((member) => ({
     id: `member-${member.id}`,
     role: member.role,
     label: member.isLeader ? `팀장 · ${ROLE_LABEL[member.role]}` : POSITION_LABEL[member.role],
     filled: true,
-    who: member.name,
-    leader: member.isLeader,
   }));
   const openSlots: ApplySlot[] = team.recruitingRoles.flatMap(({ role, count }) =>
     Array.from({ length: count }, (_, index) => ({
@@ -82,9 +68,6 @@ export function createApplyTeam(team: Team, contestTitle: string): ApplyTeam {
   return {
     id: team.id,
     name: team.name,
-    contest: contestTitle,
-    dday: Math.max(0, getDday(team.recruitEndDate)),
-    activity: `${OPERATION_LABEL[team.operationMethod]} · ${team.activityFrequency}`,
     slots: [...filledSlots, ...openSlots],
   };
 }
@@ -131,13 +114,6 @@ export function useTeamApplyDraft(team: ApplyTeam, questions: ApplyQuestion[]) {
         });
         return { ...current, availableSlots: [...next].sort((a, b) => a - b) };
       }),
-    toggleAvailableSlot: (slotIndex: number) =>
-      setDraft((current) => ({
-        ...current,
-        availableSlots: current.availableSlots.includes(slotIndex)
-          ? current.availableSlots.filter((item) => item !== slotIndex)
-          : [...current.availableSlots, slotIndex],
-      })),
   };
 }
 

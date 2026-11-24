@@ -46,7 +46,7 @@ export default function TeamApplyRoute() {
     <>
       <Stack.Screen options={{ gestureEnabled: false }} />
       <TeamApplyScreen
-        team={createApplyTeam(team, contest.title)}
+        team={createApplyTeam(team)}
         onExit={() => router.back()}
         // TODO: 지원서 생성 API 연동 후 draft를 요청 형식으로 변환해 전송
         onSubmit={async () => {}}
