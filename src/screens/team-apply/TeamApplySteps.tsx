@@ -545,6 +545,9 @@ function HoursGauge({
               onPress={() => onChange(hours)}
               scaleOnPress={false}
               accessibilityRole="radio"
+              accessibilityLabel={
+                hours === 20 ? '주 20시간 이상 참여' : `주 ${hours}시간 참여`
+              }
               accessibilityState={{ checked: selected }}
               style={[styles.hourOption, selected && styles.hourOptionSelected]}
             >
@@ -1053,7 +1056,7 @@ const styles = StyleSheet.create({
   },
   hourOption: {
     flex: 1,
-    height: 38,
+    height: 44,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radius.lg,

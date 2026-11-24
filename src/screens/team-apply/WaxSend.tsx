@@ -115,6 +115,10 @@ export function WaxSendOverlay({
   onDone: () => void;
 }) {
   const { reduced } = useMotion();
+  const [{ width: animationWidth, height: animationHeight }] = useState(() => ({
+    width,
+    height,
+  }));
   const completed = useRef(false);
   const finish = useCallback(() => {
     if (completed.current) return;
@@ -122,9 +126,9 @@ export function WaxSendOverlay({
     onDone();
   }, [onDone]);
 
-  const buttonCenterY = height - 62;
-  const startWidth = width - space[5] * 2;
-  const envelopeLeft = width / 2 - ENVELOPE.width / 2;
+  const buttonCenterY = animationHeight - 62;
+  const startWidth = animationWidth - space[5] * 2;
+  const envelopeLeft = animationWidth / 2 - ENVELOPE.width / 2;
   const envelopeTop = buttonCenterY - ENVELOPE.lift - ENVELOPE.height / 2;
 
   const [shape] = useState(() => new Animated.Value(0));
@@ -244,7 +248,7 @@ export function WaxSendOverlay({
 
   const waxPercentages = [0, 35, 55, 70, 82, 100];
   const waxEasing = Easing.bezier(0.3, 0.7, 0.4, 1);
-  const flyX = (250 * width) / 390;
+  const flyX = (250 * animationWidth) / 390;
   const flyY = -(buttonCenterY - ENVELOPE.lift - 82);
 
   return (
@@ -255,7 +259,7 @@ export function WaxSendOverlay({
           position: 'absolute',
           left: shape.interpolate({
             inputRange: [0, 1],
-            outputRange: [width / 2 - startWidth / 2, envelopeLeft],
+            outputRange: [animationWidth / 2 - startWidth / 2, envelopeLeft],
           }),
           top: shape.interpolate({
             inputRange: [0, 1],
