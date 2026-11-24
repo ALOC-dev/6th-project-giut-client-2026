@@ -62,11 +62,32 @@ export function TeamApplyScreen({
   const [screenSize, setScreenSize] = useState({ width: 390, height: 794 });
   const [completed, setCompleted] = useState(false);
   const submitLock = useRef(false);
+  const mountedRef = useRef(true);
   const rootRef = useRef<ViewInstance>(null);
   const cardRef = useRef<ViewInstance>(null);
   const measurementFallbackRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const disableRemovalPrevention = usePreventRemove(!completed && !leaving);
+  const moveTo = useCallback(
+    (nextStep: 1 | 2 | 3) => {
+      Keyboard.dismiss();
+      setDirection(nextStep > step ? 'right' : 'left');
+      setStep(nextStep);
+    },
+    [step],
+  );
+
+  const disableRemovalPrevention = usePreventRemove(
+    !completed && !leaving,
+    ({ repeat }) => {
+      if (submitting) return;
+      if (step > 1) {
+        moveTo((step - 1) as 1 | 2);
+        return;
+      }
+      setLeaving(true);
+      repeat();
+    },
+  );
 
   const startSendAnimation = useCallback(() => {
     const root = rootRef.current;
@@ -102,18 +123,14 @@ export function TeamApplyScreen({
     }
   }, []);
 
-  useEffect(
-    () => () => {
-      if (measurementFallbackRef.current) clearTimeout(measurementFallbackRef.current);
-    },
-    [],
-  );
+  useEffect(() => {
+    mountedRef.current = true;
 
-  const moveTo = (nextStep: 1 | 2 | 3) => {
-    Keyboard.dismiss();
-    setDirection(nextStep > step ? 'right' : 'left');
-    setStep(nextStep);
-  };
+    return () => {
+      mountedRef.current = false;
+      if (measurementFallbackRef.current) clearTimeout(measurementFallbackRef.current);
+    };
+  }, []);
 
   const handleBack = () => {
     if (submitting) return;
@@ -143,11 +160,13 @@ export function TeamApplyScreen({
     try {
       await onSubmit?.(api.draft);
     } catch {
+      if (!mountedRef.current) return;
       submitLock.current = false;
       setSubmitting(false);
       toast.show('지원서를 보내지 못했어요. 잠시 후 다시 시도해주세요.');
       return;
     }
+    if (!mountedRef.current) return;
     startSendAnimation();
   };
 
