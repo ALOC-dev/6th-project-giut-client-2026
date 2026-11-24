@@ -13,18 +13,18 @@ import { DeadlineSection } from './DeadlineSection';
 import { InterestBanner } from './InterestBanner';
 import { RecommendationSection } from './RecommendationSection';
 
-// TODO: 로그인·관심 분야 기능이 생기면 실제 사용자 정보로 교체 (지금은 '공모전' 선택 가정)
-const TEMP_USER_NAME = '김민재';
+// TODO: 관심 분야 기능이 생기면 실제 사용자 정보로 교체 (지금은 '공모전' 선택 가정)
 const TEMP_INTEREST: ActivityType = 'CONTEST';
 const RECOMMEND_COUNT = 3;
 
 type HomeScreenProps = {
+  userName?: string; // 프로필이 없으면 undefined
   contests: ContestDetail[];
   // 분야를 넘기면 그 분야 탭으로, 안 넘기면 전체 탭으로 공모전 목록을 열어요
   onOpenContestList: (activityType?: ActivityType) => void;
 };
 
-export function HomeScreen({ contests, onOpenContestList }: HomeScreenProps) {
+export function HomeScreen({ userName, contests, onOpenContestList }: HomeScreenProps) {
   const insets = useSafeAreaInsets();
   const [showBanner, setShowBanner] = useState(true);
 
@@ -61,7 +61,7 @@ export function HomeScreen({ contests, onOpenContestList }: HomeScreenProps) {
         )}
         {recommended.length > 0 && (
           <RecommendationSection
-            userName={TEMP_USER_NAME}
+            userName={userName}
             contests={recommended}
             // 배너를 닫으면 분야 섹션과 바로 붙어서 간격을 더 둬요
             style={!showBanner && S.recommendationSpaced}
