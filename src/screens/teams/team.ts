@@ -7,6 +7,7 @@ export type Member = {
   id: string;
   name: string;
   role: RoleKey;
+  position: string;
   isLeader: boolean;
 };
 
@@ -38,6 +39,12 @@ export type Team = {
   cooperationTools: CooperationTool[];
 };
 
+export const OPERATION_LABEL: Record<OperationMethod, string> = {
+  online: '온라인',
+  offline: '오프라인',
+  both: '온라인 + 오프라인',
+};
+
 export const ROLE_LABEL: Record<RoleKey, string> = {
   dev: '개발',
   design: '디자인',
@@ -45,7 +52,6 @@ export const ROLE_LABEL: Record<RoleKey, string> = {
   mkt: '마케팅',
 };
 
-// 모집 마감: 모집 기간이 지났거나, 정원이 다 찼을 때
 export function isTeamClosed(team: Team) {
   return getDday(team.recruitEndDate) < 0 || team.members.length >= team.capacity;
 }

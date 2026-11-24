@@ -9,6 +9,7 @@ import {
   type ScrollViewInstance,
 } from 'react-native';
 
+import { DetailHeader } from '@/components/header/DetailHeader';
 import { Text } from '@/components/ui';
 import type { ContestDetail } from '@/screens/contests/contestDetail';
 import type { Team } from '@/screens/teams';
@@ -18,7 +19,6 @@ import { openExternalUrl } from '@/utils/link';
 import { ContestBottomCTA } from './ContestBottomCTA';
 import { ContestDescription } from './ContestDescription';
 import { ContestDetailPanel, ContestDetailSection, ContestDetailTabBar } from './ContestDetailTabs';
-import { ContestHeader } from './ContestHeader';
 import { ContestInfoCard } from './ContestInfoCard';
 import { RecruitingTeamList } from './RecruitingTeamList';
 
@@ -111,7 +111,7 @@ export function ContestDetailScreen({ contest, teams, onCreateTeam }: ContestDet
 
   return (
     <View style={S.screen}>
-      <ContestHeader
+      <DetailHeader
         bookmarked={bookmarked}
         onPressBookmark={() => setBookmarked((prev) => !prev)}
         onPressShare={handleShare}
@@ -195,7 +195,7 @@ export function ContestDetailScreen({ contest, teams, onCreateTeam }: ContestDet
 export function ContestNotFoundScreen() {
   return (
     <View style={S.screen}>
-      <ContestHeader />
+      <DetailHeader />
       <View style={S.notFound}>
         <Text variant="titleLg">존재하지 않는 공모전이에요.</Text>
       </View>

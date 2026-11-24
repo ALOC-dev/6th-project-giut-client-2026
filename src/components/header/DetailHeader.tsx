@@ -8,19 +8,20 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Press, Text } from '@/components/ui';
 import { color, space } from '@/theme';
 
-type ContestHeaderProps = {
+type DetailHeaderProps = {
   title?: string;
   bookmarked?: boolean;
   onPressBookmark?: () => void; // 없으면 버튼 숨김
   onPressShare?: () => void; // 없으면 버튼 숨김
 };
 
-export function ContestHeader({
+// 상세 화면 공통 헤더 (공모전 상세, 팀 상세)
+export function DetailHeader({
   title,
   bookmarked = false,
   onPressBookmark,
   onPressShare,
-}: ContestHeaderProps) {
+}: DetailHeaderProps) {
   const insets = useSafeAreaInsets();
 
   return (
