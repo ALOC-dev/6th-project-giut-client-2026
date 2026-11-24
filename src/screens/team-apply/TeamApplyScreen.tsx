@@ -95,6 +95,7 @@ export function TeamApplyScreen({
     let started = false;
 
     const beginAnimation = (box?: { x: number; y: number; w: number; h: number }) => {
+      if (!mountedRef.current) return;
       if (started) return;
       started = true;
       if (measurementFallbackRef.current) {
