@@ -9,6 +9,10 @@ export default function MyPageRoute() {
       onPressMenu={() => {}}
       // TODO: 프로필 편집 화면이 생기면 이동
       onPressEditProfile={() => {}}
+      // TODO: 포트폴리오 편집 화면이 생기면 이동
+      onPressEditPortfolio={() => {}}
+      // TODO: 포트폴리오 상세 화면이 생기면 이동
+      onPressPortfolio={() => {}}
     />
   );
 }
