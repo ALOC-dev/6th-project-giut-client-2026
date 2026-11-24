@@ -13,6 +13,7 @@ export type Member = {
 
 export type RecruitingRole = {
   role: RoleKey;
+  position: string;
   count: number;
 };
 
@@ -51,6 +52,15 @@ export const ROLE_LABEL: Record<RoleKey, string> = {
   plan: '기획',
   mkt: '마케팅',
 };
+
+// 세부 포지션별 모집 인원을 큰 역할별로 합쳐요
+export function getRecruitingCounts(team: Team) {
+  const counts = new Map<RoleKey, number>();
+  team.recruitingRoles.forEach(({ role: key, count }) => {
+    counts.set(key, (counts.get(key) ?? 0) + count);
+  });
+  return Array.from(counts, ([key, count]) => ({ role: key, count }));
+}
 
 export function isTeamClosed(team: Team) {
   return getDday(team.recruitEndDate) < 0 || team.members.length >= team.capacity;
