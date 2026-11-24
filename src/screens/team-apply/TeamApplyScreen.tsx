@@ -64,23 +64,50 @@ export function TeamApplyScreen({
   const submitLock = useRef(false);
   const rootRef = useRef<ViewInstance>(null);
   const cardRef = useRef<ViewInstance>(null);
+  const measurementFallbackRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const disableRemovalPrevention = usePreventRemove(!completed && !leaving);
 
   const startSendAnimation = useCallback(() => {
     const root = rootRef.current;
     const card = cardRef.current;
-    if (!root || !card) {
+    let started = false;
+
+    const beginAnimation = (box?: { x: number; y: number; w: number; h: number }) => {
+      if (started) return;
+      started = true;
+      if (measurementFallbackRef.current) {
+        clearTimeout(measurementFallbackRef.current);
+        measurementFallbackRef.current = null;
+      }
+      if (box) setSendFrom(box);
+      else setCardHidden(true);
       setSending(true);
+    };
+
+    if (!root || !card) {
+      beginAnimation();
       return;
     }
-    root.measureInWindow((rootX, rootY) => {
-      card.measureInWindow((x, y, width, height) => {
-        setSendFrom({ x: x - rootX, y: y - rootY, w: width, h: height });
-        setSending(true);
+
+    measurementFallbackRef.current = setTimeout(beginAnimation, 500);
+    try {
+      root.measureInWindow((rootX, rootY) => {
+        card.measureInWindow((x, y, width, height) => {
+          beginAnimation({ x: x - rootX, y: y - rootY, w: width, h: height });
+        });
       });
-    });
+    } catch {
+      beginAnimation();
+    }
   }, []);
+
+  useEffect(
+    () => () => {
+      if (measurementFallbackRef.current) clearTimeout(measurementFallbackRef.current);
+    },
+    [],
+  );
 
   const moveTo = (nextStep: 1 | 2 | 3) => {
     Keyboard.dismiss();
@@ -115,12 +142,13 @@ export function TeamApplyScreen({
     setSubmitting(true);
     try {
       await onSubmit?.(api.draft);
-      startSendAnimation();
     } catch {
       submitLock.current = false;
       setSubmitting(false);
       toast.show('지원서를 보내지 못했어요. 잠시 후 다시 시도해주세요.');
+      return;
     }
+    startSendAnimation();
   };
 
   const handleCardHide = useCallback(() => setCardHidden(true), []);
