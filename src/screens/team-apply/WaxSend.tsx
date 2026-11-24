@@ -83,6 +83,7 @@ function useLoop(duration: number, delay = 0, enabled = true) {
 }
 
 type Box = { x: number; y: number; w: number; h: number };
+type RunningAnimation = ReturnType<typeof Animated.timing>;
 
 const ENVELOPE = { width: 132, height: 92, lift: 40 };
 const EASE_CSS = Easing.bezier(0.25, 0.1, 0.25, 1);
@@ -173,7 +174,16 @@ export function WaxSendOverlay({
 
   useEffect(() => {
     const timers: ReturnType<typeof setTimeout>[] = [];
+    const animations: RunningAnimation[] = [];
     const schedule = (delay: number, action: () => void) => timers.push(setTimeout(action, delay));
+    const start = (animation: RunningAnimation) => {
+      animations.push(animation);
+      animation.start();
+    };
+    const cleanup = () => {
+      timers.forEach(clearTimeout);
+      animations.forEach((animation) => animation.stop());
+    };
     const timing = (
       value: Animated.Value,
       toValue: number,
@@ -184,7 +194,7 @@ export function WaxSendOverlay({
     if (reduced) {
       onCardHide();
       schedule(0, finish);
-      return () => timers.forEach(clearTimeout);
+      return cleanup;
     }
 
     if (from) {
@@ -199,19 +209,23 @@ export function WaxSendOverlay({
         paper.height.setValue(foldedHeight);
         paper.opacity.setValue(1);
         const easing = Easing.bezier(0.45, 0, 0.3, 1);
-        Animated.parallel([
-          timing(paper.x, (ENVELOPE.width - targetWidth) / 2, 650, easing),
-          timing(paper.y, -targetHeight - 6, 650, easing),
-          timing(paper.width, targetWidth, 650, easing),
-          timing(paper.height, targetHeight, 650, easing),
-        ]).start();
+        start(
+          Animated.parallel([
+            timing(paper.x, (ENVELOPE.width - targetWidth) / 2, 650, easing),
+            timing(paper.y, -targetHeight - 6, 650, easing),
+            timing(paper.width, targetWidth, 650, easing),
+            timing(paper.height, targetHeight, 650, easing),
+          ]),
+        );
       });
-      schedule(1400, () => timing(paper.y, 24, 400, Easing.bezier(0.5, 0, 0.75, 0)).start());
-      schedule(2050, () => timing(paper.opacity, 0, 200, Easing.linear).start());
+      schedule(1400, () =>
+        start(timing(paper.y, 24, 400, Easing.bezier(0.5, 0, 0.75, 0))),
+      );
+      schedule(2050, () => start(timing(paper.opacity, 0, 200, Easing.linear)));
     }
     schedule(1750, () => setFlapFront(true));
     schedule(SEND_END_MS, finish);
-    return () => timers.forEach(clearTimeout);
+    return cleanup;
   }, [envelopeLeft, envelopeTop, finish, from, onCardHide, paper, reduced]);
 
   const flap = (
