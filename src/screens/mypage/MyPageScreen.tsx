@@ -1,5 +1,6 @@
 import { ScrollView, Share, StyleSheet, View } from 'react-native';
 
+import { FolderTabBar } from '@/components/tabs/FolderTabBar';
 import { color, space } from '@/theme';
 
 import { ActivityHistorySection } from './ActivityHistorySection';
@@ -10,6 +11,17 @@ import { ProfileCard } from './ProfileCard';
 import { ProfileEmptyCard } from './ProfileEmptyCard';
 import type { Scrap } from './scrap';
 import { ScrapSection } from './ScrapSection';
+import { useSectionTabs } from './useSectionTabs';
+
+type MyPageTab = 'portfolio' | 'activity' | 'scrap';
+
+// 화면에 나오는 순서
+const TABS: readonly { key: MyPageTab; label: string }[] = [
+  { key: 'portfolio', label: '포트폴리오' },
+  { key: 'activity', label: '활동 이력' },
+  { key: 'scrap', label: '스크랩' },
+];
+const TAB_KEYS = TABS.map(({ key }) => key);
 
 type MyPageScreenProps = {
   myProfile: MyProfile;
@@ -36,6 +48,16 @@ export function MyPageScreen({
 }: MyPageScreenProps) {
   const { profile, summary } = myProfile;
 
+  const {
+    tab,
+    handlePressTab,
+    scrollRef,
+    scrollProps,
+    onTabBarLayout,
+    onSectionsLayout,
+    onSectionLayout,
+  } = useSectionTabs(TAB_KEYS, space[4]);
+
   // TODO: API 연결 시 공유 링크 발급(POST /api/users/me/profile-share-links) 후 링크도 함께 공유
   const handleShare = (nickname: string) => {
     Share.share({ message: `${nickname}님의 기웃 프로필` }).catch(() => {});
@@ -45,31 +67,60 @@ export function MyPageScreen({
     <View style={S.screen}>
       <MyPageHeader onPressMenu={onPressMenu} />
 
-      <ScrollView contentContainerStyle={S.content}>
-        {profile ? (
-          <>
+      {/* stickyHeaderIndices가 순서를 세기 때문에 [프로필, 탭, 구역들] 순서를 지켜요 */}
+      <ScrollView
+        ref={scrollRef}
+        contentContainerStyle={S.content}
+        stickyHeaderIndices={profile ? [1] : undefined}
+        {...scrollProps}
+      >
+        <View style={S.profile}>
+          {profile ? (
             <ProfileCard
               profile={profile}
               summary={summary}
               onPressEdit={onPressEditProfile}
               onPressShare={() => handleShare(profile.nickname)}
             />
-            <PortfolioSection
-              items={profile.portfolioItems}
-              count={summary.portfolioCount}
-              onPressEdit={onPressEditPortfolio}
-              onPressItem={onPressPortfolio}
-            />
-            <ActivityHistorySection
-              items={profile.activityHistories}
-              onPressEdit={onPressEditActivity}
-            />
-          </>
-        ) : (
-          <ProfileEmptyCard onPressCreate={onPressCreateProfile} />
+          ) : (
+            <ProfileEmptyCard onPressCreate={onPressCreateProfile} />
+          )}
+        </View>
+
+        {/* 프로필이 없으면 스크랩만 있어서 탭을 숨겨요 */}
+        {profile && (
+          <FolderTabBar
+            tabs={TABS}
+            value={tab}
+            variant="outlined"
+            onChange={handlePressTab}
+            onLayout={onTabBarLayout}
+          />
         )}
-        <ScrapSection scraps={scraps} summary={summary} onPressScrap={onPressScrap} />
-        {/* TODO: 구역 이동 탭 */}
+
+        <View style={S.sections} onLayout={onSectionsLayout}>
+          {profile && (
+            <>
+              <View onLayout={onSectionLayout('portfolio')}>
+                <PortfolioSection
+                  items={profile.portfolioItems}
+                  count={summary.portfolioCount}
+                  onPressEdit={onPressEditPortfolio}
+                  onPressItem={onPressPortfolio}
+                />
+              </View>
+              <View onLayout={onSectionLayout('activity')}>
+                <ActivityHistorySection
+                  items={profile.activityHistories}
+                  onPressEdit={onPressEditActivity}
+                />
+              </View>
+            </>
+          )}
+          <View onLayout={onSectionLayout('scrap')}>
+            <ScrapSection scraps={scraps} summary={summary} onPressScrap={onPressScrap} />
+          </View>
+        </View>
       </ScrollView>
     </View>
   );
@@ -82,8 +133,14 @@ const S = StyleSheet.create({
   },
   content: {
     paddingTop: space[4],
-    paddingHorizontal: space[4],
     paddingBottom: space[8],
-    gap: space[6],
+  },
+  profile: {
+    paddingHorizontal: space[4],
+  },
+  sections: {
+    paddingTop: space[4],
+    paddingHorizontal: space[4],
+    gap: space[8],
   },
 });

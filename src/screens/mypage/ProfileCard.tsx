@@ -25,7 +25,7 @@ export function ProfileCard({ profile, summary, onPressEdit, onPressShare }: Pro
   const skills = profile.tags.filter(({ type }) => type === 'SKILL');
 
   return (
-    <Card corner="2xl" elevation="raised" padding={space[5]} bordered style={S.card}>
+    <Card corner="2xl" padding={space[5]} bordered style={S.card}>
       <View style={S.top}>
         <ProfileAvatar profile={profile} />
 

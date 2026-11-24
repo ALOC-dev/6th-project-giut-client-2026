@@ -9,7 +9,6 @@ const AVATAR_ICON = (AVATAR * 44) / 52;
 export const S = StyleSheet.create({
   card: {
     gap: space[4],
-    borderColor: color.lineSoft,
   },
   top: {
     flexDirection: 'row',
