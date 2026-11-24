@@ -1,6 +1,14 @@
 import { useRef, useState } from 'react';
 import { usePreventRemove } from 'expo-router';
-import { Alert, Keyboard, KeyboardAvoidingView, Pressable, StyleSheet, View } from 'react-native';
+import {
+  Alert,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ChevronIcon } from '@/components/icons';
@@ -89,8 +97,10 @@ export function TeamCreateScreen({ onExit, onSubmit, onDone, onCopyLink }: TeamC
   };
 
   const disableRemovalPrevention = usePreventRemove(
-    !completed && (step > 1 || draftChanged) && !allowRemoval,
+    !completed && (submitting || step > 1 || draftChanged) && !allowRemoval,
     ({ repeat }) => {
+      if (submitting) return;
+
       if (step > 1) {
         moveTo(step - 1);
         return;
@@ -110,7 +120,7 @@ export function TeamCreateScreen({ onExit, onSubmit, onDone, onCopyLink }: TeamC
   };
 
   const handleBack = () => {
-    if (completed) return;
+    if (completed || submitting) return;
     if (step > 1) {
       moveTo(step - 1);
       return;
@@ -183,9 +193,11 @@ export function TeamCreateScreen({ onExit, onSubmit, onDone, onCopyLink }: TeamC
           <View style={styles.topBar}>
             <Pressable
               onPress={handleBack}
+              disabled={submitting}
               accessibilityRole="button"
+              accessibilityState={{ disabled: submitting }}
               accessibilityLabel={step === 1 ? '팀 만들기 닫기' : '이전 단계로 이동'}
-              style={styles.backButton}
+              style={[styles.backButton, submitting && styles.backButtonDisabled]}
             >
               <ChevronIcon dir="left" size={22} />
             </Pressable>
@@ -220,7 +232,11 @@ export function TeamCreateScreen({ onExit, onSubmit, onDone, onCopyLink }: TeamC
         </View>
       ) : null}
 
-      <KeyboardAvoidingView style={styles.keyboardArea} behavior="padding" enabled={step === 5}>
+      <KeyboardAvoidingView
+        style={styles.keyboardArea}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        enabled={step === 5 && Platform.OS === 'ios'}
+      >
         <View style={styles.body}>
           <StepTransition key={step} direction={direction}>
             {completed ? (
@@ -298,6 +314,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  backButtonDisabled: { opacity: 0.4 },
   headerSpacer: { width: 32 },
   progress: { flexDirection: 'row', gap: space[1], marginTop: space[2] },
   progressSegment: {
