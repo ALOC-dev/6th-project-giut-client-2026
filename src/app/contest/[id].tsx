@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 
 import { ContestDetailScreen, ContestNotFoundScreen } from '@/screens/contest-detail';
 import { getContestDetail } from '@/screens/contests/detailMocks';
@@ -13,5 +13,13 @@ export default function ContestDetailRoute() {
   const contest = id ? getContestDetail(id) : undefined;
   if (!contest) return <ContestNotFoundScreen />;
 
-  return <ContestDetailScreen contest={contest} teams={getTeamsByContest(contest.id)} />;
+  return (
+    <ContestDetailScreen
+      contest={contest}
+      teams={getTeamsByContest(contest.id)}
+      onCreateTeam={() =>
+        router.push({ pathname: '/team/create', params: { contestId: contest.id } })
+      }
+    />
+  );
 }

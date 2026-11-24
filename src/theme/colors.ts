@@ -1,9 +1,9 @@
-
 export const color = {
   brand: '#2F5BFF',
   brandStrong: '#1E46E0',
   brandTint: '#EAF0FF',
   brandSoft: '#F5F8FF',
+  brandBorder: '#B9C6FF',
   brandGradientStart: '#4C8DFF',
 
   ink: '#191B20',
@@ -51,6 +51,8 @@ export const color = {
   daySat: '#2F5BFF',
   daySun: '#E5484D',
 
+  success: '#1FB57F',
+  successTint: '#E6F7F0',
   overlayDim: 'rgba(15,20,35,0.40)',
   focusRing: 'rgba(47,91,255,0.12)',
 } as const;

@@ -1,8 +1,8 @@
-
 import type { ViewStyle } from 'react-native';
 
 export const shadow = {
   card: { boxShadow: '0 1px 2px rgba(25,27,32,0.05)' },
+  control: { boxShadow: '0 1px 4px rgba(25,27,32,0.20)' },
   raised: { boxShadow: '0 10px 28px rgba(25,27,32,0.07)' },
   selection: { boxShadow: '0 3px 18px rgba(23,32,58,0.22)' },
   menu: { boxShadow: '0 10px 28px rgba(25,27,32,0.16)' },
@@ -15,6 +15,13 @@ export const shadowCompat = {
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 1,
     shadowRadius: 1.0,
+    elevation: 1,
+  },
+  control: {
+    shadowColor: 'rgba(25,27,32,0.20)',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 1,
+    shadowRadius: 2.0,
     elevation: 1,
   },
   raised: {

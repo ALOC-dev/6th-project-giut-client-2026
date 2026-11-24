@@ -357,3 +357,48 @@ export function PlusIcon({ size = 20, color: iconColor = color.surface }: IconPr
     </Svg>
   );
 }
+
+export function MinusIcon({ size = 20, color: iconColor = color.surface }: IconProps) {
+  return (
+    <Svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={iconColor}
+      strokeWidth={2.4}
+      strokeLinecap="round"
+    >
+      <Path d="M5 12h14" />
+    </Svg>
+  );
+}
+
+export function LinkIcon({ size = 20, color: iconColor = color.brand }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 20 20" fill="none">
+      <Path
+        d="M8.5 11.5a3.5 3.5 0 0 0 5 0L16 9a3.5 3.5 0 0 0-5-5l-1 1"
+        stroke={iconColor}
+        strokeWidth={1.9}
+        strokeLinecap="round"
+      />
+      <Path
+        d="M11.5 8.5a3.5 3.5 0 0 0-5 0L4 11a3.5 3.5 0 0 0 5 5l1-1"
+        stroke={iconColor}
+        strokeWidth={1.9}
+        strokeLinecap="round"
+      />
+    </Svg>
+  );
+}
+
+export function AlertCircleIcon({ size = 16, color: iconColor = color.danger }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 16 16">
+      <Circle cx={8} cy={8} r={7} fill={iconColor} />
+      <Rect x={7.1} y={3.8} width={1.8} height={5.4} rx={0.9} fill={color.surface} />
+      <Circle cx={8} cy={11.6} r={1} fill={color.surface} />
+    </Svg>
+  );
+}

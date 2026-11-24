@@ -1,4 +1,3 @@
-
 import type { TextStyle } from 'react-native';
 
 export const text = {
