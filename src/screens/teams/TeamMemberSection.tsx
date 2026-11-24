@@ -5,7 +5,7 @@ import { PersonSilhouetteIcon } from '@/components/icons';
 import { Text } from '@/components/ui';
 import { color, radius, role, space } from '@/theme';
 
-import { isTeamClosed, ROLE_LABEL, type Member, type RoleKey, type Team } from './team';
+import { isTeamClosed, ROLE_LABEL, type Member, type RecruitingRole, type Team } from './team';
 
 const AVATAR = 52;
 const ICON = 44;
@@ -28,7 +28,7 @@ export function TeamMemberSection({ team }: TeamMemberSectionProps) {
   const closed = isTeamClosed(team);
   const openSlots = closed ? 0 : Math.max(team.capacity - team.members.length, 0);
   const vacancies = team.recruitingRoles
-    .flatMap(({ role: key, count }) => Array.from({ length: count }, () => key))
+    .flatMap((recruiting) => Array.from({ length: recruiting.count }, () => recruiting))
     .slice(0, openSlots);
 
   const columns = getColumns(members.length + vacancies.length);
@@ -56,8 +56,8 @@ export function TeamMemberSection({ team }: TeamMemberSectionProps) {
         {members.map((member) => (
           <MemberCell key={member.id} member={member} width={cellWidth} />
         ))}
-        {vacancies.map((key, i) => (
-          <VacancyCell key={`vacancy-${i}`} roleKey={key} width={cellWidth} />
+        {vacancies.map((recruiting, i) => (
+          <VacancyCell key={`vacancy-${i}`} recruiting={recruiting} width={cellWidth} />
         ))}
       </View>
     </View>
@@ -95,14 +95,14 @@ function MemberCell({ member, width }: { member: Member; width: CellWidth }) {
   );
 }
 
-function VacancyCell({ roleKey, width }: { roleKey: RoleKey; width: CellWidth }) {
-  const tone = role[roleKey];
+function VacancyCell({ recruiting, width }: { recruiting: RecruitingRole; width: CellWidth }) {
+  const tone = role[recruiting.role];
 
   return (
     <View
       style={[S.cell, { width }]}
       accessible
-      accessibilityLabel={`${ROLE_LABEL[roleKey]} 빈자리`}
+      accessibilityLabel={`${ROLE_LABEL[recruiting.role]} ${recruiting.position} 빈자리`}
     >
       <View style={[S.avatar, S.vacancy]}>
         <DashedSilhouette color={tone.base} />
@@ -111,7 +111,7 @@ function VacancyCell({ roleKey, width }: { roleKey: RoleKey; width: CellWidth })
         빈자리
       </Text>
       <Text variant="badge" style={{ color: tone.text }} numberOfLines={1}>
-        {ROLE_LABEL[roleKey]}
+        {recruiting.position}
       </Text>
     </View>
   );

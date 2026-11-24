@@ -1,4 +1,3 @@
-import { BellIcon } from 'phosphor-react-native/src/icons/Bell';
 import { XIcon } from 'phosphor-react-native/src/icons/X';
 import { useState } from 'react';
 import { View } from 'react-native';
@@ -9,6 +8,7 @@ import { color, duration, easing, useMotion } from '@/theme';
 
 import { HOME_CATEGORIES, type HomeCategoryLabel } from './categories';
 import { S } from './InterestBanner.styles';
+import { RingingBell } from './RingingBell';
 
 type InterestBannerProps = {
   onSubmit: (categories: HomeCategoryLabel[]) => void;
@@ -45,7 +45,11 @@ export function InterestBanner({ onSubmit, onClose }: InterestBannerProps) {
             accessibilityRole="button"
             accessibilityState={{ expanded }}
           >
-            <BellIcon size={14} color={expanded ? color.ink : color.surface} weight="bold" />
+            <RingingBell
+              ringing={!expanded}
+              size={14}
+              color={expanded ? color.ink : color.surface}
+            />
             <Text variant="meta" color={expanded ? 'ink' : 'surface'}>
               {expanded ? '접기' : '분야 선택'}
             </Text>

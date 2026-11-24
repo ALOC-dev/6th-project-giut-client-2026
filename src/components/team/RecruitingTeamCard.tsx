@@ -3,7 +3,7 @@ import { View } from 'react-native';
 
 import { Press, Text } from '@/components/ui';
 import { color, role } from '@/theme';
-import { isTeamClosed, ROLE_LABEL, type Team } from '@/screens/teams';
+import { getRecruitingCounts, isTeamClosed, ROLE_LABEL, type Team } from '@/screens/teams';
 
 import { NOTCH_RADIUS, RIGHT_WIDTH, S } from './RecruitingTeamCard.styles';
 import { TeamMemberRing } from './TeamMemberRing';
@@ -73,7 +73,7 @@ export function RecruitingTeamCard({
               </Text>
             </View>
           ) : (
-            team.recruitingRoles.map(({ role: key, count }) => (
+            getRecruitingCounts(team).map(({ role: key, count }) => (
               <View key={key} style={[S.roleChip, { backgroundColor: role[key].tint }]}>
                 <Text variant="badge" color={role[key].text} style={S.roleText}>
                   {ROLE_LABEL[key]} {count}명
