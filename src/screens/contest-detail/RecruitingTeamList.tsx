@@ -27,6 +27,9 @@ export function RecruitingTeamList({ teams }: RecruitingTeamListProps) {
   const goTeam = (teamId: string) =>
     router.push({ pathname: '/team/[id]', params: { id: teamId } });
 
+  const goApply = (teamId: string) =>
+    router.push({ pathname: '/team/[id]/apply', params: { id: teamId } });
+
   if (teams.length === 0) {
     return (
       <View style={S.empty}>
@@ -47,8 +50,7 @@ export function RecruitingTeamList({ teams }: RecruitingTeamListProps) {
           bookmarked={bookmarkedIds.has(team.id)}
           onPress={() => goTeam(team.id)}
           onPressBookmark={() => toggleBookmark(team.id)}
-          // TODO: 지원하기 화면이 생기면 연결
-          onPressApply={() => {}}
+          onPressApply={() => goApply(team.id)}
         />
       ))}
     </View>

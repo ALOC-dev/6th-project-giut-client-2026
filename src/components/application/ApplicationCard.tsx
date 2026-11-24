@@ -1,11 +1,18 @@
+import { useEffect, useState } from 'react';
 import { StyleSheet, type StyleProp, type ViewStyle, View } from 'react-native';
-import Animated from 'react-native-reanimated';
+import Animated, {
+  Easing as ReanimatedEasing,
+  FadeInUp,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 
-import { PersonSilhouetteIcon } from '@/components/icons';
-import { color, radius, role, space, useFloat } from '@/theme';
+import { ChevronIcon, PersonSilhouetteIcon } from '@/components/icons';
+import { color, radius, role, space, useFloat, useMotion } from '@/theme';
 
-import { Text } from '@/components/ui';
+import { Press, Text } from '@/components/ui';
 
 const DAYS = ['월', '화', '수', '목', '금', '토', '일'];
 const SLOTS = ['오전', '오후', '저녁'];
@@ -36,6 +43,7 @@ export type ApplicationCardProps = {
   application: ApplicationCardData;
   appliedAt?: string;
   floating?: boolean;
+  preview?: boolean;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -43,10 +51,32 @@ export function ApplicationCard({
   application,
   appliedAt,
   floating = true,
+  preview = false,
   style,
 }: ApplicationCardProps) {
   const tone = FIELD_TONE[application.field] ?? role.dev;
-  const floatStyle = useFloat(floating, 400);
+  const { reduced, easing } = useMotion();
+  const floatStyle = useFloat(floating, preview ? 0 : 400);
+  const [showAllAnswers, setShowAllAnswers] = useState(false);
+  const chevronProgress = useSharedValue(0);
+  const answerLimit = preview ? 2 : application.answers.length;
+  const visibleAnswers = showAllAnswers
+    ? application.answers
+    : application.answers.slice(0, answerLimit);
+  const extraAnswerCount = Math.max(0, application.answers.length - answerLimit);
+
+  useEffect(() => {
+    chevronProgress.set(
+      withTiming(showAllAnswers ? 1 : 0, {
+        duration: reduced ? 0 : 250,
+        easing: ReanimatedEasing.bezier(0.42, 0, 0.58, 1),
+      }),
+    );
+  }, [chevronProgress, reduced, showAllAnswers]);
+
+  const chevronStyle = useAnimatedStyle(() => ({
+    transform: [{ rotate: `${chevronProgress.value * 180}deg` }],
+  }));
   const available = new Set(application.availableSlots);
   const availableTimeLabel = application.availableSlots
     .filter((slot) => Number.isInteger(slot) && slot >= 0 && slot < DAYS.length * SLOTS.length)
@@ -73,7 +103,7 @@ export function ApplicationCard({
             <View style={[styles.positionDot, { backgroundColor: tone.base }]} />
             <Text variant="caption" color="textSecondary">
               <Text style={{ color: tone.text, fontWeight: '700' }}>{application.position}</Text>
-              으로 지원했어요
+              {preview ? '로 지원해요' : '으로 지원했어요'}
             </Text>
           </View>
         </View>
@@ -86,7 +116,7 @@ export function ApplicationCard({
           </Text>
           <HoursGauge hours={application.hours} />
           <Text variant="label" style={styles.hoursText}>
-            주 {application.hours}시간
+            {application.hours >= 20 ? '주 20시간 이상' : `주 ${application.hours}시간`}
           </Text>
         </View>
         <View
@@ -141,19 +171,51 @@ export function ApplicationCard({
       </View>
 
       <View style={styles.answers}>
-        {application.answers.map((answer) => (
-          <View key={answer.tag} style={styles.answerCard}>
+        {visibleAnswers.map((answer, index) => (
+          <Animated.View
+            key={answer.tag}
+            entering={
+              preview && index >= answerLimit && !reduced
+                ? FadeInUp.duration(350)
+                    .delay((index - answerLimit) * 50)
+                    .easing(easing.out)
+                    .withInitialValues({ opacity: 0, transform: [{ translateY: 12 }] })
+                : undefined
+            }
+            style={styles.answerCard}
+          >
             <Text variant="micro" style={styles.answerTag}>
               {answer.tag}
             </Text>
             <Text variant="bodyStrong" style={styles.question}>
               {answer.question}
             </Text>
-            <Text variant="body" color="textBody" style={styles.answerCopy}>
+            <Text
+              variant="body"
+              color="textBody"
+              numberOfLines={preview ? 3 : undefined}
+              style={styles.answerCopy}
+            >
               {answer.answer}
             </Text>
-          </View>
+          </Animated.View>
         ))}
+        {preview && extraAnswerCount > 0 ? (
+          <Press
+            onPress={() => setShowAllAnswers((current) => !current)}
+            scaleOnPress={false}
+            accessibilityRole="button"
+            accessibilityState={{ expanded: showAllAnswers }}
+            style={styles.moreButton}
+          >
+            <Text variant="caption" color="textSecondary">
+              {showAllAnswers ? '접기' : `질문 ${extraAnswerCount}개 더 보기`}
+            </Text>
+            <Animated.View style={chevronStyle}>
+              <ChevronIcon size={16} color={color.textSecondary} />
+            </Animated.View>
+          </Press>
+        ) : null}
       </View>
     </Animated.View>
   );
@@ -277,4 +339,13 @@ const styles = StyleSheet.create({
   },
   question: { marginTop: space[2] },
   answerCopy: { marginTop: space[2] },
+  moreButton: {
+    height: 44,
+    marginTop: space[2],
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: space[1],
+    borderRadius: radius.card,
+  },
 });
