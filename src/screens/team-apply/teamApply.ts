@@ -56,13 +56,14 @@ export function createApplyTeam(team: Team): ApplyTeam {
     label: member.isLeader ? `팀장 · ${ROLE_LABEL[member.role]}` : POSITION_LABEL[member.role],
     filled: true,
   }));
-  const openSlots: ApplySlot[] = team.recruitingRoles.flatMap(({ role, count }) =>
-    Array.from({ length: count }, (_, index) => ({
-      id: `${role}-${index + 1}`,
-      role,
-      label: POSITION_LABEL[role],
-      filled: false,
-    })),
+  const openSlots: ApplySlot[] = team.recruitingRoles.flatMap(
+    ({ role, position, count }, roleIndex) =>
+      Array.from({ length: count }, (_, index) => ({
+        id: `${role}-${roleIndex + 1}-${index + 1}`,
+        role,
+        label: position,
+        filled: false,
+      })),
   );
 
   return {
