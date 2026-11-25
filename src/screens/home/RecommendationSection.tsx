@@ -8,7 +8,7 @@ import type { Contest } from '@/screens/contests/contest';
 import { color, space } from '@/theme';
 
 type RecommendationSectionProps = {
-  userName: string;
+  userName?: string;
   contests: Contest[];
   style?: StyleProp<ViewStyle>;
 };
@@ -34,7 +34,7 @@ export function RecommendationSection({ userName, contests, style }: Recommendat
   return (
     <View style={[S.section, style]}>
       <View style={S.header}>
-        <Text variant="titleLg">{userName}님을 위한 추천</Text>
+        <Text variant="titleLg">{userName ? `${userName}님을 위한 추천` : '추천 공모전'}</Text>
         {/* TODO: 공모전 목록 연결 작업 때 관심 분야로 필터된 목록으로 이동 후 disabled 제거 */}
         <Press
           disabled
