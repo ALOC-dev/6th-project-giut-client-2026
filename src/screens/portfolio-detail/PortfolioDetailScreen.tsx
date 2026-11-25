@@ -6,6 +6,7 @@ import type { PortfolioItem } from '@/screens/mypage';
 import { color, space } from '@/theme';
 
 import { PortfolioImages } from './PortfolioImages';
+import { PortfolioInfoSection } from './PortfolioInfoSection';
 
 type PortfolioDetailScreenProps = {
   item: PortfolioItem;
@@ -19,6 +20,7 @@ export function PortfolioDetailScreen({ item, onPressEdit }: PortfolioDetailScre
 
       <ScrollView contentContainerStyle={S.content}>
         <PortfolioImages imageUrls={item.imageUrls} />
+        <PortfolioInfoSection item={item} />
       </ScrollView>
     </View>
   );
