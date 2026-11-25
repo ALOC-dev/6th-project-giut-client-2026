@@ -61,7 +61,9 @@ export function useSectionTabs<K extends string>(keys: readonly K[], topGap: num
     }
 
     // 마지막 구역이 짧아도 맨 아래에 닿으면 마지막 탭으로
-    const isAtBottom = y > 0 && y + layoutMeasurement.height >= contentSize.height - 1;
+    const isScrollable = contentSize.height > layoutMeasurement.height + 1;
+    const isAtBottom =
+      isScrollable && y > 0 && y + layoutMeasurement.height >= contentSize.height - 1;
     const passed = keys.filter((key) => {
       const top = scrollYOf(key);
       return top !== undefined && y >= top - 1;

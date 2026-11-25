@@ -71,7 +71,7 @@ export function MyPageScreen({
       <ScrollView
         ref={scrollRef}
         contentContainerStyle={S.content}
-        stickyHeaderIndices={profile ? [1] : undefined}
+        stickyHeaderIndices={[1]}
         {...scrollProps}
       >
         <View style={S.profile}>
@@ -87,36 +87,39 @@ export function MyPageScreen({
           )}
         </View>
 
-        {/* 프로필이 없으면 스크랩만 있어서 탭을 숨겨요 */}
-        {profile && (
-          <FolderTabBar
-            tabs={TABS}
-            value={tab}
-            variant="outlined"
-            onChange={handlePressTab}
-            onLayout={onTabBarLayout}
-          />
-        )}
+        <FolderTabBar
+          tabs={TABS}
+          value={tab}
+          variant="outlined"
+          onChange={handlePressTab}
+          onLayout={onTabBarLayout}
+        />
 
         <View style={S.sections} onLayout={onSectionsLayout}>
-          {profile && (
-            <>
-              <View onLayout={onSectionLayout('portfolio')}>
-                <PortfolioSection
-                  items={profile.portfolioItems}
-                  count={summary.portfolioCount}
-                  onPressEdit={onPressEditPortfolio}
-                  onPressItem={onPressPortfolio}
-                />
-              </View>
-              <View onLayout={onSectionLayout('activity')}>
-                <ActivityHistorySection
-                  items={profile.activityHistories}
-                  onPressEdit={onPressEditActivity}
-                />
-              </View>
-            </>
-          )}
+          <View onLayout={onSectionLayout('portfolio')}>
+            <PortfolioSection
+              items={profile?.portfolioItems ?? []}
+              count={summary.portfolioCount}
+              emptyMessage={
+                profile
+                  ? '아직 등록한 포트폴리오가 없어요'
+                  : '프로필을 먼저 생성하고 포트폴리오를 추가해 주세요'
+              }
+              onPressEdit={profile ? onPressEditPortfolio : undefined}
+              onPressItem={onPressPortfolio}
+            />
+          </View>
+          <View onLayout={onSectionLayout('activity')}>
+            <ActivityHistorySection
+              items={profile?.activityHistories ?? []}
+              emptyMessage={
+                profile
+                  ? '아직 등록한 활동 이력이 없어요'
+                  : '프로필을 먼저 생성하고 활동 이력을 추가해 주세요'
+              }
+              onPressEdit={profile ? onPressEditActivity : undefined}
+            />
+          </View>
           <View onLayout={onSectionLayout('scrap')}>
             <ScrapSection scraps={scraps} summary={summary} onPressScrap={onPressScrap} />
           </View>

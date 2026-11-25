@@ -132,6 +132,24 @@ export const MOCK_MY_PROFILE: MyProfile = {
   },
 };
 
+// 프로필 미등록 상태 확인용
+export const MOCK_EMPTY_PROFILE: MyProfile = {
+  profileCompleted: false,
+  universityVerified: false,
+  profile: null,
+  summary: {
+    portfolioCount: 0,
+    showcaseCount: 0,
+    myTeamCount: 0,
+    scrapCount: 0,
+    competitionScrapCount: 0,
+    teamScrapCount: 0,
+    receivedProposalCount: 0,
+    receivedRecommendationCount: 0,
+    collaborationCount: 0,
+  },
+};
+
 // 기존 공모전·팀 목데이터를 참조해서 카드를 누르면 상세 화면으로 이동할 수 있어요
 function postScrap(contestId: string): Scrap[] {
   const contest = getContestDetail(contestId);

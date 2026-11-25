@@ -9,11 +9,16 @@ import { SectionHeader } from './SectionHeader';
 
 type ActivityHistorySectionProps = {
   items: ActivityHistory[];
-  onPressEdit: () => void;
+  emptyMessage: string;
+  onPressEdit?: () => void; // 없으면 편집 버튼 숨김
 };
 
 // 수상, 대외활동, 동아리, 인턴, 자격증
-export function ActivityHistorySection({ items, onPressEdit }: ActivityHistorySectionProps) {
+export function ActivityHistorySection({
+  items,
+  emptyMessage,
+  onPressEdit,
+}: ActivityHistorySectionProps) {
   // 최근에 끝난 활동부터
   const sorted = [...items].sort((a, b) => b.endMonth.localeCompare(a.endMonth));
 
@@ -29,7 +34,9 @@ export function ActivityHistorySection({ items, onPressEdit }: ActivityHistorySe
         </Card>
       ) : (
         <View style={S.empty}>
-          <Text color="textMuted">아직 등록한 활동 이력이 없어요</Text>
+          <Text color="textMuted" style={S.emptyText}>
+            {emptyMessage}
+          </Text>
         </View>
       )}
     </View>
@@ -87,5 +94,8 @@ const S = StyleSheet.create({
   empty: {
     paddingVertical: space[8],
     alignItems: 'center',
+  },
+  emptyText: {
+    textAlign: 'center',
   },
 });

@@ -16,13 +16,15 @@ const HIDDEN_ORDER = Number.MAX_SAFE_INTEGER;
 type PortfolioSectionProps = {
   items: PortfolioItem[];
   count: number;
-  onPressEdit: () => void;
+  emptyMessage: string;
+  onPressEdit?: () => void; // 없으면 편집 버튼 숨김
   onPressItem: (item: PortfolioItem) => void;
 };
 
 export function PortfolioSection({
   items,
   count,
+  emptyMessage,
   onPressEdit,
   onPressItem,
 }: PortfolioSectionProps) {
@@ -54,7 +56,9 @@ export function PortfolioSection({
 
       {items.length === 0 && (
         <View style={S.empty}>
-          <Text color="textMuted">아직 등록한 포트폴리오가 없어요</Text>
+          <Text color="textMuted" style={S.emptyText}>
+            {emptyMessage}
+          </Text>
         </View>
       )}
     </View>

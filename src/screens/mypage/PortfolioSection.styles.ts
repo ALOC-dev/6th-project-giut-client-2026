@@ -74,4 +74,7 @@ export const S = StyleSheet.create({
     paddingVertical: space[8],
     alignItems: 'center',
   },
+  emptyText: {
+    textAlign: 'center',
+  },
 });
