@@ -1,4 +1,3 @@
-// 번들 크기를 줄이려고 아이콘을 하나씩 경로로 가져와요
 import {
   AirplaneIcon,
   CalendarBlankIcon,
