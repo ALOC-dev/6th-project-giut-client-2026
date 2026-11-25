@@ -14,6 +14,8 @@ export default function MyPageRoute() {
   // TODO: API 연결 시 로딩 / 실패 화면 추가
   return (
     <MyPageScreen
+      // 프로필이 생기거나 없어지면 탭과 스크롤 위치를 초기화해요
+      key={MOCK_MY_PROFILE.profile?.userId ?? 'empty'}
       myProfile={MOCK_MY_PROFILE}
       scraps={MOCK_SCRAPS}
       // TODO: 메뉴 화면이 생기면 이동
