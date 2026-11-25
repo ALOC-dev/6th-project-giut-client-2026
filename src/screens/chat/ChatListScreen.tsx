@@ -2,44 +2,41 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Animated, Easing, Pressable, ScrollView, Text, Vibration, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { BellIcon, BellOffIcon, LeaveIcon } from '@/components/icons';
-import { C, ROLE } from './theme';
-import { EASE, bake, useEnter, useLoop, useReducedMotion } from './motion';
-import {
-  Avatar,
-  ConfirmDialog,
-  Dim,
-  Sheet,
-  SheetDivider,
-  SheetRow,
-  Switch,
-  T,
-  Toast,
-  useToast,
-} from './parts';
-import { LIVE_MESSAGE, SAMPLE_ROOMS, fmtListTime } from './data';
-import type { Room } from './data';
+import { BottomSheet, Toast, useToast } from '@/components/ui';
+import { color, easing, role, text } from '@/theme';
+import { ChatAvatar } from './ChatAvatar';
+import { ChatConfirmDialog, ChatMenuDivider, ChatMenuRow, ChatSwitch } from './ChatMenu';
+import { bake, useEnter, useLoop, useReducedMotion } from './motion';
+import { LIVE_MESSAGE, SAMPLE_ROOMS, fmtListTime } from './mocks';
+import type { ChatRoom } from './mocks';
 
-export type OpenedRoom = { id: string; name: string; color: string; tint: string; offer: boolean };
+export type OpenedRoom = {
+  id: string;
+  name: string;
+  color: string;
+  tint: string;
+  offer: boolean;
+};
 
 type Props = {
-  /** 방 목록. 없으면 캔버스 샘플 */
-  rooms?: Room[];
-  /** 빈 화면 보기 */
+  rooms?: ChatRoom[];
   empty?: boolean;
-  /** 3초 뒤 새 메시지가 오는 데모 (캔버스 liveDemo). 기본 켜짐 */
   liveDemo?: boolean;
-  /** 방을 누름 — 읽음 처리 후 호출. ChatFlow가 받아서 대화 화면을 밀어 넣는다 */
   onOpen?: (room: OpenedRoom) => void;
-  /** 빈 화면 '공모전 둘러보기' */
   onBrowse?: () => void;
-  /** 알림 켬/끔, 나가기 — 서버에 반영할 때 */
   onMuteChange?: (id: string, muted: boolean) => void;
   onLeave?: (id: string) => void;
-  /** 상태 표시줄 높이 */
   topInset?: number;
 };
 
 type SheetKind = null | 'menu' | 'leave';
+
+const ROOM_ROLE_COLOR = {
+  개발: [role.dev.base, role.dev.tint],
+  디자인: [role.design.base, role.design.tint],
+  기획: [role.plan.base, role.plan.tint],
+  마케팅: [role.mkt.base, role.mkt.tint],
+} as const;
 
 export default function ChatListScreen({
   rooms: initial = SAMPLE_ROOMS,
@@ -51,7 +48,7 @@ export default function ChatListScreen({
   onLeave,
   topInset = 50,
 }: Props) {
-  const [rooms, setRooms] = useState<Room[]>(() => initial.map((r) => ({ ...r })));
+  const [rooms, setRooms] = useState<ChatRoom[]>(() => initial.map((r) => ({ ...r })));
   const [fresh, setFresh] = useState<string | null>(null);
   const [freshN, setFreshN] = useState(0);
   const [leaving, setLeaving] = useState<string | null>(null);
@@ -59,7 +56,6 @@ export default function ChatListScreen({
   const [target, setTarget] = useState<string | null>(null);
   const toast = useToast();
 
-  // 라이브 데모 — 3초 뒤 박준호에게서 새 메시지 (맨 위로 올라오며 반짝)
   useEffect(() => {
     if (!liveDemo || empty) return;
     const t = setTimeout(() => {
@@ -105,7 +101,7 @@ export default function ChatListScreen({
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: C.white }}>
+    <View style={{ flex: 1, backgroundColor: color.surface }}>
       <View style={{ height: topInset }} />
       <View
         style={{
@@ -114,7 +110,7 @@ export default function ChatListScreen({
           justifyContent: 'center',
         }}
       >
-        <Text style={T(24, '800', C.ink, { letterSpacing: -0.5 })}>채팅</Text>
+        <Text style={[text.titleXl, { color: color.ink }]}>채팅</Text>
       </View>
 
       <ScrollView
@@ -129,7 +125,7 @@ export default function ChatListScreen({
             fresh={fresh === r.id ? freshN : 0}
             leaving={leaving === r.id}
             onPress={() => {
-              const [c, tint] = ROLE[r.field];
+              const [c, tint] = ROOM_ROLE_COLOR[r.field];
               if (r.unread > 0) {
                 setRooms((rs) => rs.map((x) => (x.id === r.id ? { ...x, unread: 0 } : x)));
                 setFresh(null);
@@ -142,53 +138,52 @@ export default function ChatListScreen({
         {list.length === 0 && <Empty onBrowse={onBrowse} />}
       </ScrollView>
 
-      <Toast text={toast.text} bottom={24} />
+      <Toast {...toast.props} bottom={24} />
 
-      {sheet && <Dim onPress={() => setSheet(null)} />}
-      {sheet === 'menu' && (
-        <Sheet label="채팅방 메뉴">
-          <Text
-            numberOfLines={1}
-            style={[
-              T(13, '700', C.muted),
-              { paddingTop: 4, paddingHorizontal: 8, paddingBottom: 10, marginTop: -4 },
-            ]}
-          >
-            {tgt?.name}
-          </Text>
-          <SheetRow
-            icon={<BellIcon />}
-            label="채팅방 알림"
-            role="switch"
-            checked={!tgt?.muted}
-            onPress={toggleMute}
-            right={<Switch on={!tgt?.muted} />}
-          />
-          <SheetDivider />
-          <SheetRow
-            icon={<LeaveIcon />}
-            label="채팅방 나가기"
-            danger
-            onPress={() => setSheet('leave')}
-          />
-        </Sheet>
-      )}
-      {sheet === 'leave' && (
-        <ConfirmDialog
-          title="채팅방을 나갈까요?"
-          body="나가면 대화 내용이 내 채팅 목록에서 사라지고, 다시 볼 수 없어요."
-          okLabel="나가기"
-          onCancel={() => setSheet(null)}
-          onOk={doLeave}
+      <BottomSheet
+        visible={sheet === 'menu'}
+        onClose={() => setSheet(null)}
+        accessibilityLabel="채팅방 메뉴"
+      >
+        <Text
+          numberOfLines={1}
+          style={[
+            text.caption,
+            { color: color.textMuted, fontWeight: '700' },
+            { paddingTop: 4, paddingHorizontal: 8, paddingBottom: 10, marginTop: -4 },
+          ]}
+        >
+          {tgt?.name}
+        </Text>
+        <ChatMenuRow
+          icon={<BellIcon />}
+          label="채팅방 알림"
+          role="switch"
+          checked={!tgt?.muted}
+          onPress={toggleMute}
+          right={<ChatSwitch on={!tgt?.muted} />}
         />
-      )}
+        <ChatMenuDivider />
+        <ChatMenuRow
+          icon={<LeaveIcon />}
+          label="채팅방 나가기"
+          danger
+          onPress={() => setSheet('leave')}
+        />
+      </BottomSheet>
+      <ChatConfirmDialog
+        visible={sheet === 'leave'}
+        title="채팅방을 나갈까요?"
+        body="나가면 대화 내용이 내 채팅 목록에서 사라지고, 다시 볼 수 없어요."
+        okLabel="나가기"
+        onCancel={() => setSheet(null)}
+        onOk={doLeave}
+      />
     </View>
   );
 }
 
-/* ───────── 한 줄 */
-
-const BADGE_POP = bake([0, 60, 100], [0, 1.25, 1], EASE.pop);
+const BADGE_POP = bake([0, 60, 100], [0, 1.25, 1], easing.spring);
 
 function RoomRow({
   room: r,
@@ -197,28 +192,26 @@ function RoomRow({
   onPress,
   onLongPress,
 }: {
-  room: Room;
+  room: ChatRoom;
   fresh: number;
   leaving: boolean;
   onPress: () => void;
   onLongPress: () => void;
 }) {
-  const [c, tint] = ROLE[r.field];
+  const [c, tint] = ROOM_ROLE_COLOR[r.field];
   const has = r.unread > 0;
   const reduce = useReducedMotion();
 
-  // 누르는 동안 살짝 작아짐 (.18s)
   const [press] = useState(() => new Animated.Value(0));
   const pressTo = (v: number) =>
     Animated.timing(press, {
       toValue: v,
       duration: 180,
-      easing: EASE.out,
+      easing: easing.out,
       useNativeDriver: true,
     }).start();
 
-  // 새 메시지: rowIn .4s + rowFlash 1.2s(.3s 뒤) + previewIn .35s + badgePop .4s
-  const rowIn = useEnter(400, EASE.out, 0, fresh);
+  const rowIn = useEnter(400, easing.out, 0, fresh);
   const [flash] = useState(() => new Animated.Value(0));
   const badge = useEnter(400, Easing.linear, 0, fresh);
   useEffect(() => {
@@ -233,7 +226,7 @@ function RoomRow({
       toValue: 0,
       duration: 1200,
       delay: 300,
-      easing: EASE.ease,
+      easing: easing.inOut,
       useNativeDriver: true,
     });
     Animated.sequence([animation, fade]).start();
@@ -242,9 +235,8 @@ function RoomRow({
       fade.stop();
     };
   }, [flash, fresh, reduce]);
-  const preview = useEnter(350, EASE.out, 0, fresh);
+  const preview = useEnter(350, easing.out, 0, fresh);
 
-  // 나가기: 높이가 접히며(.3s) 흐려진다(.25s)
   const [h, setH] = useState(0);
   const [leave] = useState(() => new Animated.Value(0));
   const [fade] = useState(() => new Animated.Value(1));
@@ -254,13 +246,13 @@ function RoomRow({
       Animated.timing(leave, {
         toValue: 1,
         duration: 300,
-        easing: EASE.std,
+        easing: easing.inOut,
         useNativeDriver: false,
       }),
       Animated.timing(fade, {
         toValue: 0,
         duration: 250,
-        easing: EASE.ease,
+        easing: easing.inOut,
         useNativeDriver: false,
       }),
     ]).start();
@@ -293,7 +285,7 @@ function RoomRow({
             right: 0,
             top: 0,
             bottom: 0,
-            backgroundColor: C.brandTint,
+            backgroundColor: color.brandTint,
             opacity: flash,
           }}
         />
@@ -313,12 +305,12 @@ function RoomRow({
             paddingHorizontal: 22,
           }}
         >
-          <Avatar size={52} color={c} tint={tint} />
+          <ChatAvatar size={52} color={c} tint={tint} />
           <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
               <Text
                 numberOfLines={1}
-                style={[T(16, '700', C.ink, { letterSpacing: -0.3 }), { flexShrink: 1 }]}
+                style={[text.button, { color: color.ink, letterSpacing: -0.3, flexShrink: 1 }]}
               >
                 {r.name}
               </Text>
@@ -327,7 +319,11 @@ function RoomRow({
             <Animated.Text
               numberOfLines={1}
               style={[
-                T(14, has ? '600' : '400', has ? C.ink : C.muted),
+                text.body,
+                {
+                  color: has ? color.ink : color.textMuted,
+                  fontWeight: has ? '600' : '400',
+                },
                 {
                   opacity: preview,
                   transform: [
@@ -350,7 +346,9 @@ function RoomRow({
               paddingBottom: 4,
             }}
           >
-            <Text style={T(12, '500', C.faint)}>{fmtListTime(r.t)}</Text>
+            <Text style={[text.meta, { color: color.textFaint, fontWeight: '500' }]}>
+              {fmtListTime(r.t)}
+            </Text>
             {has && (
               <Animated.View
                 style={{
@@ -358,13 +356,15 @@ function RoomRow({
                   height: 22,
                   paddingHorizontal: 7,
                   borderRadius: 11,
-                  backgroundColor: C.badge,
+                  backgroundColor: color.alert,
                   alignItems: 'center',
                   justifyContent: 'center',
                   transform: [{ scale: badge.interpolate(BADGE_POP) }],
                 }}
               >
-                <Text style={T(12, '800', C.white)}>{r.unread > 99 ? '99+' : r.unread}</Text>
+                <Text style={[text.meta, { color: color.surface, fontWeight: '800' }]}>
+                  {r.unread > 99 ? '99+' : r.unread}
+                </Text>
               </Animated.View>
             )}
           </View>
@@ -374,19 +374,16 @@ function RoomRow({
   );
 }
 
-/* ───────── 빈 화면 */
-
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-const BOB_Y = bake([0, 50, 100], [0, -8, 0], EASE.inOut);
-const BOB_R = bake([0, 50, 100], [-3, 2, -3], EASE.inOut);
-const BLINK = bake([0, 50, 100], [0.35, 1, 0.35], EASE.inOut);
+const BOB_Y = bake([0, 50, 100], [0, -8, 0], easing.inOut);
+const BOB_R = bake([0, 50, 100], [-3, 2, -3], easing.inOut);
+const BLINK = bake([0, 50, 100], [0.35, 1, 0.35], easing.inOut);
 
 function Empty({ onBrowse }: { onBrowse?: () => void }) {
   const bob = useLoop(3400);
   const d0 = useLoop(1200, 0);
   const d1 = useLoop(1200, 200);
   const d2 = useLoop(1200, 400);
-  // 점 깜빡임은 SVG 속성이라 JS로 돈다
   const blink = (v: Animated.Value) => v.interpolate(BLINK);
   return (
     <View style={{ alignItems: 'center', paddingTop: 110, paddingHorizontal: 32 }}>
@@ -408,23 +405,24 @@ function Empty({ onBrowse }: { onBrowse?: () => void }) {
         <Svg width={104} height={92} viewBox="0 0 104 92" fill="none">
           <Path
             d="M14 8h62a10 10 0 0 1 10 10v34a10 10 0 0 1-10 10H38L22 76V62h-8A10 10 0 0 1 4 52V18A10 10 0 0 1 14 8z"
-            fill={C.brandTint}
+            fill={color.brandTint}
           />
           <Path
             d="M50 34h38a8 8 0 0 1 8 8v24a8 8 0 0 1-8 8h-4v10l-12-10H50a8 8 0 0 1-8-8V42a8 8 0 0 1 8-8z"
-            fill={C.brand}
+            fill={color.brand}
           />
-          <AnimatedCircle cx={58} cy={54} r={3} fill={C.white} opacity={blink(d0)} />
-          <AnimatedCircle cx={69} cy={54} r={3} fill={C.white} opacity={blink(d1)} />
-          <AnimatedCircle cx={80} cy={54} r={3} fill={C.white} opacity={blink(d2)} />
+          <AnimatedCircle cx={58} cy={54} r={3} fill={color.surface} opacity={blink(d0)} />
+          <AnimatedCircle cx={69} cy={54} r={3} fill={color.surface} opacity={blink(d1)} />
+          <AnimatedCircle cx={80} cy={54} r={3} fill={color.surface} opacity={blink(d2)} />
         </Svg>
       </Animated.View>
-      <Text style={[T(19, '800', C.ink, { letterSpacing: -0.4 }), { marginTop: 22 }]}>
+      <Text style={[text.titleLg, { color: color.ink, fontSize: 19, marginTop: 22 }]}>
         아직 대화가 없어요
       </Text>
       <Text
         style={[
-          T(14, '400', C.secondary, { lineHeight: 22.4, textAlign: 'center' }),
+          text.body,
+          { color: color.textSecondary, fontWeight: '400', textAlign: 'center' },
           { marginTop: 8 },
         ]}
       >
@@ -438,12 +436,12 @@ function Empty({ onBrowse }: { onBrowse?: () => void }) {
           height: 44,
           paddingHorizontal: 18,
           borderRadius: 12,
-          backgroundColor: C.brandTint,
+          backgroundColor: color.brandTint,
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <Text style={T(14, '700', C.brandStrong)}>공모전 둘러보기</Text>
+        <Text style={[text.bodyStrong, { color: color.brandStrong }]}>공모전 둘러보기</Text>
       </Pressable>
     </View>
   );

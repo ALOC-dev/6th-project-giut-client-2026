@@ -4,6 +4,7 @@ import { KeyboardStickyView } from 'react-native-keyboard-controller';
 import {
   Animated,
   Easing,
+  Keyboard,
   Platform,
   Pressable,
   ScrollView,
@@ -24,35 +25,22 @@ import {
   SendIcon,
   TrashIcon,
 } from '@/components/icons';
-import { C } from './theme';
-import { EASE, bake, useEnter, useReducedMotion, useTween } from './motion';
-import {
-  Avatar,
-  ConfirmDialog,
-  Dim,
-  Sheet,
-  SheetDivider,
-  SheetRow,
-  Switch,
-  T,
-  Toast,
-  useToast,
-} from './parts';
-import { DAY_LABEL, OFFER_CARD, fmtClock, seedMessages } from './data';
-import type { Msg } from './data';
+import { BottomSheet, Toast, useToast } from '@/components/ui';
+import { color as C, easing, role, text } from '@/theme';
+import { ChatAvatar } from './ChatAvatar';
+import { ChatConfirmDialog, ChatMenuDivider, ChatMenuRow, ChatSwitch } from './ChatMenu';
+import { bake, useEnter, useReducedMotion, useTween } from './motion';
+import { DAY_LABEL, OFFER_CARD, fmtClock, seedMessages } from './mocks';
+import type { ChatMessage } from './mocks';
 
 type Props = {
   partner?: string;
   partnerColor?: string;
   partnerTint?: string;
-  /** 문의: 내가 팀장에게 연락한 방 · 제안: 팀장이 합류를 제안한 방 */
   scenario?: '문의' | '제안';
-  /** 내 말풍선·버튼 색 (캔버스 accent) */
   accent?: string;
-  /** 처음 메시지. 없으면 캔버스 샘플 */
-  initialMessages?: Msg[];
+  initialMessages?: ChatMessage[];
   onBack?: () => void;
-  /** 복사하기 — 앱에서 expo-clipboard 등으로 복사 */
   onCopy?: (text: string) => void;
   onSend?: (text: string) => void;
   onDelete?: (id: number) => void;
@@ -84,7 +72,9 @@ export default function ChatRoomScreen({
   topInset = 50,
   bottomInset = 28,
 }: Props) {
-  const [msgs, setMsgs] = useState<Msg[]>(() => initialMessages ?? seedMessages(scenario, partner));
+  const [msgs, setMsgs] = useState<ChatMessage[]>(
+    () => initialMessages ?? seedMessages(scenario, partner),
+  );
   const [nextId, setNextId] = useState(100);
   const [fresh, setFresh] = useState(-1);
   const [swapped, setSwapped] = useState(-1);
@@ -99,12 +89,14 @@ export default function ChatRoomScreen({
   const readT = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => () => clearTimeout(readT.current), []);
 
-  const push = (items: Partial<Msg>[]) => {
+  const push = (items: Partial<ChatMessage>[]) => {
     const d = new Date();
     const last = msgs.reduce((a, m) => Math.max(a, m.min), 0);
     const min = Math.max(d.getHours() * 60 + d.getMinutes(), last);
     let id = nextId;
-    const added = items.map((it) => ({ id: id++, kind: 'text', min, who: 'me', ...it }) as Msg);
+    const added = items.map(
+      (it) => ({ id: id++, kind: 'text', min, who: 'me', ...it }) as ChatMessage,
+    );
     setMsgs((cur) => [...cur, ...added]);
     setNextId(id);
     setFresh(added[added.length - 1].id);
@@ -116,7 +108,6 @@ export default function ChatRoomScreen({
     push([{ who: 'me', text, unread: 1 }]);
     setDraft('');
     onSend?.(text);
-    // 1.8초 뒤 상대가 읽음 → '1' 사라짐
     clearTimeout(readT.current);
     readT.current = setTimeout(
       () => setMsgs((cur) => cur.map((m) => (m.who === 'me' ? { ...m, unread: 0 } : m))),
@@ -129,7 +120,7 @@ export default function ChatRoomScreen({
     return sorted.map((m, i) => {
       const prev = sorted[i - 1],
         next = sorted[i + 1];
-      const same = (a?: Msg) => !!a && a.who === m.who && a.min === m.min;
+      const same = (a?: ChatMessage) => !!a && a.who === m.who && a.min === m.min;
       return { m, first: !same(prev), last: !same(next) };
     });
   }, [msgs]);
@@ -139,6 +130,7 @@ export default function ChatRoomScreen({
 
   const openMsgMenu = (id: number) => {
     if (left) return;
+    Keyboard.dismiss();
     setTarget(id);
     setSheet('msg');
     if (Platform.OS === 'android') {
@@ -149,10 +141,9 @@ export default function ChatRoomScreen({
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: C.white }}>
+    <View style={{ flex: 1, backgroundColor: C.surface }}>
       <View style={{ height: topInset }} />
 
-      {/* 상단 — 뒤로 · 상대 · ⋯ */}
       <View
         style={{
           height: 52,
@@ -179,7 +170,7 @@ export default function ChatRoomScreen({
         >
           <ChevronIcon size={24} dir="left" />
         </Pressable>
-        <Avatar size={40} color={partnerColor} tint={partnerTint} />
+        <ChatAvatar size={40} color={partnerColor} tint={partnerTint} />
         <View
           style={{
             flex: 1,
@@ -190,7 +181,7 @@ export default function ChatRoomScreen({
             paddingLeft: 4,
           }}
         >
-          <Text numberOfLines={1} style={T(17, '700', C.ink, { letterSpacing: -0.3 })}>
+          <Text numberOfLines={1} style={[text.titleMd, { color: C.ink, fontWeight: '700' }]}>
             {partner}
           </Text>
           {muted && <MutedMark />}
@@ -211,10 +202,9 @@ export default function ChatRoomScreen({
         </Pressable>
       </View>
 
-      {/* 대화 */}
       <ScrollView
         ref={scroll}
-        style={{ flex: 1, backgroundColor: C.chatBg }}
+        style={{ flex: 1, backgroundColor: C.surfaceMuted }}
         contentContainerStyle={{ paddingTop: 8, paddingHorizontal: 16, paddingBottom: 16 }}
         onContentSizeChange={() => scroll.current?.scrollToEnd({ animated: false })}
         keyboardDismissMode="interactive"
@@ -223,13 +213,15 @@ export default function ChatRoomScreen({
         <View style={{ alignItems: 'center', paddingTop: 16, paddingBottom: 6 }}>
           <View
             style={{
-              backgroundColor: C.datePill,
+              backgroundColor: C.line,
               borderRadius: 999,
               paddingVertical: 5,
               paddingHorizontal: 12,
             }}
           >
-            <Text style={T(12, '600', C.secondary)}>{DAY_LABEL}</Text>
+            <Text style={[text.meta, { color: C.textSecondary, fontWeight: '600' }]}>
+              {DAY_LABEL}
+            </Text>
           </View>
         </View>
 
@@ -244,13 +236,18 @@ export default function ChatRoomScreen({
               >
                 <View
                   style={{
-                    backgroundColor: C.sysPill,
+                    backgroundColor: C.lineSoft,
                     borderRadius: 10,
                     paddingVertical: 6,
                     paddingHorizontal: 12,
                   }}
                 >
-                  <Text style={T(12, '400', C.secondary, { textAlign: 'center', lineHeight: 18 })}>
+                  <Text
+                    style={[
+                      text.meta,
+                      { color: C.textSecondary, fontWeight: '400', textAlign: 'center' },
+                    ]}
+                  >
                     {m.text}
                   </Text>
                 </View>
@@ -267,13 +264,17 @@ export default function ChatRoomScreen({
                 style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-start', marginTop: mt }}
               >
                 {first ? (
-                  <Avatar size={36} color={partnerColor} tint={partnerTint} />
+                  <ChatAvatar size={36} color={partnerColor} tint={partnerTint} />
                 ) : (
                   <View style={{ width: 36 }} />
                 )}
                 <View style={{ flex: 1, minWidth: 0, gap: 5 }}>
                   {first && (
-                    <Text style={[T(13, '700', C.ink), { paddingLeft: 2 }]}>{partner}</Text>
+                    <Text
+                      style={[text.caption, { color: C.ink, fontWeight: '700', paddingLeft: 2 }]}
+                    >
+                      {partner}
+                    </Text>
                   )}
                   <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 6 }}>
                     {m.kind === 'offer' ? (
@@ -308,7 +309,7 @@ export default function ChatRoomScreen({
                           bubbleR(false, first),
                           {
                             maxWidth: 236,
-                            backgroundColor: C.white,
+                            backgroundColor: C.surface,
                             paddingVertical: 10,
                             paddingHorizontal: 14,
                             shadowColor: C.ink,
@@ -319,11 +320,18 @@ export default function ChatRoomScreen({
                           },
                         ]}
                       >
-                        <Text style={T(15, '400', C.ink, { lineHeight: 21.75 })}>{m.text}</Text>
+                        <Text style={[text.label, { color: C.ink, fontWeight: '400' }]}>
+                          {m.text}
+                        </Text>
                       </View>
                     )}
                     {last && (
-                      <Text style={[T(11, '400', C.muted), { paddingBottom: 2 }]}>
+                      <Text
+                        style={[
+                          text.badge,
+                          { color: C.textMuted, fontWeight: '400', paddingBottom: 2 },
+                        ]}
+                      >
                         {fmtClock(m.min)}
                       </Text>
                     )}
@@ -345,8 +353,12 @@ export default function ChatRoomScreen({
               }}
             >
               <View style={{ alignItems: 'flex-end', gap: 1, paddingBottom: 2 }}>
-                {!!m.unread && <Text style={T(11, '800', accent)}>1</Text>}
-                {last && <Text style={T(11, '400', C.muted)}>{fmtClock(m.min)}</Text>}
+                {!!m.unread && <Text style={[text.badge, { color: accent }]}>1</Text>}
+                {last && (
+                  <Text style={[text.badge, { color: C.textMuted, fontWeight: '400' }]}>
+                    {fmtClock(m.min)}
+                  </Text>
+                )}
               </View>
               {m.deleted ? (
                 <DeletedBubble first={first} swap={m.id === swapped} />
@@ -364,15 +376,15 @@ export default function ChatRoomScreen({
         })}
       </ScrollView>
 
-      {/* 입력 */}
       <KeyboardStickyView
         offset={{ opened: Math.max(bottomInset - 6, 0) }}
-        style={{ backgroundColor: C.white, borderTopWidth: 1, borderTopColor: C.lineSoft }}
+        style={{ backgroundColor: C.surface, borderTopWidth: 1, borderTopColor: C.lineSoft }}
       >
         {left ? (
           <Text
             style={[
-              T(14, '600', C.muted, { textAlign: 'center' }),
+              text.body,
+              { color: C.textMuted, fontWeight: '600', textAlign: 'center' },
               { paddingTop: 14, paddingHorizontal: 16, paddingBottom: 32 },
             ]}
           >
@@ -393,84 +405,82 @@ export default function ChatRoomScreen({
         )}
       </KeyboardStickyView>
 
-      <Toast text={toast.text} bottom={sheet === 'more' ? 196 : 96} />
+      <Toast {...toast.props} bottom={sheet === 'more' ? 196 : 96} />
 
-      {sheet && <Dim onPress={() => setSheet(null)} />}
+      <BottomSheet
+        visible={sheet === 'more'}
+        onClose={() => setSheet(null)}
+        accessibilityLabel="채팅방 메뉴"
+      >
+        <ChatMenuRow
+          icon={<BellIcon />}
+          label="채팅방 알림"
+          role="switch"
+          checked={!muted}
+          onPress={() => {
+            const m = !muted;
+            setMuted(m);
+            onMuteChange?.(m);
+            toast.show(m ? '이 채팅방 알림을 껐어요' : '이 채팅방 알림을 켰어요');
+          }}
+          right={<ChatSwitch on={!muted} accent={accent} />}
+        />
+        <ChatMenuDivider />
+        <ChatMenuRow
+          icon={<LeaveIcon />}
+          label="채팅방 나가기"
+          danger
+          onPress={() => setSheet('leave')}
+        />
+      </BottomSheet>
 
-      {sheet === 'more' && (
-        <Sheet label="채팅방 메뉴">
-          <SheetRow
-            icon={<BellIcon />}
-            label="채팅방 알림"
-            role="switch"
-            checked={!muted}
-            onPress={() => {
-              const m = !muted;
-              setMuted(m);
-              onMuteChange?.(m);
-              toast.show(m ? '이 채팅방 알림을 껐어요' : '이 채팅방 알림을 켰어요');
-            }}
-            right={<Switch on={!muted} accent={accent} />}
-          />
-          <SheetDivider />
-          <SheetRow
-            icon={<LeaveIcon />}
-            label="채팅방 나가기"
-            danger
-            onPress={() => setSheet('leave')}
-          />
-        </Sheet>
-      )}
-
-      {sheet === 'msg' && (
-        <Sheet label="메시지 메뉴">
-          <SheetRow
-            icon={<CopyIcon />}
-            label="복사하기"
-            onPress={() => {
-              onCopy?.(targetMsg?.text ?? '');
-              setSheet(null);
-              toast.show('메시지를 복사했어요');
-            }}
-          />
-          <SheetRow icon={<TrashIcon />} label="삭제하기" danger onPress={() => setSheet('del')} />
-        </Sheet>
-      )}
-
-      {(sheet === 'leave' || sheet === 'del') && (
-        <ConfirmDialog
-          title={sheet === 'del' ? '메시지를 삭제할까요?' : '채팅방을 나갈까요?'}
-          body={
-            sheet === 'del'
-              ? partner + "님 화면에서도 '삭제된 메시지예요'로 바뀌어요."
-              : '나가면 대화 내용이 내 채팅 목록에서 사라지고, 다시 볼 수 없어요.'
-          }
-          okLabel={sheet === 'del' ? '삭제' : '나가기'}
-          onCancel={() => setSheet(null)}
-          onOk={() => {
-            if (sheet === 'del') {
-              setMsgs((cur) => cur.map((m) => (m.id === target ? { ...m, deleted: true } : m)));
-              setSwapped(target);
-              setFresh(-1);
-              setSheet(null);
-              onDelete?.(target);
-              return;
-            }
+      <BottomSheet
+        visible={sheet === 'msg'}
+        onClose={() => setSheet(null)}
+        accessibilityLabel="메시지 메뉴"
+      >
+        <ChatMenuRow
+          icon={<CopyIcon />}
+          label="복사하기"
+          onPress={() => {
+            onCopy?.(targetMsg?.text ?? '');
             setSheet(null);
-            setLeft(true);
-            setDraft('');
-            push([{ who: 'sys', text: '채팅방을 나갔어요' }]);
-            onLeave?.();
+            toast.show('메시지를 복사했어요');
           }}
         />
-      )}
+        <ChatMenuRow icon={<TrashIcon />} label="삭제하기" danger onPress={() => setSheet('del')} />
+      </BottomSheet>
+
+      <ChatConfirmDialog
+        visible={sheet === 'leave' || sheet === 'del'}
+        title={sheet === 'del' ? '메시지를 삭제할까요?' : '채팅방을 나갈까요?'}
+        body={
+          sheet === 'del'
+            ? partner + "님 화면에서도 '삭제된 메시지예요'로 바뀌어요."
+            : '나가면 대화 내용이 내 채팅 목록에서 사라지고, 다시 볼 수 없어요.'
+        }
+        okLabel={sheet === 'del' ? '삭제' : '나가기'}
+        onCancel={() => setSheet(null)}
+        onOk={() => {
+          if (sheet === 'del') {
+            setMsgs((cur) => cur.map((m) => (m.id === target ? { ...m, deleted: true } : m)));
+            setSwapped(target);
+            setFresh(-1);
+            setSheet(null);
+            onDelete?.(target);
+            return;
+          }
+          setSheet(null);
+          setLeft(true);
+          setDraft('');
+          push([{ who: 'sys', text: '채팅방을 나갔어요' }]);
+          onLeave?.();
+        }}
+      />
     </View>
   );
 }
 
-/* ───────── 조각 */
-
-/** 말풍선 모서리 — 묶음 첫 말풍선만 상대 쪽 위 모서리가 뾰족(6) */
 const bubbleR = (mine: boolean, first: boolean) =>
   first
     ? mine
@@ -488,9 +498,8 @@ const bubbleR = (mine: boolean, first: boolean) =>
         }
     : { borderRadius: 18 };
 
-/** 새 메시지 등장 — msgIn .3s (아래에서 10px, 96% → 100%) */
 function MsgIn({ on, style, children }: { on: boolean; style: object; children: React.ReactNode }) {
-  const v = useEnter(300, EASE.out, 0, on);
+  const v = useEnter(300, easing.out, 0, on);
   return (
     <Animated.View
       style={[
@@ -511,7 +520,6 @@ function MsgIn({ on, style, children }: { on: boolean; style: object; children: 
   );
 }
 
-/** 이름 옆 알림 꺼짐 — dlgIn .24s */
 function MutedMark() {
   const v = useEnter(240);
   return (
@@ -527,9 +535,8 @@ function MutedMark() {
   );
 }
 
-/** 내 말풍선 — 길게(0.45초) 누르면 메시지 메뉴. 누르는 동안 96% + 살짝 어둡게 (.18s) */
 function MyBubble({
-  text,
+  text: message,
   accent,
   first,
   onLongPress,
@@ -546,7 +553,7 @@ function MyBubble({
     Animated.timing(p, {
       toValue: v,
       duration: 180,
-      easing: EASE.out,
+      easing: easing.out,
       useNativeDriver: true,
     }).start();
   return (
@@ -570,7 +577,7 @@ function MyBubble({
           },
         ]}
       >
-        <Text style={T(15, '400', C.white, { lineHeight: 21.75 })}>{text}</Text>
+        <Text style={[text.label, { color: C.surface, fontWeight: '400' }]}>{message}</Text>
         <Animated.View
           pointerEvents="none"
           style={{
@@ -588,9 +595,8 @@ function MyBubble({
   );
 }
 
-/** 삭제된 메시지 — delSwap .3s */
 function DeletedBubble({ first, swap }: { first: boolean; swap: boolean }) {
-  const v = useEnter(300, EASE.out, 0, swap);
+  const v = useEnter(300, easing.out, 0, swap);
   return (
     <Animated.View
       style={[
@@ -599,7 +605,7 @@ function DeletedBubble({ first, swap }: { first: boolean; swap: boolean }) {
           flexDirection: 'row',
           alignItems: 'center',
           gap: 6,
-          backgroundColor: C.white,
+          backgroundColor: C.surface,
           borderWidth: 1,
           borderColor: C.line,
           paddingVertical: 9,
@@ -614,12 +620,11 @@ function DeletedBubble({ first, swap }: { first: boolean; swap: boolean }) {
       ]}
     >
       <DeletedIcon />
-      <Text style={T(14, '400', C.muted, { lineHeight: 20.3 })}>삭제된 메시지예요</Text>
+      <Text style={[text.body, { color: C.textMuted, fontWeight: '400' }]}>삭제된 메시지예요</Text>
     </Animated.View>
   );
 }
 
-/** 팀 합류 제안 카드 */
 function OfferCard({
   accent,
   first,
@@ -639,7 +644,7 @@ function OfferCard({
         bubbleR(false, first),
         {
           width: 252,
-          backgroundColor: C.white,
+          backgroundColor: C.surface,
           overflow: 'hidden',
           shadowColor: C.ink,
           shadowOpacity: 0.04,
@@ -650,26 +655,26 @@ function OfferCard({
       ]}
     >
       <View style={{ backgroundColor: accent, paddingVertical: 14, paddingHorizontal: 16, gap: 4 }}>
-        <Text style={T(12, '700', C.white)}>팀 합류 제안</Text>
-        <Text style={T(18, '800', C.white, { letterSpacing: -0.3 })}>{OFFER_CARD.team}</Text>
+        <Text style={[text.meta, { color: C.surface }]}>팀 합류 제안</Text>
+        <Text style={[text.titleLg, { color: C.surface, fontSize: 18 }]}>{OFFER_CARD.team}</Text>
       </View>
       <View style={{ paddingTop: 14, paddingHorizontal: 16, paddingBottom: 4, gap: 10 }}>
         <OfferDetailRow label="공모전">
-          <Text style={[T(13, '600', C.ink, { lineHeight: 18.2 }), { flex: 1 }]}>
-            {OFFER_CARD.contest}
-          </Text>
+          <Text style={[text.caption, { color: C.ink, flex: 1 }]}>{OFFER_CARD.contest}</Text>
         </OfferDetailRow>
         <OfferDetailRow label="포지션">
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
             <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: C.brand }} />
-            <Text style={T(13, '700', C.ink)}>{OFFER_CARD.position}</Text>
+            <Text style={[text.caption, { color: C.ink, fontWeight: '700' }]}>
+              {OFFER_CARD.position}
+            </Text>
           </View>
         </OfferDetailRow>
         <OfferDetailRow label="팀 구성">
-          <Text style={T(13, '600', C.ink)}>{OFFER_CARD.members}</Text>
+          <Text style={[text.caption, { color: C.ink }]}>{OFFER_CARD.members}</Text>
         </OfferDetailRow>
         <OfferDetailRow label="활동">
-          <Text style={T(13, '600', C.ink)}>{OFFER_CARD.activity}</Text>
+          <Text style={[text.caption, { color: C.ink }]}>{OFFER_CARD.activity}</Text>
         </OfferDetailRow>
       </View>
       <View style={{ padding: 12 }}>
@@ -684,12 +689,12 @@ function OfferCard({
                 borderRadius: 12,
                 borderWidth: 1.5,
                 borderColor: C.line,
-                backgroundColor: C.white,
+                backgroundColor: C.surface,
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <Text style={T(14, '700', C.body)}>거절하기</Text>
+              <Text style={[text.bodyStrong, { color: C.textBody }]}>거절하기</Text>
             </Pressable>
             <Pressable
               onPress={onAccept}
@@ -703,7 +708,7 @@ function OfferCard({
                 justifyContent: 'center',
               }}
             >
-              <Text style={T(14, '700', C.white)}>수락하기</Text>
+              <Text style={[text.bodyStrong, { color: C.surface }]}>수락하기</Text>
             </Pressable>
           </View>
         )}
@@ -716,23 +721,24 @@ function OfferCard({
 function OfferDetailRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
-      <Text style={[T(13, '400', C.muted), { width: 44 }]}>{label}</Text>
+      <Text style={[text.caption, { width: 44, color: C.textMuted, fontWeight: '400' }]}>
+        {label}
+      </Text>
       {children}
     </View>
   );
 }
 
-/** 수락/거절 결과 — popIn .35s (수락은 튀는 곡선, 거절은 ease). 키프레임 0→60→100% */
 const POP_OP = (e: (t: number) => number) => bake([0, 60, 100], [0, 1, 1], e);
 function OfferResult({ accepted }: { accepted: boolean }) {
-  const e = accepted ? EASE.pop : EASE.ease;
+  const e = accepted ? easing.spring : easing.inOut;
   const v = useEnter(350, Easing.linear);
   return (
     <Animated.View
       style={{
         height: 44,
         borderRadius: 12,
-        backgroundColor: accepted ? C.okTint : C.surface,
+        backgroundColor: accepted ? C.successTint : C.surfaceMuted,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
@@ -741,15 +747,14 @@ function OfferResult({ accepted }: { accepted: boolean }) {
         transform: [{ scale: v.interpolate(bake([0, 60, 100], [0.9, 1.04, 1], e)) }],
       }}
     >
-      {accepted && <CheckIcon size={16} color={C.okText} />}
-      <Text style={T(14, '700', accepted ? C.okText : C.secondary)}>
+      {accepted && <CheckIcon size={16} color={role.plan.text} />}
+      <Text style={[text.bodyStrong, { color: accepted ? role.plan.text : C.textSecondary }]}>
         {accepted ? '제안을 수락했어요' : '제안을 거절했어요'}
       </Text>
     </Animated.View>
   );
 }
 
-/** 입력창 + 보내기 — 글자가 있으면 테두리·버튼이 accent로 (.2s), 버튼 92% → 100% */
 function Composer({
   value,
   onChange,
@@ -768,8 +773,8 @@ function Composer({
   bottomInset: number;
 }) {
   const reduce = useReducedMotion();
-  const on = useTween(empty ? 0 : 1, reduce ? 0 : 200, EASE.ease, false);
-  const sc = useTween(empty ? 0 : 1, reduce ? 0 : 200, EASE.ease);
+  const on = useTween(empty ? 0 : 1, reduce ? 0 : 200, easing.inOut, false);
+  const sc = useTween(empty ? 0 : 1, reduce ? 0 : 200, easing.inOut);
   return (
     <View
       style={{
@@ -789,10 +794,13 @@ function Composer({
           height: 44,
           borderRadius: 22,
           borderWidth: 1.5,
-          borderColor: on.interpolate({ inputRange: [0, 1], outputRange: [C.surface, accent] }),
+          borderColor: on.interpolate({
+            inputRange: [0, 1],
+            outputRange: [C.surfaceMuted, accent],
+          }),
           backgroundColor: on.interpolate({
             inputRange: [0, 1],
-            outputRange: [C.surface, C.white],
+            outputRange: [C.surfaceMuted, C.surface],
           }),
           justifyContent: 'center',
           paddingHorizontal: 16,
@@ -805,9 +813,9 @@ function Composer({
           blurOnSubmit={false}
           returnKeyType="send"
           placeholder={placeholder}
-          placeholderTextColor={C.placeholder}
+          placeholderTextColor={C.textFaint}
           accessibilityLabel="메시지 입력"
-          style={[T(15, '400', C.ink), { padding: 0 }]}
+          style={[text.label, { color: C.ink, fontWeight: '400', padding: 0 }]}
         />
       </Animated.View>
       <Pressable
@@ -834,7 +842,7 @@ function Composer({
               }),
             }}
           >
-            <SendIcon color={empty ? C.placeholder : C.white} />
+            <SendIcon color={empty ? C.textFaint : C.surface} />
           </Animated.View>
         </Animated.View>
       </Pressable>

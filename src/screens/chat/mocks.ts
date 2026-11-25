@@ -1,23 +1,27 @@
-/** 캔버스 샘플 데이터 — 실제 API 응답으로 바꿔 끼우세요 */
+export type ChatField = '개발' | '디자인' | '기획' | '마케팅';
 
-export type Field = '개발' | '디자인' | '기획' | '마케팅';
-
-export type Room = {
+export type ChatRoom = {
   id: string;
   name: string;
-  /** 직군 — 프로필 색을 정한다 */
-  field: Field;
+  field: ChatField;
   last: string;
-  /** 분 단위 시각. 0 = 오늘 00:00, 음수 = 어제 이전 */
   t: number;
   unread: number;
   muted?: boolean;
-  /** 상대가 팀 합류 제안을 보낸 방 */
   offer?: boolean;
 };
 
-/** 1:1 대화만 있다 (단체 채팅 없음) */
-export const SAMPLE_ROOMS: Room[] = [
+export type ChatMessage = {
+  id: number;
+  who: 'me' | 'lead' | 'sys';
+  kind: 'text' | 'offer';
+  min: number;
+  text?: string;
+  unread?: number;
+  deleted?: boolean;
+};
+
+export const SAMPLE_ROOMS: ChatRoom[] = [
   {
     id: 'dm-1',
     name: '박준호',
@@ -62,21 +66,18 @@ export const SAMPLE_ROOMS: Room[] = [
   },
 ];
 
-/** 라이브 데모 — 3초 뒤 박준호에게서 새 메시지 */
 export const LIVE_MESSAGE = {
   id: 'dm-1',
   last: '주 1회 온라인으로 해요! 편하게 오세요 🙂',
   t: 1190,
 };
 
-/** 목록의 시간 표기 */
 export const fmtListTime = (t: number) => {
   if (t < -1440) return '11월 21일';
   if (t < 0) return '어제';
   return fmtClock(t);
 };
 
-/** 오전/오후 h:mm */
 export const fmtClock = (min: number) => {
   const h = Math.floor(min / 60),
     m = min % 60;
@@ -84,21 +85,9 @@ export const fmtClock = (min: number) => {
   return (h < 12 ? '오전 ' : '오후 ') + hh + ':' + String(m).padStart(2, '0');
 };
 
-export type Msg = {
-  id: number;
-  who: 'me' | 'lead' | 'sys';
-  kind: 'text' | 'offer';
-  min: number;
-  text?: string;
-  /** 내 메시지 — 상대가 아직 안 읽음 */
-  unread?: number;
-  deleted?: boolean;
-};
-
 export const DAY_LABEL = '11월 9일 월요일';
 
-/** 문의 — 내가 모집글을 보고 팀장에게 연락한 방 */
-export const INQUIRY: Omit<Msg, 'id' | 'kind'>[] = [
+export const INQUIRY: Omit<ChatMessage, 'id' | 'kind'>[] = [
   { min: 1102, who: 'me', text: '안녕하세요! 모집글 보고 연락드려요.' },
   { min: 1102, who: 'me', text: '프론트엔드 포지션 아직 모집 중인가요?' },
   { min: 1110, who: 'lead', text: '안녕하세요, 연락 주셔서 감사해요.' },
@@ -115,8 +104,7 @@ export const INQUIRY: Omit<Msg, 'id' | 'kind'>[] = [
   },
 ];
 
-/** 제안 — 팀장이 내 프로필을 보고 합류를 제안한 방 */
-export const OFFER: (Omit<Msg, 'id' | 'kind'> & { kind?: Msg['kind'] })[] = [
+export const OFFER: (Omit<ChatMessage, 'id' | 'kind'> & { kind?: ChatMessage['kind'] })[] = [
   { min: 1050, who: 'sys', text: '{P}님이 팀 합류를 제안했어요' },
   { min: 1050, who: 'lead', text: '안녕하세요, 프로필 보고 연락드렸어요.' },
   {
@@ -127,15 +115,14 @@ export const OFFER: (Omit<Msg, 'id' | 'kind'> & { kind?: Msg['kind'] })[] = [
   { min: 1051, who: 'lead', kind: 'offer' },
 ];
 
-export const seedMessages = (scenario: '문의' | '제안', partner: string): Msg[] =>
+export const seedMessages = (scenario: '문의' | '제안', partner: string): ChatMessage[] =>
   (scenario === '제안' ? OFFER : INQUIRY).map((m, i) => ({
     id: i,
     kind: 'text',
     ...m,
     ...(m.text ? { text: m.text.replace('{P}', partner) } : {}),
-  })) as Msg[];
+  })) as ChatMessage[];
 
-/** 제안 카드 내용 */
 export const OFFER_CARD = {
   team: '데이터 길잡이',
   contest: '2026 공공데이터 활용 창업경진대회',
