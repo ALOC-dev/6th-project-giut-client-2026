@@ -8,6 +8,7 @@ import { color, space } from '@/theme';
 import { PortfolioDescriptionSection } from './PortfolioDescriptionSection';
 import { PortfolioImages } from './PortfolioImages';
 import { PortfolioInfoSection } from './PortfolioInfoSection';
+import { PortfolioLinkSection } from './PortfolioLinkSection';
 import { PortfolioSkillSection } from './PortfolioSkillSection';
 
 type PortfolioDetailScreenProps = {
@@ -25,6 +26,7 @@ export function PortfolioDetailScreen({ item, onPressEdit }: PortfolioDetailScre
         <PortfolioInfoSection item={item} />
         <PortfolioSkillSection skills={item.skillTags} />
         <PortfolioDescriptionSection description={item.markdownContent} />
+        <PortfolioLinkSection links={item.links} />
       </ScrollView>
     </View>
   );

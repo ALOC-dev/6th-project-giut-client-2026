@@ -58,6 +58,11 @@ export const MOCK_MY_PROFILE: MyProfile = {
         markdownContent:
           "교내 분실물은 학과 게시판, 단톡방, 학생회 SNS에 흩어져 올라와서 정작 주인이 찾기 어려웠어요. '찾아줘'는 분실물과 습득물을 지도 위에 모아, 잃어버린 위치 근처의 물건을 바로 확인할 수 있게 만든 앱이에요.\n\n프론트엔드를 맡아 지도 화면과 등록 화면을 만들었어요. 물건이 많아지면 지도가 느려져서, 가까운 물건을 하나로 묶어 보여주는 방식으로 바꿨어요.\n\n학과 학생 30명과 2주 동안 써 보고 의견을 모았고, 등록 단계를 5단계에서 3단계로 줄였어요.",
         skillTags: [TAG.reactNative, TAG.typescript, TAG.expo, TAG.firebase, TAG.figma],
+        links: [
+          { title: 'GitHub 저장소', url: 'https://github.com/example/chajajwo' },
+          { title: '시연 영상', url: 'https://youtu.be/example' },
+          { title: '발표 자료', url: 'https://drive.google.com/file/example' },
+        ],
         showcaseOrder: 1,
         representative: true,
       },
@@ -74,6 +79,9 @@ export const MOCK_MY_PROFILE: MyProfile = {
         markdownContent:
           '서울시 따릉이 대여 데이터를 모아 시간대별 이용 패턴을 분석했어요.\n날씨와 요일을 함께 넣어 대여소별 수요를 예측했어요.',
         skillTags: [TAG.python, TAG.pandas, TAG.sql],
+        links: [
+          { title: '분석 결과 페이지', url: 'https://example.com/seoul-bike-demand-forecast-2025' },
+        ],
         showcaseOrder: 2,
         representative: false,
       },
@@ -89,6 +97,7 @@ export const MOCK_MY_PROFILE: MyProfile = {
         roles: [ROLE.frontend],
         markdownContent: '',
         skillTags: [TAG.react, TAG.figma],
+        links: [],
         showcaseOrder: 3,
         representative: false,
       },

@@ -16,6 +16,11 @@ export type ProfileTag = {
   name: string;
 };
 
+export type PortfolioLink = {
+  title: string;
+  url: string;
+};
+
 export type PortfolioItem = {
   id: number;
   imageUrl: string | null; // 목록에 보이는 이미지
@@ -29,6 +34,8 @@ export type PortfolioItem = {
   roles: CodeName[];
   markdownContent: string; // API 이름은 markdown이지만 일반 글로 보여줘요
   skillTags: ProfileTag[];
+  // TODO: 아직 API에 없는 값. 백엔드와 정해지면 맞추기 (최대 5개)
+  links: PortfolioLink[];
   showcaseOrder: number | null; // 공개 프로필에 보이는 순서. null이면 숨김
   representative: boolean;
 };

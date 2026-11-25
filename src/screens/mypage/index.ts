@@ -7,6 +7,7 @@ export type {
   CodeName,
   MyProfile,
   PortfolioItem,
+  PortfolioLink,
   Profile,
   ProfileSummary,
   ProfileTag,
