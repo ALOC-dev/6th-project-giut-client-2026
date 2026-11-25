@@ -37,7 +37,14 @@ export const MOCK_MY_PROFILE: MyProfile = {
     portfolioItems: [
       {
         id: 15,
-        imageUrl: null,
+        imageUrl: 'https://picsum.photos/seed/giut-portfolio-15-1/800/600',
+        imageUrls: [
+          'https://picsum.photos/seed/giut-portfolio-15-1/800/600',
+          'https://picsum.photos/seed/giut-portfolio-15-2/800/600',
+          'https://picsum.photos/seed/giut-portfolio-15-3/800/600',
+          'https://picsum.photos/seed/giut-portfolio-15-4/800/600',
+          'https://picsum.photos/seed/giut-portfolio-15-5/800/600',
+        ],
         title: "캠퍼스 분실물 찾기 앱 '찾아줘'",
         caption:
           '교내 분실물 게시판을 지도 기반 앱으로 옮겨, 잃어버린 물건을 더 빨리 찾을 수 있게 만들었어요.',
@@ -53,7 +60,8 @@ export const MOCK_MY_PROFILE: MyProfile = {
       },
       {
         id: 16,
-        imageUrl: null,
+        imageUrl: 'https://picsum.photos/seed/giut-portfolio-16-1/800/600',
+        imageUrls: ['https://picsum.photos/seed/giut-portfolio-16-1/800/600'],
         title: '공공데이터로 본 서울 따릉이 수요 예측',
         caption: '따릉이 대여 데이터를 분석해 대여소별 수요를 예측했어요.',
         projectStartDate: '2025-03-01',
@@ -68,6 +76,7 @@ export const MOCK_MY_PROFILE: MyProfile = {
       {
         id: 17,
         imageUrl: null,
+        imageUrls: [],
         title: '학과 행사 신청 웹페이지',
         caption: '행사 신청과 명단 관리를 할 수 있는 웹페이지를 만들었어요.',
         projectStartDate: '2024-11-01',

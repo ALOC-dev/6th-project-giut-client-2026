@@ -18,7 +18,9 @@ export type ProfileTag = {
 
 export type PortfolioItem = {
   id: number;
-  imageUrl: string | null;
+  imageUrl: string | null; // 목록에 보이는 이미지
+  // TODO: 아직 API에 없는 값. 백엔드와 정해지면 맞추기 (최대 10장)
+  imageUrls: string[];
   title: string;
   caption: string;
   projectStartDate: string | null; // 'YYYY-MM-DD'

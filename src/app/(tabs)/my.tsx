@@ -1,6 +1,12 @@
 import { router } from 'expo-router';
 
-import { MOCK_MY_PROFILE, MOCK_SCRAPS, MyPageScreen, type Scrap } from '@/screens/mypage';
+import {
+  MOCK_MY_PROFILE,
+  MOCK_SCRAPS,
+  MyPageScreen,
+  type PortfolioItem,
+  type Scrap,
+} from '@/screens/mypage';
 
 function openScrap(scrap: Scrap) {
   if (scrap.kind === 'post') {
@@ -8,6 +14,10 @@ function openScrap(scrap: Scrap) {
   } else {
     router.push({ pathname: '/team/[id]', params: { id: scrap.teamId } });
   }
+}
+
+function openPortfolio(item: PortfolioItem) {
+  router.push({ pathname: '/portfolio/[id]', params: { id: String(item.id) } });
 }
 
 export default function MyPageRoute() {
@@ -26,8 +36,7 @@ export default function MyPageRoute() {
       onPressEditProfile={() => {}}
       // TODO: 포트폴리오 편집 화면이 생기면 이동
       onPressEditPortfolio={() => {}}
-      // TODO: 포트폴리오 상세 화면이 생기면 이동
-      onPressPortfolio={() => {}}
+      onPressPortfolio={openPortfolio}
       // TODO: 활동 이력 편집 화면이 생기면 이동
       onPressEditActivity={() => {}}
       onPressScrap={openScrap}

@@ -1,5 +1,10 @@
 import { router } from 'expo-router';
-import { BookmarkSimpleIcon, CaretLeftIcon, ExportIcon } from 'phosphor-react-native';
+import {
+  BookmarkSimpleIcon,
+  CaretLeftIcon,
+  ExportIcon,
+  PencilSimpleIcon,
+} from 'phosphor-react-native';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -8,22 +13,26 @@ import { color, space } from '@/theme';
 
 type DetailHeaderProps = {
   title?: string;
+  background?: 'surface' | 'surfaceSunken'; // 화면 배경색과 맞춰요
   bookmarked?: boolean;
   onPressBookmark?: () => void; // 없으면 버튼 숨김
   onPressShare?: () => void; // 없으면 버튼 숨김
+  onPressEdit?: () => void; // 없으면 버튼 숨김
 };
 
-// 상세 화면 공통 헤더 (공모전 상세, 팀 상세)
+// 상세 화면 공통 헤더 (공모전 상세, 팀 상세, 포트폴리오 상세)
 export function DetailHeader({
   title,
+  background = 'surfaceSunken',
   bookmarked = false,
   onPressBookmark,
   onPressShare,
+  onPressEdit,
 }: DetailHeaderProps) {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[S.wrap, { paddingTop: insets.top }]}>
+    <View style={{ paddingTop: insets.top, backgroundColor: color[background] }}>
       <View style={S.bar}>
         {/* 제목은 버튼 개수와 상관없이 항상 가운데 */}
         {title && (
@@ -67,6 +76,16 @@ export function DetailHeader({
               <ExportIcon size={24} color={color.ink} />
             </Press>
           )}
+          {onPressEdit && (
+            <Press
+              onPress={onPressEdit}
+              accessibilityRole="button"
+              accessibilityLabel="편집"
+              style={S.iconButton}
+            >
+              <PencilSimpleIcon size={24} color={color.ink} />
+            </Press>
+          )}
         </View>
       </View>
     </View>
@@ -76,9 +95,6 @@ export function DetailHeader({
 const ICON_BUTTON_SIZE = 44;
 
 const S = StyleSheet.create({
-  wrap: {
-    backgroundColor: color.surfaceSunken,
-  },
   bar: {
     height: 52,
     flexDirection: 'row',
