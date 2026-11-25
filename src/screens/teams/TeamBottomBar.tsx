@@ -1,4 +1,4 @@
-import { ChatCircleIcon } from 'phosphor-react-native/src/icons/ChatCircle';
+import { ChatCircleIcon } from 'phosphor-react-native';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 

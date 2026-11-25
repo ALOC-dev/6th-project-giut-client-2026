@@ -218,9 +218,7 @@ export function WaxSendOverlay({
           ]),
         );
       });
-      schedule(1400, () =>
-        start(timing(paper.y, 24, 400, Easing.bezier(0.5, 0, 0.75, 0))),
-      );
+      schedule(1400, () => start(timing(paper.y, 24, 400, Easing.bezier(0.5, 0, 0.75, 0))));
       schedule(2050, () => start(timing(paper.opacity, 0, 200, Easing.linear)));
     }
     schedule(1750, () => setFlapFront(true));

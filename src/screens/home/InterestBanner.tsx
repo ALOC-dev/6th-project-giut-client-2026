@@ -1,4 +1,4 @@
-import { XIcon } from 'phosphor-react-native/src/icons/X';
+import { XIcon } from 'phosphor-react-native';
 import { useState } from 'react';
 import { View } from 'react-native';
 import Animated, { LinearTransition } from 'react-native-reanimated';

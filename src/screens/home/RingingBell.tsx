@@ -1,4 +1,4 @@
-import { BellIcon } from 'phosphor-react-native/src/icons/Bell';
+import { BellIcon } from 'phosphor-react-native';
 import { useEffect } from 'react';
 import Animated, {
   Easing,

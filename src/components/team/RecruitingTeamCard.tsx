@@ -1,4 +1,4 @@
-import { BookmarkSimpleIcon } from 'phosphor-react-native/src/icons/BookmarkSimple';
+import { BookmarkSimpleIcon } from 'phosphor-react-native';
 import { View } from 'react-native';
 
 import { Press, Text } from '@/components/ui';

@@ -1,4 +1,4 @@
-import { ListIcon } from 'phosphor-react-native/src/icons/List';
+import { ListIcon } from 'phosphor-react-native';
 import { Image, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
