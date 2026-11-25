@@ -1,5 +1,4 @@
-import { CaretRightIcon } from 'phosphor-react-native/src/icons/CaretRight';
-import { ImageIcon } from 'phosphor-react-native/src/icons/Image';
+import { CaretRightIcon, ImageIcon } from 'phosphor-react-native';
 import { Image, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { Card, Press, Text } from '@/components/ui';

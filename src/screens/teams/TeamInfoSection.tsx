@@ -1,4 +1,4 @@
-import { ArrowRightIcon } from 'phosphor-react-native/src/icons/ArrowRight';
+import { ArrowRightIcon } from 'phosphor-react-native';
 import { StyleSheet, View } from 'react-native';
 
 import { Text } from '@/components/ui';

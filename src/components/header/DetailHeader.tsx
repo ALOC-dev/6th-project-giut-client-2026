@@ -1,7 +1,5 @@
 import { router } from 'expo-router';
-import { BookmarkSimpleIcon } from 'phosphor-react-native/src/icons/BookmarkSimple';
-import { CaretLeftIcon } from 'phosphor-react-native/src/icons/CaretLeft';
-import { ExportIcon } from 'phosphor-react-native/src/icons/Export';
+import { BookmarkSimpleIcon, CaretLeftIcon, ExportIcon } from 'phosphor-react-native';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 

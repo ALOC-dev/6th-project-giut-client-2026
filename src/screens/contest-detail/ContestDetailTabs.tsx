@@ -1,4 +1,4 @@
-import { CaretRightIcon } from 'phosphor-react-native/src/icons/CaretRight';
+import { CaretRightIcon } from 'phosphor-react-native';
 import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 
 import { Press, Text } from '@/components/ui';

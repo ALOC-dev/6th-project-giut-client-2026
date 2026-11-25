@@ -1,6 +1,4 @@
-import { ExportIcon } from 'phosphor-react-native/src/icons/Export';
-import { PencilSimpleIcon } from 'phosphor-react-native/src/icons/PencilSimple';
-import { StarIcon } from 'phosphor-react-native/src/icons/Star';
+import { ExportIcon, PencilSimpleIcon, StarIcon } from 'phosphor-react-native';
 import { Image, View } from 'react-native';
 
 import { PersonSilhouetteIcon } from '@/components/icons';

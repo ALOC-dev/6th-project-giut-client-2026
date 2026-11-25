@@ -1,14 +1,16 @@
 // 번들 크기를 줄이려고 아이콘을 하나씩 경로로 가져와요
-import { AirplaneIcon } from 'phosphor-react-native/src/icons/Airplane';
-import { CalendarBlankIcon } from 'phosphor-react-native/src/icons/CalendarBlank';
-import { CodeIcon } from 'phosphor-react-native/src/icons/Code';
-import { DotsThreeCircleIcon } from 'phosphor-react-native/src/icons/DotsThreeCircle';
-import { GraduationCapIcon } from 'phosphor-react-native/src/icons/GraduationCap';
-import { HeartIcon } from 'phosphor-react-native/src/icons/Heart';
-import { LightbulbIcon } from 'phosphor-react-native/src/icons/Lightbulb';
-import { MegaphoneIcon } from 'phosphor-react-native/src/icons/Megaphone';
-import { RankingIcon } from 'phosphor-react-native/src/icons/Ranking';
-import { TrophyIcon } from 'phosphor-react-native/src/icons/Trophy';
+import {
+  AirplaneIcon,
+  CalendarBlankIcon,
+  CodeIcon,
+  DotsThreeCircleIcon,
+  GraduationCapIcon,
+  HeartIcon,
+  LightbulbIcon,
+  MegaphoneIcon,
+  RankingIcon,
+  TrophyIcon,
+} from 'phosphor-react-native';
 
 import type { ActivityType } from '@/screens/contests/contest';
 
