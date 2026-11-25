@@ -5,8 +5,10 @@ import { Text } from '@/components/ui';
 import type { PortfolioItem } from '@/screens/mypage';
 import { color, space } from '@/theme';
 
+import { PortfolioDescriptionSection } from './PortfolioDescriptionSection';
 import { PortfolioImages } from './PortfolioImages';
 import { PortfolioInfoSection } from './PortfolioInfoSection';
+import { PortfolioSkillSection } from './PortfolioSkillSection';
 
 type PortfolioDetailScreenProps = {
   item: PortfolioItem;
@@ -21,6 +23,8 @@ export function PortfolioDetailScreen({ item, onPressEdit }: PortfolioDetailScre
       <ScrollView contentContainerStyle={S.content}>
         <PortfolioImages imageUrls={item.imageUrls} />
         <PortfolioInfoSection item={item} />
+        <PortfolioSkillSection skills={item.skillTags} />
+        <PortfolioDescriptionSection description={item.markdownContent} />
       </ScrollView>
     </View>
   );

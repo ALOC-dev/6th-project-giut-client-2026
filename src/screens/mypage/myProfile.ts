@@ -27,7 +27,7 @@ export type PortfolioItem = {
   projectEndDate: string | null; // 'YYYY-MM-DD'
   teamSize: number | null;
   roles: CodeName[];
-  markdownContent: string;
+  markdownContent: string; // API 이름은 markdown이지만 일반 글로 보여줘요
   skillTags: ProfileTag[];
   showcaseOrder: number | null; // 공개 프로필에 보이는 순서. null이면 숨김
   representative: boolean;
