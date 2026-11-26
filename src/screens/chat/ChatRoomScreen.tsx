@@ -41,7 +41,7 @@ type Props = {
   accent?: string;
   initialMessages?: ChatMessage[];
   onBack?: () => void;
-  onCopy?: (text: string) => void;
+  onCopy?: (text: string) => void | Promise<unknown>;
   onSend?: (text: string) => void;
   onDelete?: (id: number) => void;
   onLeave?: () => void;
@@ -442,10 +442,14 @@ export default function ChatRoomScreen({
         <ChatMenuRow
           icon={<CopyIcon />}
           label="복사하기"
-          onPress={() => {
-            onCopy?.(targetMsg?.text ?? '');
-            setSheet(null);
-            toast.show('메시지를 복사했어요');
+          onPress={async () => {
+            try {
+              await onCopy?.(targetMsg?.text ?? '');
+              setSheet(null);
+              toast.show('메시지를 복사했어요');
+            } catch {
+              toast.show('메시지를 복사하지 못했어요');
+            }
           }}
         />
         <ChatMenuRow icon={<TrashIcon />} label="삭제하기" danger onPress={() => setSheet('del')} />
