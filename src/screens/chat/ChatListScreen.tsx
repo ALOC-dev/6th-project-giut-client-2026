@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Easing, Pressable, ScrollView, Text, Vibration, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { BellIcon, BellOffIcon, LeaveIcon } from '@/components/icons';
@@ -28,7 +28,8 @@ type Props = {
   topInset?: number;
 };
 
-type SheetKind = null | 'menu' | 'leave';
+type SheetKind = null | 'menu';
+type ConfirmKind = null | 'leave';
 
 export default function ChatListScreen({
   rooms: initial = SAMPLE_ROOMS,
@@ -45,8 +46,14 @@ export default function ChatListScreen({
   const [freshN, setFreshN] = useState(0);
   const [leaving, setLeaving] = useState<string | null>(null);
   const [sheet, setSheet] = useState<SheetKind>(null);
+  const [confirm, setConfirm] = useState<ConfirmKind>(null);
+  const pendingConfirm = useRef<ConfirmKind>(null);
   const [target, setTarget] = useState<string | null>(null);
   const toast = useToast();
+  const handleSheetDismiss = useCallback(() => {
+    setConfirm(pendingConfirm.current);
+    pendingConfirm.current = null;
+  }, [setConfirm]);
 
   useEffect(() => {
     if (!liveDemo || empty) return;
@@ -82,7 +89,7 @@ export default function ChatListScreen({
   const doLeave = () => {
     if (!target) return;
     const id = target;
-    setSheet(null);
+    setConfirm(null);
     setLeaving(id);
     toast.show('채팅방을 나갔어요');
     setTimeout(() => {
@@ -134,6 +141,7 @@ export default function ChatListScreen({
       <BottomSheet
         visible={sheet === 'menu'}
         onClose={() => setSheet(null)}
+        onDismiss={handleSheetDismiss}
         accessibilityLabel="채팅방 메뉴"
       >
         <Text
@@ -159,15 +167,18 @@ export default function ChatListScreen({
           icon={<LeaveIcon />}
           label="채팅방 나가기"
           danger
-          onPress={() => setSheet('leave')}
+          onPress={() => {
+            pendingConfirm.current = 'leave';
+            setSheet(null);
+          }}
         />
       </BottomSheet>
       <ChatConfirmDialog
-        visible={sheet === 'leave'}
+        visible={confirm === 'leave'}
         title="채팅방을 나갈까요?"
         body="나가면 대화 내용이 내 채팅 목록에서 사라지고, 다시 볼 수 없어요."
         okLabel="나가기"
-        onCancel={() => setSheet(null)}
+        onCancel={() => setConfirm(null)}
         onOk={doLeave}
       />
     </View>

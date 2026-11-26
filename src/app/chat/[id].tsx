@@ -31,6 +31,7 @@ export default function ChatRoomRoute() {
         topInset={insets.top}
         bottomInset={Math.max(insets.bottom, space[3])}
         onBack={() => router.back()}
+        onLeave={() => router.dismissTo('/chat')}
         onCopy={(text) => Clipboard.setStringAsync(text)}
       />
     </>

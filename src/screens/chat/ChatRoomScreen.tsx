@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as Haptics from 'expo-haptics';
 import { KeyboardStickyView } from 'react-native-keyboard-controller';
 import {
@@ -51,7 +51,8 @@ type Props = {
   bottomInset?: number;
 };
 
-type SheetKind = null | 'more' | 'leave' | 'msg' | 'del';
+type SheetKind = null | 'more' | 'msg';
+type ConfirmKind = null | 'leave' | 'del';
 
 export default function ChatRoomScreen({
   partner = '박준호',
@@ -79,10 +80,16 @@ export default function ChatRoomScreen({
   const [draft, setDraft] = useState('');
   const [offer, setOffer] = useState<'pending' | 'accepted' | 'declined'>('pending');
   const [sheet, setSheet] = useState<SheetKind>(null);
+  const [confirm, setConfirm] = useState<ConfirmKind>(null);
+  const pendingConfirm = useRef<ConfirmKind>(null);
   const [target, setTarget] = useState(-1);
   const [left, setLeft] = useState(false);
   const [muted, setMuted] = useState(false);
   const toast = useToast();
+  const handleSheetDismiss = useCallback(() => {
+    setConfirm(pendingConfirm.current);
+    pendingConfirm.current = null;
+  }, [setConfirm]);
   const scroll = useRef<ScrollViewInstance>(null);
   const readT = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => () => clearTimeout(readT.current), []);
@@ -414,6 +421,7 @@ export default function ChatRoomScreen({
       <BottomSheet
         visible={sheet === 'more'}
         onClose={() => setSheet(null)}
+        onDismiss={handleSheetDismiss}
         accessibilityLabel="채팅방 메뉴"
       >
         <ChatMenuRow
@@ -434,13 +442,17 @@ export default function ChatRoomScreen({
           icon={<LeaveIcon />}
           label="채팅방 나가기"
           danger
-          onPress={() => setSheet('leave')}
+          onPress={() => {
+            pendingConfirm.current = 'leave';
+            setSheet(null);
+          }}
         />
       </BottomSheet>
 
       <BottomSheet
         visible={sheet === 'msg'}
         onClose={() => setSheet(null)}
+        onDismiss={handleSheetDismiss}
         accessibilityLabel="메시지 메뉴"
       >
         <ChatMenuRow
@@ -462,29 +474,37 @@ export default function ChatRoomScreen({
             }
           }}
         />
-        <ChatMenuRow icon={<TrashIcon />} label="삭제하기" danger onPress={() => setSheet('del')} />
+        <ChatMenuRow
+          icon={<TrashIcon />}
+          label="삭제하기"
+          danger
+          onPress={() => {
+            pendingConfirm.current = 'del';
+            setSheet(null);
+          }}
+        />
       </BottomSheet>
 
       <ChatConfirmDialog
-        visible={sheet === 'leave' || sheet === 'del'}
-        title={sheet === 'del' ? '메시지를 삭제할까요?' : '채팅방을 나갈까요?'}
+        visible={confirm === 'leave' || confirm === 'del'}
+        title={confirm === 'del' ? '메시지를 삭제할까요?' : '채팅방을 나갈까요?'}
         body={
-          sheet === 'del'
+          confirm === 'del'
             ? partner + "님 화면에서도 '삭제된 메시지예요'로 바뀌어요."
             : '나가면 대화 내용이 내 채팅 목록에서 사라지고, 다시 볼 수 없어요.'
         }
-        okLabel={sheet === 'del' ? '삭제' : '나가기'}
-        onCancel={() => setSheet(null)}
+        okLabel={confirm === 'del' ? '삭제' : '나가기'}
+        onCancel={() => setConfirm(null)}
         onOk={() => {
-          if (sheet === 'del') {
+          if (confirm === 'del') {
             setMsgs((cur) => cur.map((m) => (m.id === target ? { ...m, deleted: true } : m)));
             setSwapped(target);
             setFresh(-1);
-            setSheet(null);
+            setConfirm(null);
             onDelete?.(target);
             return;
           }
-          setSheet(null);
+          setConfirm(null);
           setLeft(true);
           setDraft('');
           push([{ who: 'sys', text: '채팅방을 나갔어요' }]);

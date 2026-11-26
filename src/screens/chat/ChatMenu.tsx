@@ -185,6 +185,7 @@ function ConfirmDialogBody({ title, body, okLabel, onCancel, onOk }: ChatConfirm
 
 const styles = StyleSheet.create({
   dialogRoot: {
+    flex: 1,
     zIndex: 42,
     alignItems: 'center',
     justifyContent: 'center',
