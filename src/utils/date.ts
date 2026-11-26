@@ -43,6 +43,17 @@ export function formatFullDate(value: string) {
   return `${date.getFullYear()}.${pad(date.getMonth() + 1)}.${pad(date.getDate())}`;
 }
 
+// '2025-05-01' 또는 '2025-05' → '2025.05'
+function formatYearMonth(value: string) {
+  return value.slice(0, 7).replace('-', '.');
+}
+
+// '2025-05-01', '2025-07-31' → '2025.05 – 2025.07' (같은 달이거나 하나만 있으면 '2025.05')
+export function formatMonthPeriod(startDate: string | null, endDate: string | null) {
+  const months = [startDate, endDate].filter((date) => date !== null).map(formatYearMonth);
+  return Array.from(new Set(months)).join(' – ');
+}
+
 export function formatPeriod(startDate: string, endDate: string) {
   const start = parseDate(startDate);
   const end = parseDate(endDate);

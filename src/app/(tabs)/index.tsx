@@ -4,6 +4,7 @@ import { useCallback, useMemo } from 'react';
 import type { ActivityType } from '@/screens/contests/contest';
 import { getContestDetails } from '@/screens/contests/detailMocks';
 import { HomeScreen } from '@/screens/home';
+import { MOCK_MY_PROFILE } from '@/screens/mypage';
 
 export default function HomeRoute() {
   // TODO: API 연결 시 서버에서 받아온 목록으로 교체
@@ -18,5 +19,11 @@ export default function HomeRoute() {
     });
   }, []);
 
-  return <HomeScreen contests={contests} onOpenContestList={openContestList} />;
+  return (
+    <HomeScreen
+      userName={MOCK_MY_PROFILE.profile?.nickname}
+      contests={contests}
+      onOpenContestList={openContestList}
+    />
+  );
 }

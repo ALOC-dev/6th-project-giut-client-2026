@@ -1,58 +1,8 @@
-import { CaretRightIcon } from 'phosphor-react-native/src/icons/CaretRight';
+import { CaretRightIcon } from 'phosphor-react-native';
 import { StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 
 import { Press, Text } from '@/components/ui';
 import { color, radius, shadow, space } from '@/theme';
-
-export type ContestDetailTab<K extends string> = {
-  key: K;
-  label: string;
-  count?: number;
-};
-
-type ContestDetailTabBarProps<K extends string> = {
-  tabs: ContestDetailTab<K>[];
-  value: K;
-  onChange: (key: K) => void;
-  onLayout?: (e: LayoutChangeEvent) => void;
-};
-
-// 폴더 모양 탭 (스크롤하면 위에 고정)
-export function ContestDetailTabBar<K extends string>({
-  tabs,
-  value,
-  onChange,
-  onLayout,
-}: ContestDetailTabBarProps<K>) {
-  return (
-    <View style={S.tabBar} onLayout={onLayout}>
-      <View style={S.tabRow} accessibilityRole="tablist">
-        {tabs.map((tab) => {
-          const on = tab.key === value;
-          return (
-            <Press
-              key={tab.key}
-              onPress={() => onChange(tab.key)}
-              scaleOnPress={false}
-              accessibilityRole="tab"
-              accessibilityState={{ selected: on }}
-              style={[S.tab, on ? S.tabOn : S.tabOff]}
-            >
-              <Text variant="caption" color={on ? 'ink' : 'textMuted'} style={on && S.tabTextOn}>
-                {tab.label}
-                {tab.count !== undefined && (
-                  <Text variant="caption" color={on ? 'brand' : 'textMuted'} style={S.count}>
-                    {` ${tab.count}`}
-                  </Text>
-                )}
-              </Text>
-            </Press>
-          );
-        })}
-      </View>
-    </View>
-  );
-}
 
 type ContestDetailPanelProps = {
   title?: string; // 탭이 없을 때 카드 위 제목
@@ -128,37 +78,6 @@ export function ContestDetailSection({
 }
 
 const S = StyleSheet.create({
-  tabBar: {
-    paddingTop: space[5],
-    paddingHorizontal: space[4],
-    backgroundColor: color.surfaceSunken,
-  },
-  tabRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: space[1],
-  },
-  tab: {
-    paddingHorizontal: space[5],
-    paddingVertical: space[3],
-    borderTopLeftRadius: radius.xl,
-    borderTopRightRadius: radius.xl,
-    borderCurve: 'continuous',
-  },
-  tabOn: {
-    backgroundColor: color.surface,
-  },
-  tabOff: {
-    backgroundColor: color.lineSoft,
-    paddingVertical: space[2] + 2,
-  },
-  tabTextOn: {
-    fontWeight: '800',
-  },
-  count: {
-    fontWeight: '800',
-  },
-
   panelWrap: {
     marginHorizontal: space[4],
   },

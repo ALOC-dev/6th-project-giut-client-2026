@@ -76,18 +76,15 @@ export function TeamApplyScreen({
     [step],
   );
 
-  const disableRemovalPrevention = usePreventRemove(
-    !completed && !leaving,
-    ({ repeat }) => {
-      if (submitting) return;
-      if (step > 1) {
-        moveTo((step - 1) as 1 | 2);
-        return;
-      }
-      setLeaving(true);
-      repeat();
-    },
-  );
+  const disableRemovalPrevention = usePreventRemove(!completed && !leaving, ({ repeat }) => {
+    if (submitting) return;
+    if (step > 1) {
+      moveTo((step - 1) as 1 | 2);
+      return;
+    }
+    setLeaving(true);
+    repeat();
+  });
 
   const startSendAnimation = useCallback(() => {
     const root = rootRef.current;

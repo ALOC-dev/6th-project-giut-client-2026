@@ -2,7 +2,7 @@ import { GlassView, isGlassEffectAPIAvailable } from 'expo-glass-effect';
 import { SymbolView, type AndroidSymbol, type SFSymbol } from 'expo-symbols';
 import bold from 'expo-symbols/androidWeights/bold';
 import semiBold from 'expo-symbols/androidWeights/semiBold';
-import { CirclesThreeIcon } from 'phosphor-react-native/src/icons/CirclesThree';
+import { CirclesThreeIcon } from 'phosphor-react-native';
 import { useEffect, useRef, useState } from 'react';
 import {
   Image,

@@ -1,5 +1,6 @@
 export { Press, type PressProps } from './Press';
 export { Text, type TextProps } from './Text';
+export { ExpandableText, type ExpandableTextProps } from './ExpandableText';
 export { Card, type CardProps } from './Card';
 export { Button, type ButtonProps, type ButtonVariant } from './Button';
 export { Chip, type ChipProps } from './Chip';
