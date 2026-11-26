@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { color, easing, text } from '@/theme';
 import { useEnter, useTween } from './motion';
 
@@ -137,36 +137,49 @@ function ConfirmDialogBody({ title, body, okLabel, onCancel, onOk }: ChatConfirm
   const value = useEnter(240);
 
   return (
-    <View style={[StyleSheet.absoluteFill, styles.dialogRoot]}>
-      <Pressable style={StyleSheet.absoluteFill} onPress={onCancel} accessible={false} />
-      <Animated.View
-        accessibilityViewIsModal
-        accessibilityRole="alert"
-        accessibilityLabel={title}
-        style={[
-          styles.dialog,
-          {
-            opacity: value,
-            transform: [
-              { scale: value.interpolate({ inputRange: [0, 1], outputRange: [0.94, 1] }) },
-            ],
-          },
-        ]}
-      >
-        <Text style={[text.titleLg, { color: color.ink }]}>{title}</Text>
-        <Text style={[text.body, { color: color.textSecondary, fontWeight: '400', marginTop: 8 }]}>
-          {body}
-        </Text>
-        <View style={styles.actions}>
-          <Pressable onPress={onCancel} accessibilityRole="button" style={styles.cancelButton}>
-            <Text style={[text.label, { color: color.textBody }]}>취소</Text>
-          </Pressable>
-          <Pressable onPress={onOk} accessibilityRole="button" style={styles.okButton}>
-            <Text style={[text.label, { color: color.surface }]}>{okLabel}</Text>
-          </Pressable>
-        </View>
-      </Animated.View>
-    </View>
+    <Modal
+      transparent
+      visible
+      animationType="none"
+      presentationStyle="overFullScreen"
+      statusBarTranslucent
+      navigationBarTranslucent
+      onRequestClose={onCancel}
+    >
+      <View style={styles.dialogRoot}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={onCancel} accessible={false} />
+        <Animated.View
+          accessibilityViewIsModal
+          onAccessibilityEscape={onCancel}
+          style={[
+            styles.dialog,
+            {
+              opacity: value,
+              transform: [
+                { scale: value.interpolate({ inputRange: [0, 1], outputRange: [0.94, 1] }) },
+              ],
+            },
+          ]}
+        >
+          <Text accessibilityRole="header" style={[text.titleLg, { color: color.ink }]}>
+            {title}
+          </Text>
+          <Text
+            style={[text.body, { color: color.textSecondary, fontWeight: '400', marginTop: 8 }]}
+          >
+            {body}
+          </Text>
+          <View style={styles.actions}>
+            <Pressable onPress={onCancel} accessibilityRole="button" style={styles.cancelButton}>
+              <Text style={[text.label, { color: color.textBody }]}>취소</Text>
+            </Pressable>
+            <Pressable onPress={onOk} accessibilityRole="button" style={styles.okButton}>
+              <Text style={[text.label, { color: color.surface }]}>{okLabel}</Text>
+            </Pressable>
+          </View>
+        </Animated.View>
+      </View>
+    </Modal>
   );
 }
 

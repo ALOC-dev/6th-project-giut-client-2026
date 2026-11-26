@@ -184,6 +184,7 @@ export default function ChatListScreen({
 }
 
 const BADGE_POP = bake([0, 60, 100], [0, 1.25, 1], easing.spring);
+const ROOM_MENU_ACCESSIBILITY_ACTIONS = [{ name: 'openMenu', label: '채팅방 메뉴 열기' }];
 
 function RoomRow({
   room: r,
@@ -297,6 +298,11 @@ function RoomRow({
           onPressOut={() => pressTo(0)}
           accessibilityRole="button"
           accessibilityLabel={r.name + (has ? ', 안 읽은 메시지 ' + r.unread + '개' : '')}
+          accessibilityHint="추가 메뉴에서 알림을 설정하거나 채팅방을 나갈 수 있습니다"
+          accessibilityActions={ROOM_MENU_ACCESSIBILITY_ACTIONS}
+          onAccessibilityAction={(event) => {
+            if (event.nativeEvent.actionName === 'openMenu') onLongPress();
+          }}
           style={{
             flexDirection: 'row',
             alignItems: 'center',

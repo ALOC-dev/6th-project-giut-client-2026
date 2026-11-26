@@ -539,6 +539,8 @@ function MutedMark() {
   );
 }
 
+const MESSAGE_MENU_ACCESSIBILITY_ACTIONS = [{ name: 'openMenu', label: '메시지 메뉴 열기' }];
+
 function MyBubble({
   text: message,
   accent,
@@ -567,6 +569,13 @@ function MyBubble({
       disabled={disabled}
       onPressIn={() => to(1)}
       onPressOut={() => to(0)}
+      accessible
+      accessibilityLabel={message}
+      accessibilityHint="추가 메뉴에서 메시지를 복사하거나 삭제할 수 있습니다"
+      accessibilityActions={MESSAGE_MENU_ACCESSIBILITY_ACTIONS}
+      onAccessibilityAction={(event) => {
+        if (event.nativeEvent.actionName === 'openMenu') onLongPress();
+      }}
       style={{ maxWidth: 250 }}
     >
       <Animated.View
