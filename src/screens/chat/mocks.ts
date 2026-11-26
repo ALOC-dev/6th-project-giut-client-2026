@@ -1,5 +1,10 @@
 export type ChatField = '개발' | '디자인' | '기획' | '마케팅';
 
+const CHAT_FIELDS: readonly ChatField[] = ['개발', '디자인', '기획', '마케팅'];
+
+export const isChatField = (value: unknown): value is ChatField =>
+  typeof value === 'string' && CHAT_FIELDS.includes(value as ChatField);
+
 export type ChatRoom = {
   id: string;
   name: string;

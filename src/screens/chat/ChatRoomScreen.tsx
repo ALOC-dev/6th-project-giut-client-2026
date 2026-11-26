@@ -31,12 +31,11 @@ import { ChatAvatar } from './ChatAvatar';
 import { ChatConfirmDialog, ChatMenuDivider, ChatMenuRow, ChatSwitch } from './ChatMenu';
 import { bake, useEnter, useReducedMotion, useTween } from './motion';
 import { DAY_LABEL, OFFER_CARD, fmtClock, seedMessages } from './mocks';
-import type { ChatMessage } from './mocks';
+import type { ChatField, ChatMessage } from './mocks';
 
 type Props = {
   partner?: string;
-  partnerColor?: string;
-  partnerTint?: string;
+  partnerField?: ChatField;
   scenario?: '문의' | '제안';
   accent?: string;
   initialMessages?: ChatMessage[];
@@ -56,8 +55,7 @@ type SheetKind = null | 'more' | 'leave' | 'msg' | 'del';
 
 export default function ChatRoomScreen({
   partner = '박준호',
-  partnerColor = '#1FB57F',
-  partnerTint = '#E6F7F0',
+  partnerField = '기획',
   scenario = '문의',
   accent = C.brand,
   initialMessages,
@@ -75,7 +73,7 @@ export default function ChatRoomScreen({
   const [msgs, setMsgs] = useState<ChatMessage[]>(
     () => initialMessages ?? seedMessages(scenario, partner),
   );
-  const [nextId, setNextId] = useState(100);
+  const nextId = useRef(Math.max(0, ...msgs.map((message) => message.id)) + 1);
   const [fresh, setFresh] = useState(-1);
   const [swapped, setSwapped] = useState(-1);
   const [draft, setDraft] = useState('');
@@ -91,15 +89,21 @@ export default function ChatRoomScreen({
 
   const push = (items: Partial<ChatMessage>[]) => {
     const d = new Date();
-    const last = msgs.reduce((a, m) => Math.max(a, m.min), 0);
-    const min = Math.max(d.getHours() * 60 + d.getMinutes(), last);
-    let id = nextId;
-    const added = items.map(
-      (it) => ({ id: id++, kind: 'text', min, who: 'me', ...it }) as ChatMessage,
-    );
-    setMsgs((cur) => [...cur, ...added]);
-    setNextId(id);
-    setFresh(added[added.length - 1].id);
+    const currentMinute = d.getHours() * 60 + d.getMinutes();
+    const drafts = items.map((item) => ({
+      id: nextId.current++,
+      kind: 'text' as const,
+      who: 'me' as const,
+      ...item,
+    }));
+
+    setMsgs((current) => {
+      const lastMinute = current.reduce((latest, message) => Math.max(latest, message.min), 0);
+      const min = Math.max(currentMinute, lastMinute);
+      const added = drafts.map((item) => ({ min, ...item }) as ChatMessage);
+      return [...current, ...added];
+    });
+    setFresh(drafts[drafts.length - 1].id);
   };
 
   const send = () => {
@@ -170,7 +174,7 @@ export default function ChatRoomScreen({
         >
           <ChevronIcon size={24} dir="left" />
         </Pressable>
-        <ChatAvatar size={40} color={partnerColor} tint={partnerTint} />
+        <ChatAvatar size={40} field={partnerField} />
         <View
           style={{
             flex: 1,
@@ -264,7 +268,7 @@ export default function ChatRoomScreen({
                 style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-start', marginTop: mt }}
               >
                 {first ? (
-                  <ChatAvatar size={36} color={partnerColor} tint={partnerTint} />
+                  <ChatAvatar size={36} field={partnerField} />
                 ) : (
                   <View style={{ width: 36 }} />
                 )}
@@ -443,8 +447,14 @@ export default function ChatRoomScreen({
           icon={<CopyIcon />}
           label="복사하기"
           onPress={async () => {
+            const message = targetMsg?.text;
+            if (!onCopy || !message) {
+              toast.show('메시지를 복사하지 못했어요');
+              return;
+            }
+
             try {
-              await onCopy?.(targetMsg?.text ?? '');
+              await onCopy(message);
               setSheet(null);
               toast.show('메시지를 복사했어요');
             } catch {

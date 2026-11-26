@@ -3,7 +3,7 @@ import { Animated, Easing, Pressable, ScrollView, Text, Vibration, View } from '
 import Svg, { Circle, Path } from 'react-native-svg';
 import { BellIcon, BellOffIcon, LeaveIcon } from '@/components/icons';
 import { BottomSheet, Toast, useToast } from '@/components/ui';
-import { color, easing, role, text } from '@/theme';
+import { color, easing, text } from '@/theme';
 import { ChatAvatar } from './ChatAvatar';
 import { ChatConfirmDialog, ChatMenuDivider, ChatMenuRow, ChatSwitch } from './ChatMenu';
 import { bake, useEnter, useLoop, useReducedMotion } from './motion';
@@ -13,8 +13,7 @@ import type { ChatRoom } from './mocks';
 export type OpenedRoom = {
   id: string;
   name: string;
-  color: string;
-  tint: string;
+  field: ChatRoom['field'];
   offer: boolean;
 };
 
@@ -30,13 +29,6 @@ type Props = {
 };
 
 type SheetKind = null | 'menu' | 'leave';
-
-const ROOM_ROLE_COLOR = {
-  개발: [role.dev.base, role.dev.tint],
-  디자인: [role.design.base, role.design.tint],
-  기획: [role.plan.base, role.plan.tint],
-  마케팅: [role.mkt.base, role.mkt.tint],
-} as const;
 
 export default function ChatListScreen({
   rooms: initial = SAMPLE_ROOMS,
@@ -125,12 +117,11 @@ export default function ChatListScreen({
             fresh={fresh === r.id ? freshN : 0}
             leaving={leaving === r.id}
             onPress={() => {
-              const [c, tint] = ROOM_ROLE_COLOR[r.field];
               if (r.unread > 0) {
                 setRooms((rs) => rs.map((x) => (x.id === r.id ? { ...x, unread: 0 } : x)));
                 setFresh(null);
               }
-              onOpen?.({ id: r.id, name: r.name, color: c, tint, offer: !!r.offer });
+              onOpen?.({ id: r.id, name: r.name, field: r.field, offer: !!r.offer });
             }}
             onLongPress={() => openMenu(r.id)}
           />
@@ -199,7 +190,6 @@ function RoomRow({
   onPress: () => void;
   onLongPress: () => void;
 }) {
-  const [c, tint] = ROOM_ROLE_COLOR[r.field];
   const has = r.unread > 0;
   const reduce = useReducedMotion();
 
@@ -311,7 +301,7 @@ function RoomRow({
             paddingHorizontal: 22,
           }}
         >
-          <ChatAvatar size={52} color={c} tint={tint} />
+          <ChatAvatar size={52} field={r.field} />
           <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
               <Text

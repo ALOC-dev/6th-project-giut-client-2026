@@ -11,8 +11,7 @@ export default function ChatScreen() {
       params: {
         id: room.id,
         name: room.name,
-        color: room.color,
-        tint: room.tint,
+        field: room.field,
         offer: room.offer ? 'true' : 'false',
       },
     });
