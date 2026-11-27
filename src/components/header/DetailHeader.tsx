@@ -2,8 +2,10 @@ import { router } from 'expo-router';
 import {
   BookmarkSimpleIcon,
   CaretLeftIcon,
+  DotsThreeVerticalIcon,
   ExportIcon,
   PencilSimpleIcon,
+  StarIcon,
 } from 'phosphor-react-native';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -18,9 +20,12 @@ type DetailHeaderProps = {
   onPressBookmark?: () => void; // 없으면 버튼 숨김
   onPressShare?: () => void; // 없으면 버튼 숨김
   onPressEdit?: () => void; // 없으면 버튼 숨김
+  recommended?: boolean;
+  onPressRecommend?: () => void; // 없으면 버튼 숨김
+  onPressMore?: () => void; // 없으면 버튼 숨김
 };
 
-// 상세 화면 공통 헤더 (공모전 상세, 팀 상세, 포트폴리오 상세)
+// 상세 화면 공통 헤더 (공모전 상세, 팀 상세, 포트폴리오 상세, 다른 사람 프로필)
 export function DetailHeader({
   title,
   background = 'surfaceSunken',
@@ -28,6 +33,9 @@ export function DetailHeader({
   onPressBookmark,
   onPressShare,
   onPressEdit,
+  recommended = false,
+  onPressRecommend,
+  onPressMore,
 }: DetailHeaderProps) {
   const insets = useSafeAreaInsets();
 
@@ -84,6 +92,31 @@ export function DetailHeader({
               style={S.iconButton}
             >
               <PencilSimpleIcon size={24} color={color.ink} />
+            </Press>
+          )}
+          {onPressRecommend && (
+            <Press
+              onPress={onPressRecommend}
+              accessibilityRole="button"
+              accessibilityLabel={recommended ? '추천 취소' : '추천'}
+              accessibilityState={{ selected: recommended }}
+              style={S.iconButton}
+            >
+              <StarIcon
+                size={24}
+                color={recommended ? color.brand : color.ink}
+                weight={recommended ? 'fill' : 'regular'}
+              />
+            </Press>
+          )}
+          {onPressMore && (
+            <Press
+              onPress={onPressMore}
+              accessibilityRole="button"
+              accessibilityLabel="더보기"
+              style={S.iconButton}
+            >
+              <DotsThreeVerticalIcon size={24} color={color.ink} weight="bold" />
             </Press>
           )}
         </View>

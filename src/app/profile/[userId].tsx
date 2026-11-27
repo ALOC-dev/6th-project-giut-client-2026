@@ -11,5 +11,12 @@ export default function UserProfileRoute() {
   const person = MOCK_PEOPLE.find((it) => it.id === userId);
   if (!person) return <UserProfileNotFoundScreen />;
 
-  return <UserProfileScreen key={person.id} name={person.name} />;
+  return (
+    <UserProfileScreen
+      key={person.id}
+      name={person.name}
+      // TODO: 공유 / 신고 / 차단 메뉴 추가
+      onPressMore={() => {}}
+    />
+  );
 }
