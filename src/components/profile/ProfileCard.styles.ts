@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-import { color, radius, shadow, space } from '@/theme';
+import { color, radius, space } from '@/theme';
 
 const AVATAR = 72;
 // 팀 상세 팀원 프로필과 같은 비율 (원 52, 아이콘 44)
@@ -65,18 +65,8 @@ export const S = StyleSheet.create({
   roles: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    alignItems: 'center',
-    gap: space[1.5],
-  },
-  role: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space[1.5],
-  },
-  roleDivider: {
-    width: 1,
-    height: 12,
-    backgroundColor: color.line,
+    columnGap: space[2],
+    rowGap: space[0.5],
   },
   tags: {
     flexDirection: 'row',
@@ -88,25 +78,5 @@ export const S = StyleSheet.create({
     paddingHorizontal: space[2.5],
     borderRadius: radius.md,
     backgroundColor: color.surfaceMuted,
-  },
-  actions: {
-    flexDirection: 'row',
-    gap: space[2],
-  },
-  action: {
-    ...shadow.card,
-    height: 48,
-    borderRadius: radius.xl,
-    borderWidth: 1,
-    borderColor: color.lineSoft,
-    backgroundColor: color.surface,
-  },
-  edit: {
-    flex: 1,
-  },
-  share: {
-    width: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });

@@ -1,11 +1,12 @@
-import { ExportIcon, PencilSimpleIcon, StarIcon } from 'phosphor-react-native';
+import { StarIcon } from 'phosphor-react-native';
+import type { ReactNode } from 'react';
 import { Image, View } from 'react-native';
 
 import { PersonSilhouetteIcon } from '@/components/icons';
-import { Button, Card, ExpandableText, Press, Text } from '@/components/ui';
+import { Card, ExpandableText, Text } from '@/components/ui';
+import { getPrimaryRoleKey, getRoleKey, type Profile } from '@/screens/mypage';
 import { color, role, space } from '@/theme';
 
-import { getPrimaryRoleKey, getRoleKey, type Profile, type ProfileSummary } from './myProfile';
 import { S } from './ProfileCard.styles';
 
 const BIO_MAX_LINES = 3;
@@ -13,12 +14,23 @@ const LOOKING_FOR_TEAM = '팀 찾는 중';
 
 type ProfileCardProps = {
   profile: Profile;
-  summary: ProfileSummary;
-  onPressEdit: () => void;
-  onPressShare: () => void;
+  recommendationCount: number;
+  collaborationCount?: number; // 없으면 숨김
+  actions: ReactNode; // 카드 맨 아래 버튼
 };
 
-export function ProfileCard({ profile, summary, onPressEdit, onPressShare }: ProfileCardProps) {
+// 프로필 카드 (마이페이지, 다른 사람 프로필)
+export function ProfileCard({
+  profile,
+  recommendationCount,
+  collaborationCount,
+  actions,
+}: ProfileCardProps) {
+  const stats = [
+    `추천 ${recommendationCount}`,
+    collaborationCount !== undefined && `협업 ${collaborationCount}`,
+  ].filter(Boolean);
+
   const lookingForTeam = profile.activityStatusName === LOOKING_FOR_TEAM;
   const skills = profile.tags.filter(({ type }) => type === 'SKILL');
 
@@ -49,40 +61,42 @@ export function ProfileCard({ profile, summary, onPressEdit, onPressShare }: Pro
             {profile.departmentName} · {profile.grade}학년
           </Text>
 
-          <View
-            style={S.statRow}
-            accessible
-            accessibilityLabel={`추천 ${summary.receivedRecommendationCount}, 협업 ${summary.collaborationCount}`}
-          >
+          <View style={S.statRow} accessible accessibilityLabel={stats.join(', ')}>
             <StarIcon size={13} color={color.brand} weight="fill" />
             <Text variant="caption" color="textSecondary">
               추천{' '}
               <Text variant="caption" style={S.statNumber}>
-                {summary.receivedRecommendationCount}
+                {recommendationCount}
               </Text>
-              <Text variant="caption" color="textDisabled">
-                {'  ·  '}
-              </Text>
-              협업{' '}
-              <Text variant="caption" style={S.statNumber}>
-                {summary.collaborationCount}
-              </Text>
+              {collaborationCount !== undefined && (
+                <>
+                  <Text variant="caption" color="textDisabled">
+                    {'  ·  '}
+                  </Text>
+                  협업{' '}
+                  <Text variant="caption" style={S.statNumber}>
+                    {collaborationCount}
+                  </Text>
+                </>
+              )}
             </Text>
           </View>
         </View>
       </View>
 
       {profile.roles.length > 0 && (
-        <View style={S.roles}>
-          {profile.roles.map(({ code, name }, index) => {
+        <View
+          style={S.roles}
+          accessible
+          accessibilityLabel={`역할: ${profile.roles.map(({ name }) => name).join(', ')}`}
+        >
+          {/* 기웃허브 카드의 태그처럼 #으로 */}
+          {profile.roles.map(({ code, name }) => {
             const key = getRoleKey(code);
             return (
-              <View key={code} style={S.role}>
-                {index > 0 && <View style={S.roleDivider} />}
-                <Text variant="caption" color={key ? role[key].text : 'textBody'}>
-                  {name}
-                </Text>
-              </View>
+              <Text key={code} variant="caption" color={key ? role[key].text : 'textBody'}>
+                #{name}
+              </Text>
             );
           })}
         </View>
@@ -106,23 +120,7 @@ export function ProfileCard({ profile, summary, onPressEdit, onPressShare }: Pro
         </View>
       )}
 
-      <View style={S.actions}>
-        <Button
-          variant="secondary"
-          label="프로필 편집"
-          left={<PencilSimpleIcon size={16} color={color.ink} weight="bold" />}
-          onPress={onPressEdit}
-          style={[S.action, S.edit]}
-        />
-        <Press
-          onPress={onPressShare}
-          accessibilityRole="button"
-          accessibilityLabel="프로필 공유"
-          style={[S.action, S.share]}
-        >
-          <ExportIcon size={20} color={color.ink} />
-        </Press>
-      </View>
+      {actions}
     </Card>
   );
 }

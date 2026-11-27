@@ -51,7 +51,7 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-// '개발 · 프론트엔드'
+// '개발 · 프론트엔드 개발자'
 function RoleBadge({ itemRole }: { itemRole: CodeName }) {
   const key = getRoleKey(itemRole.code);
 
