@@ -1,7 +1,11 @@
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 
-import { HubScreen, MOCK_PEOPLE } from '@/screens/giuthub';
+import { HubScreen, MOCK_PEOPLE, type Person } from '@/screens/giuthub';
+
+function openProfile(person: Person) {
+  router.push({ pathname: '/profile/[userId]', params: { userId: person.id } });
+}
 
 export default function GiutHubScreen() {
   const [initialLoading, setInitialLoading] = useState(true);
@@ -35,6 +39,7 @@ export default function GiutHubScreen() {
       people={initialLoading ? [] : MOCK_PEOPLE}
       loading={initialLoading || refreshing}
       onRefresh={initialLoading ? undefined : handleRefresh}
+      onPressPerson={openProfile}
       onRegisterProfile={() => router.push('/my')}
     />
   );
