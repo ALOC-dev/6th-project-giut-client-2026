@@ -4,7 +4,7 @@ import { Animated, Easing, FlatList, Platform, Pressable, Text, View } from 'rea
 import Svg, { Circle, Path } from 'react-native-svg';
 import { BellIcon, BellOffIcon, LeaveIcon } from '@/components/icons';
 import { BottomSheet, Toast, useToast } from '@/components/ui';
-import { color, easing, layout, radius, space, text } from '@/theme';
+import { color, duration, easing, layout, radius, space, text } from '@/theme';
 import { ChatAvatar } from './ChatAvatar';
 import { ChatConfirmDialog, ChatMenuDivider, ChatMenuRow, ChatSwitch } from './ChatMenu';
 import { bake, useEnter, useLoop, useReducedMotion } from './motion';
@@ -32,6 +32,13 @@ type Props = {
 type SheetKind = null | 'menu';
 type ConfirmKind = null | 'leave';
 
+const LIVE_MESSAGE_DELAY_MS = 3000;
+const LEAVE_COLLAPSE_DELAY_MS = 320;
+const MESSAGE_FLASH_DURATION_MS = 1200;
+const EMPTY_BOB_DURATION_MS = 3400;
+const EMPTY_DOT_DURATION_MS = 1200;
+const EMPTY_CONTENT_TOP_OFFSET = 110;
+
 export default function ChatListScreen({
   rooms: initial = SAMPLE_ROOMS,
   empty = false,
@@ -40,7 +47,7 @@ export default function ChatListScreen({
   onBrowse,
   onMuteChange,
   onLeave,
-  topInset = 50,
+  topInset = 0,
 }: Props) {
   const [rooms, setRooms] = useState<ChatRoom[]>(() => initial.map((r) => ({ ...r })));
   const [fresh, setFresh] = useState<string | null>(null);
@@ -69,7 +76,7 @@ export default function ChatListScreen({
       );
       setFresh(LIVE_MESSAGE.id);
       setFreshN((n) => n + 1);
-    }, 3000);
+    }, LIVE_MESSAGE_DELAY_MS);
     return () => clearTimeout(t);
   }, [liveDemo, empty]);
 
@@ -111,7 +118,7 @@ export default function ChatListScreen({
       setLeaving(null);
       setRooms((rs) => rs.filter((x) => x.id !== id));
       onLeave?.(id);
-    }, 320);
+    }, LEAVE_COLLAPSE_DELAY_MS);
   };
 
   return (
@@ -220,14 +227,14 @@ function RoomRow({
   const pressTo = (v: number) =>
     Animated.timing(press, {
       toValue: v,
-      duration: 180,
+      duration: duration.d1,
       easing: easing.out,
       useNativeDriver: true,
     }).start();
 
-  const rowIn = useEnter(400, easing.out, 0, fresh);
+  const rowIn = useEnter(duration.d5, easing.out, 0, fresh);
   const [flash] = useState(() => new Animated.Value(0));
-  const badge = useEnter(400, Easing.linear, 0, fresh);
+  const badge = useEnter(duration.d5, Easing.linear, 0, fresh);
   useEffect(() => {
     if (!fresh || reduce) return;
     flash.setValue(1);
@@ -238,8 +245,8 @@ function RoomRow({
     });
     const fade = Animated.timing(flash, {
       toValue: 0,
-      duration: 1200,
-      delay: 300,
+      duration: MESSAGE_FLASH_DURATION_MS,
+      delay: duration.d3,
       easing: easing.inOut,
       useNativeDriver: true,
     });
@@ -249,7 +256,7 @@ function RoomRow({
       fade.stop();
     };
   }, [flash, fresh, reduce]);
-  const preview = useEnter(350, easing.out, 0, fresh);
+  const preview = useEnter(duration.d4, easing.out, 0, fresh);
 
   const [h, setH] = useState(0);
   const [leave] = useState(() => new Animated.Value(0));
@@ -259,13 +266,13 @@ function RoomRow({
     Animated.parallel([
       Animated.timing(leave, {
         toValue: 1,
-        duration: 300,
+        duration: duration.d3,
         easing: easing.inOut,
         useNativeDriver: false,
       }),
       Animated.timing(fade, {
         toValue: 0,
-        duration: 250,
+        duration: duration.d2,
         easing: easing.inOut,
         useNativeDriver: false,
       }),
@@ -323,12 +330,12 @@ function RoomRow({
             alignItems: 'center',
             gap: space[3],
             paddingVertical: space[3],
-            paddingHorizontal: 22,
+            paddingHorizontal: space[5],
           }}
         >
           <ChatAvatar size={52} field={r.field} />
           <View style={{ flex: 1, minWidth: 0, gap: space[1] }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[1] }}>
               <Text
                 numberOfLines={1}
                 style={[text.button, { color: color.ink, letterSpacing: -0.3, flexShrink: 1 }]}
@@ -363,8 +370,8 @@ function RoomRow({
               alignSelf: 'stretch',
               alignItems: 'flex-end',
               justifyContent: 'space-between',
-              paddingTop: 3,
-              paddingBottom: 4,
+              paddingTop: space[1],
+              paddingBottom: space[1],
             }}
           >
             <Text style={[text.meta, { color: color.textFaint, fontWeight: '500' }]}>
@@ -373,10 +380,10 @@ function RoomRow({
             {has && (
               <Animated.View
                 style={{
-                  minWidth: 22,
-                  height: 22,
-                  paddingHorizontal: 7,
-                  borderRadius: 11,
+                  minWidth: space[5],
+                  height: space[5],
+                  paddingHorizontal: space[1.5],
+                  borderRadius: radius.lg,
                   backgroundColor: color.alert,
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -401,13 +408,19 @@ const BOB_R = bake([0, 50, 100], [-3, 2, -3], easing.inOut);
 const BLINK = bake([0, 50, 100], [0.35, 1, 0.35], easing.inOut);
 
 function Empty({ onBrowse }: { onBrowse?: () => void }) {
-  const bob = useLoop(3400);
-  const d0 = useLoop(1200, 0);
-  const d1 = useLoop(1200, 200);
-  const d2 = useLoop(1200, 400);
+  const bob = useLoop(EMPTY_BOB_DURATION_MS);
+  const d0 = useLoop(EMPTY_DOT_DURATION_MS, 0);
+  const d1 = useLoop(EMPTY_DOT_DURATION_MS, duration.d1);
+  const d2 = useLoop(EMPTY_DOT_DURATION_MS, duration.d5);
   const blink = (v: Animated.Value) => v.interpolate(BLINK);
   return (
-    <View style={{ alignItems: 'center', paddingTop: 110, paddingHorizontal: space[8] }}>
+    <View
+      style={{
+        alignItems: 'center',
+        paddingTop: EMPTY_CONTENT_TOP_OFFSET,
+        paddingHorizontal: space[8],
+      }}
+    >
       <Animated.View
         style={{
           width: 104,
@@ -437,7 +450,7 @@ function Empty({ onBrowse }: { onBrowse?: () => void }) {
           <AnimatedCircle cx={80} cy={54} r={3} fill={color.surface} opacity={blink(d2)} />
         </Svg>
       </Animated.View>
-      <Text style={[text.titleLg, { color: color.ink, fontSize: 19, marginTop: 22 }]}>
+      <Text style={[text.titleLg, { color: color.ink, marginTop: space[5] }]}>
         아직 대화가 없어요
       </Text>
       <Text
@@ -453,9 +466,9 @@ function Empty({ onBrowse }: { onBrowse?: () => void }) {
         onPress={onBrowse}
         accessibilityRole="button"
         style={{
-          marginTop: 22,
+          marginTop: space[5],
           height: layout.minimumTouchTargetSize,
-          paddingHorizontal: 18,
+          paddingHorizontal: space[4.5],
           borderRadius: radius.control,
           backgroundColor: color.brandTint,
           alignItems: 'center',

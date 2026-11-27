@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Animated, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
-import { color, easing, layout, radius, shadowCompat, space, text } from '@/theme';
+import { color, duration, easing, layout, radius, shadowCompat, space, text } from '@/theme';
 import { useEnter, useTween } from './motion';
 
 type ChatMenuRowProps = {
@@ -69,8 +69,8 @@ export const ChatMenuDivider = () => (
 );
 
 export function ChatSwitch({ on, accent = color.brand }: { on: boolean; accent?: string }) {
-  const knob = useTween(on ? 1 : 0, 250, easing.spring);
-  const track = useTween(on ? 1 : 0, 200, easing.inOut, false);
+  const knob = useTween(on ? 1 : 0, duration.d2, easing.spring);
+  const track = useTween(on ? 1 : 0, duration.d1, easing.inOut, false);
 
   return (
     <Animated.View
@@ -135,7 +135,7 @@ export function ChatConfirmDialog({
 }
 
 function ConfirmDialogBody({ title, body, okLabel, onCancel, onOk }: ChatConfirmDialogProps) {
-  const value = useEnter(240);
+  const value = useEnter(duration.d2);
 
   return (
     <Modal

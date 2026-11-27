@@ -26,7 +26,17 @@ import {
   TrashIcon,
 } from '@/components/icons';
 import { BottomSheet, Toast, useToast } from '@/components/ui';
-import { color as C, easing, layout, radius, role, shadowCompat, space, text } from '@/theme';
+import {
+  color as C,
+  duration,
+  easing,
+  layout,
+  radius,
+  role,
+  shadowCompat,
+  space,
+  text,
+} from '@/theme';
 import { ChatAvatar } from './ChatAvatar';
 import { ChatConfirmDialog, ChatMenuDivider, ChatMenuRow, ChatSwitch } from './ChatMenu';
 import { bake, useEnter, useReducedMotion, useTween } from './motion';
@@ -55,6 +65,9 @@ type SheetKind = null | 'more' | 'msg';
 type ConfirmKind = null | 'leave' | 'del';
 type MessageRow = { m: ChatMessage; first: boolean; last: boolean };
 
+const READ_RECEIPT_DELAY_MS = 1800;
+const OFFER_CARD_WIDTH = 252;
+
 export default function ChatRoomScreen({
   partner = '박준호',
   partnerField = '기획',
@@ -69,8 +82,8 @@ export default function ChatRoomScreen({
   onMuteChange,
   onAccept,
   onDecline,
-  topInset = 50,
-  bottomInset = 28,
+  topInset = 0,
+  bottomInset = 0,
 }: Props) {
   const [msgs, setMsgs] = useState<ChatMessage[]>(
     () => initialMessages ?? seedMessages(scenario, partner),
@@ -132,7 +145,7 @@ export default function ChatRoomScreen({
     clearTimeout(readT.current);
     readT.current = setTimeout(
       () => setMsgs((cur) => cur.map((m) => (m.who === 'me' ? { ...m, unread: 0 } : m))),
-      1800,
+      READ_RECEIPT_DELAY_MS,
     );
   };
 
@@ -297,7 +310,7 @@ export default function ChatRoomScreen({
               style={{
                 backgroundColor: C.line,
                 borderRadius: radius.full,
-                paddingVertical: 5,
+                paddingVertical: space[1],
                 paddingHorizontal: space[3],
               }}
             >
@@ -375,13 +388,13 @@ export default function ChatRoomScreen({
           icon={<CopyIcon />}
           label="복사하기"
           onPress={async () => {
-            const message = targetMsg?.text;
-            if (!onCopy || !message) {
+            if (!onCopy || !targetMsg?.text || targetMsg.deleted) {
               setSheet(null);
               toast.show('메시지를 복사하지 못했어요');
               return;
             }
 
+            const message = targetMsg.text;
             setSheet(null);
             try {
               await onCopy(message);
@@ -462,7 +475,10 @@ const ChatMessageRow = React.memo(function ChatMessageRow({
 }: ChatMessageRowProps) {
   if (message.who === 'sys') {
     return (
-      <MsgIn on={isFresh} style={{ alignItems: 'center', paddingTop: 10, paddingBottom: 2 }}>
+      <MsgIn
+        on={isFresh}
+        style={{ alignItems: 'center', paddingTop: space[2.5], paddingBottom: space[0.5] }}
+      >
         <View
           style={{
             backgroundColor: C.lineSoft,
@@ -494,9 +510,11 @@ const ChatMessageRow = React.memo(function ChatMessageRow({
         }}
       >
         {first ? <ChatAvatar size={36} field={partnerField} /> : <View style={{ width: 36 }} />}
-        <View style={{ flex: 1, minWidth: 0, gap: 5 }}>
+        <View style={{ flex: 1, minWidth: 0, gap: space[1] }}>
           {first && (
-            <Text style={[text.caption, { color: C.ink, fontWeight: '700', paddingLeft: 2 }]}>
+            <Text
+              style={[text.caption, { color: C.ink, fontWeight: '700', paddingLeft: space[0.5] }]}
+            >
               {partner}
             </Text>
           )}
@@ -529,7 +547,10 @@ const ChatMessageRow = React.memo(function ChatMessageRow({
             )}
             {last && (
               <Text
-                style={[text.badge, { color: C.textMuted, fontWeight: '400', paddingBottom: 2 }]}
+                style={[
+                  text.badge,
+                  { color: C.textMuted, fontWeight: '400', paddingBottom: space[0.5] },
+                ]}
               >
                 {fmtClock(message.min)}
               </Text>
@@ -551,7 +572,7 @@ const ChatMessageRow = React.memo(function ChatMessageRow({
         marginTop,
       }}
     >
-      <View style={{ alignItems: 'flex-end', gap: 1, paddingBottom: 2 }}>
+      <View style={{ alignItems: 'flex-end', gap: space[0.5], paddingBottom: space[0.5] }}>
         {!!message.unread && <Text style={[text.badge, { color: accent }]}>1</Text>}
         {last && (
           <Text style={[text.badge, { color: C.textMuted, fontWeight: '400' }]}>
@@ -591,7 +612,7 @@ const bubbleR = (mine: boolean, first: boolean) =>
     : { borderRadius: 18 };
 
 function MsgIn({ on, style, children }: { on: boolean; style: object; children: React.ReactNode }) {
-  const v = useEnter(300, easing.out, 0, on);
+  const v = useEnter(duration.d3, easing.out, 0, on);
   return (
     <Animated.View
       style={[
@@ -613,7 +634,7 @@ function MsgIn({ on, style, children }: { on: boolean; style: object; children: 
 }
 
 function MutedMark() {
-  const v = useEnter(240);
+  const v = useEnter(duration.d2);
   return (
     <Animated.View
       accessibilityLabel="알림 꺼짐"
@@ -644,7 +665,7 @@ function MyBubble({
   const to = (v: number) =>
     Animated.timing(p, {
       toValue: v,
-      duration: 180,
+      duration: duration.d1,
       easing: easing.out,
       useNativeDriver: true,
     }).start();
@@ -694,7 +715,7 @@ function MyBubble({
 }
 
 function DeletedBubble({ first, swap }: { first: boolean; swap: boolean }) {
-  const v = useEnter(300, easing.out, 0, swap);
+  const v = useEnter(duration.d3, easing.out, 0, swap);
   return (
     <Animated.View
       style={[
@@ -706,8 +727,8 @@ function DeletedBubble({ first, swap }: { first: boolean; swap: boolean }) {
           backgroundColor: C.surface,
           borderWidth: 1,
           borderColor: C.line,
-          paddingVertical: 9,
-          paddingHorizontal: 13,
+          paddingVertical: space[2],
+          paddingHorizontal: space[3],
         },
         swap
           ? {
@@ -741,7 +762,7 @@ function OfferCard({
       style={[
         bubbleR(false, first),
         {
-          width: 252,
+          width: OFFER_CARD_WIDTH,
           backgroundColor: C.surface,
           overflow: 'hidden',
           ...shadowCompat.card,
@@ -757,7 +778,7 @@ function OfferCard({
         }}
       >
         <Text style={[text.meta, { color: C.surface }]}>팀 합류 제안</Text>
-        <Text style={[text.titleLg, { color: C.surface, fontSize: 18 }]}>{OFFER_CARD.team}</Text>
+        <Text style={[text.titleLg, { color: C.surface }]}>{OFFER_CARD.team}</Text>
       </View>
       <View
         style={{
@@ -771,8 +792,15 @@ function OfferCard({
           <Text style={[text.caption, { color: C.ink, flex: 1 }]}>{OFFER_CARD.contest}</Text>
         </OfferDetailRow>
         <OfferDetailRow label="포지션">
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-            <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: C.brand }} />
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: space[1] }}>
+            <View
+              style={{
+                width: space[1.5],
+                height: space[1.5],
+                borderRadius: radius.full,
+                backgroundColor: C.brand,
+              }}
+            />
             <Text style={[text.caption, { color: C.ink, fontWeight: '700' }]}>
               {OFFER_CARD.position}
             </Text>
@@ -849,7 +877,7 @@ function OfferDetailRow({ label, children }: { label: string; children: React.Re
 const POP_OP = (e: (t: number) => number) => bake([0, 60, 100], [0, 1, 1], e);
 function OfferResult({ accepted }: { accepted: boolean }) {
   const e = accepted ? easing.spring : easing.inOut;
-  const v = useEnter(350, Easing.linear);
+  const v = useEnter(duration.d4, Easing.linear);
   return (
     <Animated.View
       style={{
@@ -890,8 +918,8 @@ function Composer({
   bottomInset: number;
 }) {
   const reduce = useReducedMotion();
-  const on = useTween(empty ? 0 : 1, reduce ? 0 : 200, easing.inOut, false);
-  const sc = useTween(empty ? 0 : 1, reduce ? 0 : 200, easing.inOut);
+  const on = useTween(empty ? 0 : 1, reduce ? 0 : duration.d1, easing.inOut, false);
+  const sc = useTween(empty ? 0 : 1, reduce ? 0 : duration.d1, easing.inOut);
   return (
     <View
       style={{
