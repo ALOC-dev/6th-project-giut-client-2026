@@ -1,5 +1,6 @@
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
+import { CaretRightIcon } from 'phosphor-react-native';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, View, useWindowDimensions, type ScrollViewInstance } from 'react-native';
 
@@ -7,7 +8,7 @@ import { GiutMark } from '@/components/brand/GiutMark';
 import { Press, Text } from '@/components/ui';
 import { CATEGORY_LABEL } from '@/screens/contests/contest';
 import type { ContestDetail } from '@/screens/contests/contestDetail';
-import { role, space, type RoleName } from '@/theme';
+import { color, role, space, type RoleName } from '@/theme';
 import { formatDday, formatShortDate, getDday } from '@/utils/date';
 
 import { S } from './DeadlineSection.styles';
@@ -77,7 +78,18 @@ export function DeadlineSection({ contests: allContests }: DeadlineSectionProps)
     contest.posterUrl ? null : FALLBACK_ROLES[fallbackCount++ % FALLBACK_ROLES.length],
   );
 
-  if (contests.length === 0) return null;
+  if (contests.length === 0) {
+    return (
+      <View style={S.section}>
+        <View style={S.header}>
+          <Text variant="titleLg">이번 주 마감</Text>
+        </View>
+        <View style={S.list}>
+          <EmptyCard />
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={S.section}>
@@ -191,5 +203,31 @@ export function DeadlineSection({ contests: allContests }: DeadlineSectionProps)
         })}
       </ScrollView>
     </View>
+  );
+}
+
+// 이번 주에 마감되는 공모전이 없을 때. 누르면 공모전 목록으로
+function EmptyCard() {
+  return (
+    <Press
+      onPress={() => router.navigate('/contest')}
+      accessibilityRole="button"
+      accessibilityLabel="이번 주에 마감되는 공고가 없어요. 다른 공모전 둘러보기"
+      style={[S.card, S.emptyCard]}
+    >
+      <GiutMark width={200} color={role.dev.base} style={S.fallbackSymbol} />
+
+      <View style={S.emptyContent}>
+        <Text variant="titleXl">{'이번 주에 마감되는\n공고가 없어요'}</Text>
+        <Text color="textMuted">다른 공모전을 둘러볼까요?</Text>
+
+        <View style={S.emptyButton}>
+          <Text variant="button" color="brandStrong">
+            공모전 둘러보기
+          </Text>
+          <CaretRightIcon size={14} color={color.brandStrong} weight="bold" />
+        </View>
+      </View>
+    </Press>
   );
 }

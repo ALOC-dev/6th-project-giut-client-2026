@@ -87,6 +87,22 @@ export const S = StyleSheet.create({
   bottom: {
     gap: space[1],
   },
+  emptyCard: {
+    backgroundColor: color.brandTint,
+  },
+  emptyContent: {
+    flex: 1,
+    padding: space[5],
+    justifyContent: 'center',
+    gap: space[1],
+  },
+  emptyButton: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space[0.5],
+    marginTop: space[4],
+  },
   ddayText: {
     fontSize: 38,
     lineHeight: 42,
