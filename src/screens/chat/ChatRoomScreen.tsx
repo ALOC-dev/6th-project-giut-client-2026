@@ -4,14 +4,13 @@ import { KeyboardStickyView } from 'react-native-keyboard-controller';
 import {
   Animated,
   Easing,
+  FlatList,
   Keyboard,
   Platform,
   Pressable,
-  ScrollView,
   Text,
   TextInput,
   View,
-  type ScrollViewInstance,
 } from 'react-native';
 import {
   BellIcon,
@@ -26,7 +25,7 @@ import {
   TrashIcon,
 } from '@/components/icons';
 import { BottomSheet, Toast, useToast } from '@/components/ui';
-import { color as C, easing, role, text } from '@/theme';
+import { color as C, easing, radius, role, shadowCompat, space, text } from '@/theme';
 import { ChatAvatar } from './ChatAvatar';
 import { ChatConfirmDialog, ChatMenuDivider, ChatMenuRow, ChatSwitch } from './ChatMenu';
 import { bake, useEnter, useReducedMotion, useTween } from './motion';
@@ -53,6 +52,7 @@ type Props = {
 
 type SheetKind = null | 'more' | 'msg';
 type ConfirmKind = null | 'leave' | 'del';
+type MessageRow = { m: ChatMessage; first: boolean; last: boolean };
 
 export default function ChatRoomScreen({
   partner = '박준호',
@@ -90,7 +90,8 @@ export default function ChatRoomScreen({
     setConfirm(pendingConfirm.current);
     pendingConfirm.current = null;
   }, [setConfirm]);
-  const scroll = useRef<ScrollViewInstance>(null);
+  const scroll = useRef<FlatList<MessageRow>>(null);
+  const shouldScrollToEnd = useRef(true);
   const readT = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => () => clearTimeout(readT.current), []);
 
@@ -104,6 +105,7 @@ export default function ChatRoomScreen({
       ...item,
     }));
 
+    shouldScrollToEnd.current = true;
     setMsgs((current) => {
       const lastMinute = current.reduce((latest, message) => Math.max(latest, message.min), 0);
       const min = Math.max(currentMinute, lastMinute);
@@ -160,9 +162,9 @@ export default function ChatRoomScreen({
           height: 52,
           flexDirection: 'row',
           alignItems: 'center',
-          gap: 6,
-          paddingRight: 8,
-          paddingLeft: 6,
+          gap: space[1.5],
+          paddingRight: space[2],
+          paddingLeft: space[1.5],
           borderBottomWidth: 1,
           borderBottomColor: C.lineSoft,
         }}
@@ -188,8 +190,8 @@ export default function ChatRoomScreen({
             minWidth: 0,
             flexDirection: 'row',
             alignItems: 'center',
-            gap: 6,
-            paddingLeft: 4,
+            gap: space[1.5],
+            paddingLeft: space[1],
           }}
         >
           <Text numberOfLines={1} style={[text.titleMd, { color: C.ink, fontWeight: '700' }]}>
@@ -213,30 +215,40 @@ export default function ChatRoomScreen({
         </Pressable>
       </View>
 
-      <ScrollView
+      <FlatList
         ref={scroll}
+        data={rows}
+        keyExtractor={(row) => String(row.m.id)}
         style={{ flex: 1, backgroundColor: C.surfaceMuted }}
-        contentContainerStyle={{ paddingTop: 8, paddingHorizontal: 16, paddingBottom: 16 }}
-        onContentSizeChange={() => scroll.current?.scrollToEnd({ animated: false })}
+        contentContainerStyle={{
+          paddingTop: space[2],
+          paddingHorizontal: space[4],
+          paddingBottom: space[4],
+        }}
+        onContentSizeChange={() => {
+          if (!shouldScrollToEnd.current) return;
+          scroll.current?.scrollToEnd({ animated: false });
+          shouldScrollToEnd.current = false;
+        }}
         keyboardDismissMode="interactive"
         showsVerticalScrollIndicator={false}
-      >
-        <View style={{ alignItems: 'center', paddingTop: 16, paddingBottom: 6 }}>
-          <View
-            style={{
-              backgroundColor: C.line,
-              borderRadius: 999,
-              paddingVertical: 5,
-              paddingHorizontal: 12,
-            }}
-          >
-            <Text style={[text.meta, { color: C.textSecondary, fontWeight: '600' }]}>
-              {DAY_LABEL}
-            </Text>
+        ListHeaderComponent={
+          <View style={{ alignItems: 'center', paddingTop: space[4], paddingBottom: space[1.5] }}>
+            <View
+              style={{
+                backgroundColor: C.line,
+                borderRadius: radius.full,
+                paddingVertical: 5,
+                paddingHorizontal: space[3],
+              }}
+            >
+              <Text style={[text.meta, { color: C.textSecondary, fontWeight: '600' }]}>
+                {DAY_LABEL}
+              </Text>
+            </View>
           </View>
-        </View>
-
-        {rows.map(({ m, first, last }) => {
+        }
+        renderItem={({ item: { m, first, last } }) => {
           const isFresh = m.id === fresh;
           if (m.who === 'sys') {
             return (
@@ -272,7 +284,12 @@ export default function ChatRoomScreen({
               <MsgIn
                 key={'m' + m.id}
                 on={isFresh}
-                style={{ flexDirection: 'row', gap: 8, alignItems: 'flex-start', marginTop: mt }}
+                style={{
+                  flexDirection: 'row',
+                  gap: space[2],
+                  alignItems: 'flex-start',
+                  marginTop: mt,
+                }}
               >
                 {first ? (
                   <ChatAvatar size={36} field={partnerField} />
@@ -321,13 +338,9 @@ export default function ChatRoomScreen({
                           {
                             maxWidth: 236,
                             backgroundColor: C.surface,
-                            paddingVertical: 10,
-                            paddingHorizontal: 14,
-                            shadowColor: C.ink,
-                            shadowOpacity: 0.04,
-                            shadowRadius: 1,
-                            shadowOffset: { width: 0, height: 1 },
-                            elevation: 1,
+                            paddingVertical: space[2.5],
+                            paddingHorizontal: space[3.5],
+                            ...shadowCompat.card,
                           },
                         ]}
                       >
@@ -359,7 +372,7 @@ export default function ChatRoomScreen({
                 flexDirection: 'row',
                 justifyContent: 'flex-end',
                 alignItems: 'flex-end',
-                gap: 6,
+                gap: space[1.5],
                 marginTop: mt,
               }}
             >
@@ -384,8 +397,8 @@ export default function ChatRoomScreen({
               )}
             </MsgIn>
           );
-        })}
-      </ScrollView>
+        }}
+      />
 
       <KeyboardStickyView
         offset={{ opened: Math.max(bottomInset - 6, 0) }}
@@ -396,7 +409,11 @@ export default function ChatRoomScreen({
             style={[
               text.body,
               { color: C.textMuted, fontWeight: '600', textAlign: 'center' },
-              { paddingTop: 14, paddingHorizontal: 16, paddingBottom: 32 },
+              {
+                paddingTop: space[3.5],
+                paddingHorizontal: space[4],
+                paddingBottom: space[8],
+              },
             ]}
           >
             나간 채팅방이에요. 메시지를 보낼 수 없어요.
@@ -613,8 +630,8 @@ function MyBubble({
           bubbleR(true, first),
           {
             backgroundColor: accent,
-            paddingVertical: 10,
-            paddingHorizontal: 14,
+            paddingVertical: space[2.5],
+            paddingHorizontal: space[3.5],
             overflow: 'hidden',
             transform: [{ scale: p.interpolate({ inputRange: [0, 1], outputRange: [1, 0.96] }) }],
           },
@@ -647,7 +664,7 @@ function DeletedBubble({ first, swap }: { first: boolean; swap: boolean }) {
         {
           flexDirection: 'row',
           alignItems: 'center',
-          gap: 6,
+          gap: space[1.5],
           backgroundColor: C.surface,
           borderWidth: 1,
           borderColor: C.line,
@@ -689,19 +706,29 @@ function OfferCard({
           width: 252,
           backgroundColor: C.surface,
           overflow: 'hidden',
-          shadowColor: C.ink,
-          shadowOpacity: 0.04,
-          shadowRadius: 1,
-          shadowOffset: { width: 0, height: 1 },
-          elevation: 1,
+          ...shadowCompat.card,
         },
       ]}
     >
-      <View style={{ backgroundColor: accent, paddingVertical: 14, paddingHorizontal: 16, gap: 4 }}>
+      <View
+        style={{
+          backgroundColor: accent,
+          paddingVertical: space[3.5],
+          paddingHorizontal: space[4],
+          gap: space[1],
+        }}
+      >
         <Text style={[text.meta, { color: C.surface }]}>팀 합류 제안</Text>
         <Text style={[text.titleLg, { color: C.surface, fontSize: 18 }]}>{OFFER_CARD.team}</Text>
       </View>
-      <View style={{ paddingTop: 14, paddingHorizontal: 16, paddingBottom: 4, gap: 10 }}>
+      <View
+        style={{
+          paddingTop: space[3.5],
+          paddingHorizontal: space[4],
+          paddingBottom: space[1],
+          gap: space[2.5],
+        }}
+      >
         <OfferDetailRow label="공모전">
           <Text style={[text.caption, { color: C.ink, flex: 1 }]}>{OFFER_CARD.contest}</Text>
         </OfferDetailRow>
@@ -720,9 +747,9 @@ function OfferCard({
           <Text style={[text.caption, { color: C.ink }]}>{OFFER_CARD.activity}</Text>
         </OfferDetailRow>
       </View>
-      <View style={{ padding: 12 }}>
+      <View style={{ padding: space[3] }}>
         {state === 'pending' && (
-          <View style={{ flexDirection: 'row', gap: 8 }}>
+          <View style={{ flexDirection: 'row', gap: space[2] }}>
             <Pressable
               onPress={onDecline}
               accessibilityRole="button"
@@ -763,7 +790,7 @@ function OfferCard({
 
 function OfferDetailRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
+    <View style={{ flexDirection: 'row', gap: space[3], alignItems: 'center' }}>
       <Text style={[text.caption, { width: 44, color: C.textMuted, fontWeight: '400' }]}>
         {label}
       </Text>
@@ -785,7 +812,7 @@ function OfferResult({ accepted }: { accepted: boolean }) {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 6,
+        gap: space[1.5],
         opacity: v.interpolate(POP_OP(e)),
         transform: [{ scale: v.interpolate(bake([0, 60, 100], [0.9, 1.04, 1], e)) }],
       }}
@@ -823,11 +850,11 @@ function Composer({
       style={{
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
-        paddingTop: 10,
-        paddingRight: 12,
+        gap: space[2],
+        paddingTop: space[2.5],
+        paddingRight: space[3],
         paddingBottom: bottomInset,
-        paddingLeft: 16,
+        paddingLeft: space[4],
       }}
     >
       <Animated.View
@@ -846,7 +873,7 @@ function Composer({
             outputRange: [C.surfaceMuted, C.surface],
           }),
           justifyContent: 'center',
-          paddingHorizontal: 16,
+          paddingHorizontal: space[4],
         }}
       >
         <TextInput

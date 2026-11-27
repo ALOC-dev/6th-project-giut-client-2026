@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Animated, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
-import { color, easing, text } from '@/theme';
+import { color, easing, radius, shadowCompat, space, text } from '@/theme';
 import { useEnter, useTween } from './motion';
 
 type ChatMenuRowProps = {
@@ -29,11 +29,11 @@ export function ChatMenuRow({
       accessibilityState={role ? { checked } : undefined}
       style={({ pressed }) => ({
         height: 56,
-        borderRadius: 14,
+        borderRadius: radius.card,
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 12,
-        paddingHorizontal: 8,
+        gap: space[3],
+        paddingHorizontal: space[2],
         backgroundColor: pressed ? color.surfaceMuted : 'transparent',
       })}
     >
@@ -59,7 +59,12 @@ export function ChatMenuRow({
 
 export const ChatMenuDivider = () => (
   <View
-    style={{ height: 1, backgroundColor: color.lineSoft, marginVertical: 6, marginHorizontal: 8 }}
+    style={{
+      height: 1,
+      backgroundColor: color.lineSoft,
+      marginVertical: space[1.5],
+      marginHorizontal: space[2],
+    }}
   />
 );
 
@@ -86,13 +91,9 @@ export function ChatSwitch({ on, accent = color.brand }: { on: boolean; accent?:
           left: 3,
           width: 20,
           height: 20,
-          borderRadius: 10,
+          borderRadius: radius.lg,
           backgroundColor: color.surface,
-          shadowColor: color.ink,
-          shadowOpacity: 0.2,
-          shadowRadius: 1.5,
-          shadowOffset: { width: 0, height: 1 },
-          elevation: 2,
+          ...shadowCompat.control,
           transform: [
             { translateX: knob.interpolate({ inputRange: [0, 1], outputRange: [0, 18] }) },
           ],
@@ -165,7 +166,10 @@ function ConfirmDialogBody({ title, body, okLabel, onCancel, onOk }: ChatConfirm
             {title}
           </Text>
           <Text
-            style={[text.body, { color: color.textSecondary, fontWeight: '400', marginTop: 8 }]}
+            style={[
+              text.body,
+              { color: color.textSecondary, fontWeight: '400', marginTop: space[2] },
+            ]}
           >
             {body}
           </Text>
@@ -189,31 +193,27 @@ const styles = StyleSheet.create({
     zIndex: 42,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 32,
+    paddingHorizontal: space[8],
     backgroundColor: color.overlayDim,
   },
   dialog: {
     width: '100%',
     backgroundColor: color.surface,
     borderRadius: 22,
-    paddingTop: 24,
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-    shadowColor: color.ink,
-    shadowOpacity: 0.2,
-    shadowRadius: 25,
-    shadowOffset: { width: 0, height: 20 },
-    elevation: 12,
+    paddingTop: space[6],
+    paddingHorizontal: space[5],
+    paddingBottom: space[4],
+    ...shadowCompat.menu,
   },
   actions: {
     flexDirection: 'row',
-    gap: 8,
-    marginTop: 20,
+    gap: space[2],
+    marginTop: space[5],
   },
   cancelButton: {
     flex: 1,
     height: 48,
-    borderRadius: 14,
+    borderRadius: radius.card,
     backgroundColor: color.surfaceMuted,
     alignItems: 'center',
     justifyContent: 'center',
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
   okButton: {
     flex: 1,
     height: 48,
-    borderRadius: 14,
+    borderRadius: radius.card,
     backgroundColor: color.danger,
     alignItems: 'center',
     justifyContent: 'center',

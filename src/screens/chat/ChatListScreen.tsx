@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Easing, Pressable, ScrollView, Text, Vibration, View } from 'react-native';
+import { Animated, Easing, FlatList, Pressable, Text, Vibration, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { BellIcon, BellOffIcon, LeaveIcon } from '@/components/icons';
 import { BottomSheet, Toast, useToast } from '@/components/ui';
-import { color, easing, text } from '@/theme';
+import { color, easing, space, text } from '@/theme';
 import { ChatAvatar } from './ChatAvatar';
 import { ChatConfirmDialog, ChatMenuDivider, ChatMenuRow, ChatSwitch } from './ChatMenu';
 import { bake, useEnter, useLoop, useReducedMotion } from './motion';
@@ -48,6 +48,7 @@ export default function ChatListScreen({
   const [sheet, setSheet] = useState<SheetKind>(null);
   const [confirm, setConfirm] = useState<ConfirmKind>(null);
   const pendingConfirm = useRef<ConfirmKind>(null);
+  const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [target, setTarget] = useState<string | null>(null);
   const toast = useToast();
   const handleSheetDismiss = useCallback(() => {
@@ -71,6 +72,13 @@ export default function ChatListScreen({
     return () => clearTimeout(t);
   }, [liveDemo, empty]);
 
+  useEffect(
+    () => () => {
+      if (leaveTimer.current) clearTimeout(leaveTimer.current);
+    },
+    [],
+  );
+
   const list = useMemo(() => (empty ? [] : [...rooms].sort((a, b) => b.t - a.t)), [rooms, empty]);
   const tgt = rooms.find((r) => r.id === target);
 
@@ -92,7 +100,9 @@ export default function ChatListScreen({
     setConfirm(null);
     setLeaving(id);
     toast.show('채팅방을 나갔어요');
-    setTimeout(() => {
+    if (leaveTimer.current) clearTimeout(leaveTimer.current);
+    leaveTimer.current = setTimeout(() => {
+      leaveTimer.current = null;
       setLeaving(null);
       setRooms((rs) => rs.filter((x) => x.id !== id));
       onLeave?.(id);
@@ -105,38 +115,45 @@ export default function ChatListScreen({
       <View
         style={{
           height: 54,
-          paddingHorizontal: 20,
+          paddingHorizontal: space[5],
           justifyContent: 'center',
         }}
       >
         <Text style={[text.titleXl, { color: color.ink }]}>채팅</Text>
       </View>
 
-      <ScrollView
+      <FlatList
+        data={list}
+        keyExtractor={(room) => room.id}
         style={{ flex: 1 }}
-        contentContainerStyle={{ paddingTop: 4, paddingBottom: 100 }}
+        contentContainerStyle={{ paddingTop: space[1], paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
-      >
-        {list.map((r) => (
+        renderItem={({ item: room }) => (
           <RoomRow
-            key={r.id}
-            room={r}
-            fresh={fresh === r.id ? freshN : 0}
-            leaving={leaving === r.id}
+            room={room}
+            fresh={fresh === room.id ? freshN : 0}
+            leaving={leaving === room.id}
             onPress={() => {
-              if (r.unread > 0) {
-                setRooms((rs) => rs.map((x) => (x.id === r.id ? { ...x, unread: 0 } : x)));
+              if (room.unread > 0) {
+                setRooms((rs) =>
+                  rs.map((item) => (item.id === room.id ? { ...item, unread: 0 } : item)),
+                );
                 setFresh(null);
               }
-              onOpen?.({ id: r.id, name: r.name, field: r.field, offer: !!r.offer });
+              onOpen?.({
+                id: room.id,
+                name: room.name,
+                field: room.field,
+                offer: !!room.offer,
+              });
             }}
-            onLongPress={() => openMenu(r.id)}
+            onLongPress={() => openMenu(room.id)}
           />
-        ))}
-        {list.length === 0 && <Empty onBrowse={onBrowse} />}
-      </ScrollView>
+        )}
+        ListEmptyComponent={<Empty onBrowse={onBrowse} />}
+      />
 
-      <Toast {...toast.props} bottom={24} />
+      <Toast {...toast.props} bottom={space[6]} />
 
       <BottomSheet
         visible={sheet === 'menu'}
@@ -144,16 +161,6 @@ export default function ChatListScreen({
         onDismiss={handleSheetDismiss}
         accessibilityLabel="채팅방 메뉴"
       >
-        <Text
-          numberOfLines={1}
-          style={[
-            text.caption,
-            { color: color.textMuted, fontWeight: '700' },
-            { paddingTop: 4, paddingHorizontal: 8, paddingBottom: 10, marginTop: -4 },
-          ]}
-        >
-          {tgt?.name}
-        </Text>
         <ChatMenuRow
           icon={<BellIcon />}
           label="채팅방 알림"
@@ -307,13 +314,13 @@ function RoomRow({
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            gap: 12,
-            paddingVertical: 12,
+            gap: space[3],
+            paddingVertical: space[3],
             paddingHorizontal: 22,
           }}
         >
           <ChatAvatar size={52} field={r.field} />
-          <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
+          <View style={{ flex: 1, minWidth: 0, gap: space[1] }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
               <Text
                 numberOfLines={1}
@@ -393,7 +400,7 @@ function Empty({ onBrowse }: { onBrowse?: () => void }) {
   const d2 = useLoop(1200, 400);
   const blink = (v: Animated.Value) => v.interpolate(BLINK);
   return (
-    <View style={{ alignItems: 'center', paddingTop: 110, paddingHorizontal: 32 }}>
+    <View style={{ alignItems: 'center', paddingTop: 110, paddingHorizontal: space[8] }}>
       <Animated.View
         style={{
           width: 104,
@@ -430,7 +437,7 @@ function Empty({ onBrowse }: { onBrowse?: () => void }) {
         style={[
           text.body,
           { color: color.textSecondary, fontWeight: '400', textAlign: 'center' },
-          { marginTop: 8 },
+          { marginTop: space[2] },
         ]}
       >
         {'마음에 드는 팀에 문의하거나\n팀 제안을 받으면 대화가 시작돼요.'}
