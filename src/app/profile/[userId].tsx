@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 
 import {
   getPublicProfile,
@@ -12,11 +12,11 @@ export default function UserProfileRoute() {
 
   // TODO: API 연결 시 GET /api/profile/{userId}로 교체, 로딩 / 실패 화면 추가
   const detail = userId ? getPublicProfile(userId) : undefined;
-  if (!detail) return <UserProfileNotFoundScreen />;
+  if (!userId || !detail) return <UserProfileNotFoundScreen />;
 
   return (
     <UserProfileScreen
-      key={detail.profile.userId}
+      key={userId}
       detail={detail}
       // TODO: 공유 / 신고 / 차단 메뉴 추가
       onPressMore={() => {}}
@@ -24,6 +24,9 @@ export default function UserProfileRoute() {
       onPressPropose={() => {}}
       // TODO: 채팅 화면이 생기면 이 사람과의 대화로 이동
       onPressMessage={() => {}}
+      onPressPortfolio={(item) =>
+        router.push({ pathname: '/portfolio/[id]', params: { id: String(item.id), userId } })
+      }
     />
   );
 }

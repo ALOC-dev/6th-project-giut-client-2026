@@ -1,4 +1,5 @@
 export { MOCK_EMPTY_PROFILE, MOCK_MY_PROFILE, MOCK_SCRAPS } from './mocks';
+export { ActivityHistorySection } from './ActivityHistorySection';
 export { MyPageScreen } from './MyPageScreen';
 export { getPrimaryRoleKey, getRoleKey, ROLE_CATALOG } from './myProfile';
 export type {
@@ -13,4 +14,6 @@ export type {
   ProfileTag,
   ProfileTagType,
 } from './myProfile';
+export { PortfolioSection } from './PortfolioSection';
 export type { PostScrap, Scrap, ScrapKind, TeamScrap } from './scrap';
+export { useSectionTabs } from './useSectionTabs';
