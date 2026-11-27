@@ -25,7 +25,7 @@ import {
   TrashIcon,
 } from '@/components/icons';
 import { BottomSheet, Toast, useToast } from '@/components/ui';
-import { color as C, easing, radius, role, shadowCompat, space, text } from '@/theme';
+import { color as C, easing, layout, radius, role, shadowCompat, space, text } from '@/theme';
 import { ChatAvatar } from './ChatAvatar';
 import { ChatConfirmDialog, ChatMenuDivider, ChatMenuRow, ChatSwitch } from './ChatMenu';
 import { bake, useEnter, useReducedMotion, useTween } from './motion';
@@ -83,8 +83,8 @@ export default function ChatRoomScreen({
   const [confirm, setConfirm] = useState<ConfirmKind>(null);
   const pendingConfirm = useRef<ConfirmKind>(null);
   const [target, setTarget] = useState(-1);
-  const [left, setLeft] = useState(false);
   const [muted, setMuted] = useState(false);
+  const [composerHeight, setComposerHeight] = useState(0);
   const toast = useToast();
   const handleSheetDismiss = useCallback(() => {
     setConfirm(pendingConfirm.current);
@@ -142,7 +142,6 @@ export default function ChatRoomScreen({
   const targetMsg = msgs.find((m) => m.id === target);
 
   const openMsgMenu = (id: number) => {
-    if (left) return;
     Keyboard.dismiss();
     setTarget(id);
     setSheet('msg');
@@ -159,7 +158,7 @@ export default function ChatRoomScreen({
 
       <View
         style={{
-          height: 52,
+          height: layout.appHeaderHeight,
           flexDirection: 'row',
           alignItems: 'center',
           gap: space[1.5],
@@ -174,9 +173,9 @@ export default function ChatRoomScreen({
           accessibilityRole="button"
           accessibilityLabel="뒤로 가기"
           style={{
-            width: 44,
-            height: 44,
-            borderRadius: 12,
+            width: layout.minimumTouchTargetSize,
+            height: layout.minimumTouchTargetSize,
+            borderRadius: radius.control,
             alignItems: 'center',
             justifyContent: 'center',
           }}
@@ -200,13 +199,13 @@ export default function ChatRoomScreen({
           {muted && <MutedMark />}
         </View>
         <Pressable
-          onPress={() => !left && setSheet('more')}
+          onPress={() => setSheet('more')}
           accessibilityRole="button"
           accessibilityLabel="더보기"
           style={{
-            width: 44,
-            height: 44,
-            borderRadius: 12,
+            width: layout.minimumTouchTargetSize,
+            height: layout.minimumTouchTargetSize,
+            borderRadius: radius.control,
             alignItems: 'center',
             justifyContent: 'center',
           }}
@@ -262,7 +261,7 @@ export default function ChatRoomScreen({
                     backgroundColor: C.lineSoft,
                     borderRadius: 10,
                     paddingVertical: 6,
-                    paddingHorizontal: 12,
+                    paddingHorizontal: space[3],
                   }}
                 >
                   <Text
@@ -278,7 +277,7 @@ export default function ChatRoomScreen({
             );
           }
           const mine = m.who === 'me';
-          const mt = first ? 14 : 4;
+          const mt = first ? space[3.5] : space[1];
           if (!mine) {
             return (
               <MsgIn
@@ -392,7 +391,6 @@ export default function ChatRoomScreen({
                   accent={accent}
                   first={first}
                   onLongPress={() => openMsgMenu(m.id)}
-                  disabled={left}
                 />
               )}
             </MsgIn>
@@ -402,38 +400,26 @@ export default function ChatRoomScreen({
 
       <KeyboardStickyView
         offset={{ opened: Math.max(bottomInset - 6, 0) }}
+        onLayout={(event) => setComposerHeight(event.nativeEvent.layout.height)}
         style={{ backgroundColor: C.surface, borderTopWidth: 1, borderTopColor: C.lineSoft }}
       >
-        {left ? (
-          <Text
-            style={[
-              text.body,
-              { color: C.textMuted, fontWeight: '600', textAlign: 'center' },
-              {
-                paddingTop: space[3.5],
-                paddingHorizontal: space[4],
-                paddingBottom: space[8],
-              },
-            ]}
-          >
-            나간 채팅방이에요. 메시지를 보낼 수 없어요.
-          </Text>
-        ) : (
-          <Composer
-            value={draft}
-            onChange={setDraft}
-            onSend={send}
-            empty={empty}
-            accent={accent}
-            placeholder={
-              scenario === '문의' ? '팀장에게 궁금한 점을 물어보세요' : '답장을 입력하세요'
-            }
-            bottomInset={bottomInset}
-          />
-        )}
+        <Composer
+          value={draft}
+          onChange={setDraft}
+          onSend={send}
+          empty={empty}
+          accent={accent}
+          placeholder={
+            scenario === '문의' ? '팀장에게 궁금한 점을 물어보세요' : '답장을 입력하세요'
+          }
+          bottomInset={bottomInset}
+        />
       </KeyboardStickyView>
 
-      <Toast {...toast.props} bottom={sheet === 'more' ? 196 : 96} />
+      <Toast
+        {...toast.props}
+        bottom={Math.max(composerHeight, layout.minimumTouchTargetSize) + space[3]}
+      />
 
       <BottomSheet
         visible={sheet === 'more'}
@@ -450,6 +436,7 @@ export default function ChatRoomScreen({
             const m = !muted;
             setMuted(m);
             onMuteChange?.(m);
+            setSheet(null);
             toast.show(m ? '이 채팅방 알림을 껐어요' : '이 채팅방 알림을 켰어요');
           }}
           right={<ChatSwitch on={!muted} accent={accent} />}
@@ -522,9 +509,6 @@ export default function ChatRoomScreen({
             return;
           }
           setConfirm(null);
-          setLeft(true);
-          setDraft('');
-          push([{ who: 'sys', text: '채팅방을 나갔어요' }]);
           onLeave?.();
         }}
       />
@@ -593,13 +577,11 @@ function MyBubble({
   accent,
   first,
   onLongPress,
-  disabled,
 }: {
   text: string;
   accent: string;
   first: boolean;
   onLongPress: () => void;
-  disabled: boolean;
 }) {
   const [p] = useState(() => new Animated.Value(0));
   const to = (v: number) =>
@@ -613,7 +595,6 @@ function MyBubble({
     <Pressable
       onLongPress={onLongPress}
       delayLongPress={450}
-      disabled={disabled}
       onPressIn={() => to(1)}
       onPressOut={() => to(0)}
       accessible
@@ -755,8 +736,8 @@ function OfferCard({
               accessibilityRole="button"
               style={{
                 flex: 1,
-                height: 44,
-                borderRadius: 12,
+                height: layout.minimumTouchTargetSize,
+                borderRadius: radius.control,
                 borderWidth: 1.5,
                 borderColor: C.line,
                 backgroundColor: C.surface,
@@ -771,8 +752,8 @@ function OfferCard({
               accessibilityRole="button"
               style={{
                 flex: 1,
-                height: 44,
-                borderRadius: 12,
+                height: layout.minimumTouchTargetSize,
+                borderRadius: radius.control,
                 backgroundColor: accent,
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -791,7 +772,16 @@ function OfferCard({
 function OfferDetailRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <View style={{ flexDirection: 'row', gap: space[3], alignItems: 'center' }}>
-      <Text style={[text.caption, { width: 44, color: C.textMuted, fontWeight: '400' }]}>
+      <Text
+        style={[
+          text.caption,
+          {
+            width: layout.minimumTouchTargetSize,
+            color: C.textMuted,
+            fontWeight: '400',
+          },
+        ]}
+      >
         {label}
       </Text>
       {children}
@@ -806,8 +796,8 @@ function OfferResult({ accepted }: { accepted: boolean }) {
   return (
     <Animated.View
       style={{
-        height: 44,
-        borderRadius: 12,
+        height: layout.minimumTouchTargetSize,
+        borderRadius: radius.control,
         backgroundColor: accepted ? C.successTint : C.surfaceMuted,
         flexDirection: 'row',
         alignItems: 'center',
@@ -861,7 +851,7 @@ function Composer({
         style={{
           flex: 1,
           minWidth: 0,
-          height: 44,
+          height: layout.minimumTouchTargetSize,
           borderRadius: 22,
           borderWidth: 1.5,
           borderColor: on.interpolate({
@@ -901,8 +891,8 @@ function Composer({
         >
           <Animated.View
             style={{
-              width: 44,
-              height: 44,
+              width: layout.minimumTouchTargetSize,
+              height: layout.minimumTouchTargetSize,
               borderRadius: 22,
               alignItems: 'center',
               justifyContent: 'center',

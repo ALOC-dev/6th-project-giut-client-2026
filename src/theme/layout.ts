@@ -16,6 +16,8 @@ export const space = {
 
 export const layout = {
   bottomNavigationMinHeight: 64,
+  appHeaderHeight: 52,
+  minimumTouchTargetSize: 44,
   teamCreateNameBottomPadding: 60,
 } as const;
 
@@ -24,6 +26,7 @@ export const radius = {
   sm: 6,
   md: 8,
   lg: 10,
+  control: 12,
   card: 14,
   xl: 16,
   '2xl': 20,

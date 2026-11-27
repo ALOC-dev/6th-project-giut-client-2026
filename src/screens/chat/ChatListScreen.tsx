@@ -3,7 +3,7 @@ import { Animated, Easing, FlatList, Pressable, Text, Vibration, View } from 're
 import Svg, { Circle, Path } from 'react-native-svg';
 import { BellIcon, BellOffIcon, LeaveIcon } from '@/components/icons';
 import { BottomSheet, Toast, useToast } from '@/components/ui';
-import { color, easing, space, text } from '@/theme';
+import { color, easing, layout, radius, space, text } from '@/theme';
 import { ChatAvatar } from './ChatAvatar';
 import { ChatConfirmDialog, ChatMenuDivider, ChatMenuRow, ChatSwitch } from './ChatMenu';
 import { bake, useEnter, useLoop, useReducedMotion } from './motion';
@@ -281,7 +281,9 @@ function RoomRow({
         style={{
           opacity: rowIn,
           transform: [
-            { translateY: rowIn.interpolate({ inputRange: [0, 1], outputRange: [-14, 0] }) },
+            {
+              translateY: rowIn.interpolate({ inputRange: [0, 1], outputRange: [-space[3.5], 0] }),
+            },
             { scale: press.interpolate({ inputRange: [0, 1], outputRange: [1, 0.98] }) },
           ],
         }}
@@ -447,9 +449,9 @@ function Empty({ onBrowse }: { onBrowse?: () => void }) {
         accessibilityRole="button"
         style={{
           marginTop: 22,
-          height: 44,
+          height: layout.minimumTouchTargetSize,
           paddingHorizontal: 18,
-          borderRadius: 12,
+          borderRadius: radius.control,
           backgroundColor: color.brandTint,
           alignItems: 'center',
           justifyContent: 'center',

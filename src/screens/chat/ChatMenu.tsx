@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Animated, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
-import { color, easing, radius, shadowCompat, space, text } from '@/theme';
+import { color, easing, layout, radius, shadowCompat, space, text } from '@/theme';
 import { useEnter, useTween } from './motion';
 
 type ChatMenuRowProps = {
@@ -41,7 +41,7 @@ export function ChatMenuRow({
         style={{
           width: 36,
           height: 36,
-          borderRadius: 12,
+          borderRadius: radius.control,
           backgroundColor: danger ? color.dangerTint : color.surfaceMuted,
           alignItems: 'center',
           justifyContent: 'center',
@@ -75,7 +75,7 @@ export function ChatSwitch({ on, accent = color.brand }: { on: boolean; accent?:
   return (
     <Animated.View
       style={{
-        width: 44,
+        width: layout.minimumTouchTargetSize,
         height: 26,
         borderRadius: 13,
         backgroundColor: track.interpolate({
