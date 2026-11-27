@@ -165,7 +165,7 @@ export default function ChatRoomScreen({
     push([
       {
         who: 'sys',
-        text: '데이터 길잡이 팀에 합류했어요. 팀 채팅방에 초대됐어요.',
+        text: `${OFFER_CARD.team} 팀에 합류했어요. 팀 채팅방에 초대됐어요.`,
       },
     ]);
     onAccept?.();

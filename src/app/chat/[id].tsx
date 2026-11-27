@@ -14,6 +14,14 @@ export default function ChatRoomRoute() {
     offer?: string;
   }>();
   const field = isChatField(params.field) ? params.field : '기획';
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+      return;
+    }
+
+    router.replace('/chat');
+  };
 
   return (
     <>
@@ -25,12 +33,13 @@ export default function ChatRoomRoute() {
         }}
       />
       <ChatRoomScreen
+        key={params.id}
         partner={params.name}
         partnerField={field}
         scenario={params.offer === 'true' ? '제안' : '문의'}
         topInset={insets.top}
         bottomInset={Math.max(insets.bottom, space[3])}
-        onBack={() => router.back()}
+        onBack={handleBack}
         onLeave={() => router.dismissTo('/chat')}
         onCopy={(text) => Clipboard.setStringAsync(text)}
       />
