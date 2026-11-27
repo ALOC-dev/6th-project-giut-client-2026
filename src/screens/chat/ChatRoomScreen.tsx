@@ -11,6 +11,7 @@ import {
   Text,
   TextInput,
   View,
+  type ListRenderItem,
 } from 'react-native';
 import {
   BellIcon,
@@ -92,10 +93,17 @@ export default function ChatRoomScreen({
   }, [setConfirm]);
   const scroll = useRef<FlatList<MessageRow>>(null);
   const shouldScrollToEnd = useRef(true);
+  const mountedRef = useRef(true);
   const readT = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  useEffect(() => () => clearTimeout(readT.current), []);
+  useEffect(
+    () => () => {
+      mountedRef.current = false;
+      clearTimeout(readT.current);
+    },
+    [],
+  );
 
-  const push = (items: Partial<ChatMessage>[]) => {
+  const push = useCallback((items: Partial<ChatMessage>[]) => {
     const d = new Date();
     const currentMinute = d.getHours() * 60 + d.getMinutes();
     const drafts = items.map((item) => ({
@@ -113,7 +121,7 @@ export default function ChatRoomScreen({
       return [...current, ...added];
     });
     setFresh(drafts[drafts.length - 1].id);
-  };
+  }, []);
 
   const send = () => {
     const text = draft.trim();
@@ -141,7 +149,7 @@ export default function ChatRoomScreen({
   const empty = draft.trim() === '';
   const targetMsg = msgs.find((m) => m.id === target);
 
-  const openMsgMenu = (id: number) => {
+  const openMsgMenu = useCallback((id: number) => {
     Keyboard.dismiss();
     setTarget(id);
     setSheet('msg');
@@ -150,7 +158,59 @@ export default function ChatRoomScreen({
       return;
     }
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-  };
+  }, []);
+
+  const handleAccept = useCallback(() => {
+    setOffer('accepted');
+    push([
+      {
+        who: 'sys',
+        text: '데이터 길잡이 팀에 합류했어요. 팀 채팅방에 초대됐어요.',
+      },
+    ]);
+    onAccept?.();
+  }, [onAccept, push]);
+
+  const handleDecline = useCallback(() => {
+    setOffer('declined');
+    push([
+      {
+        who: 'sys',
+        text: '제안을 거절했어요. 대화는 계속 이어갈 수 있어요.',
+      },
+    ]);
+    onDecline?.();
+  }, [onDecline, push]);
+
+  const renderMessage = useCallback<ListRenderItem<MessageRow>>(
+    ({ item }) => (
+      <ChatMessageRow
+        message={item.m}
+        first={item.first}
+        last={item.last}
+        isFresh={item.m.id === fresh}
+        partner={partner}
+        partnerField={partnerField}
+        accent={accent}
+        offer={offer}
+        swapped={item.m.id === swapped}
+        onAccept={handleAccept}
+        onDecline={handleDecline}
+        onOpenMenu={openMsgMenu}
+      />
+    ),
+    [
+      accent,
+      fresh,
+      handleAccept,
+      handleDecline,
+      offer,
+      openMsgMenu,
+      partner,
+      partnerField,
+      swapped,
+    ],
+  );
 
   return (
     <View style={{ flex: 1, backgroundColor: C.surface }}>
@@ -247,155 +307,7 @@ export default function ChatRoomScreen({
             </View>
           </View>
         }
-        renderItem={({ item: { m, first, last } }) => {
-          const isFresh = m.id === fresh;
-          if (m.who === 'sys') {
-            return (
-              <MsgIn
-                key={'s' + m.id}
-                on={isFresh}
-                style={{ alignItems: 'center', paddingTop: 10, paddingBottom: 2 }}
-              >
-                <View
-                  style={{
-                    backgroundColor: C.lineSoft,
-                    borderRadius: 10,
-                    paddingVertical: 6,
-                    paddingHorizontal: space[3],
-                  }}
-                >
-                  <Text
-                    style={[
-                      text.meta,
-                      { color: C.textSecondary, fontWeight: '400', textAlign: 'center' },
-                    ]}
-                  >
-                    {m.text}
-                  </Text>
-                </View>
-              </MsgIn>
-            );
-          }
-          const mine = m.who === 'me';
-          const mt = first ? space[3.5] : space[1];
-          if (!mine) {
-            return (
-              <MsgIn
-                key={'m' + m.id}
-                on={isFresh}
-                style={{
-                  flexDirection: 'row',
-                  gap: space[2],
-                  alignItems: 'flex-start',
-                  marginTop: mt,
-                }}
-              >
-                {first ? (
-                  <ChatAvatar size={36} field={partnerField} />
-                ) : (
-                  <View style={{ width: 36 }} />
-                )}
-                <View style={{ flex: 1, minWidth: 0, gap: 5 }}>
-                  {first && (
-                    <Text
-                      style={[text.caption, { color: C.ink, fontWeight: '700', paddingLeft: 2 }]}
-                    >
-                      {partner}
-                    </Text>
-                  )}
-                  <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 6 }}>
-                    {m.kind === 'offer' ? (
-                      <OfferCard
-                        accent={accent}
-                        first={first}
-                        state={offer}
-                        onAccept={() => {
-                          setOffer('accepted');
-                          push([
-                            {
-                              who: 'sys',
-                              text: '데이터 길잡이 팀에 합류했어요. 팀 채팅방에 초대됐어요.',
-                            },
-                          ]);
-                          onAccept?.();
-                        }}
-                        onDecline={() => {
-                          setOffer('declined');
-                          push([
-                            {
-                              who: 'sys',
-                              text: '제안을 거절했어요. 대화는 계속 이어갈 수 있어요.',
-                            },
-                          ]);
-                          onDecline?.();
-                        }}
-                      />
-                    ) : (
-                      <View
-                        style={[
-                          bubbleR(false, first),
-                          {
-                            maxWidth: 236,
-                            backgroundColor: C.surface,
-                            paddingVertical: space[2.5],
-                            paddingHorizontal: space[3.5],
-                            ...shadowCompat.card,
-                          },
-                        ]}
-                      >
-                        <Text style={[text.label, { color: C.ink, fontWeight: '400' }]}>
-                          {m.text}
-                        </Text>
-                      </View>
-                    )}
-                    {last && (
-                      <Text
-                        style={[
-                          text.badge,
-                          { color: C.textMuted, fontWeight: '400', paddingBottom: 2 },
-                        ]}
-                      >
-                        {fmtClock(m.min)}
-                      </Text>
-                    )}
-                  </View>
-                </View>
-              </MsgIn>
-            );
-          }
-          return (
-            <MsgIn
-              key={'m' + m.id}
-              on={isFresh}
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'flex-end',
-                alignItems: 'flex-end',
-                gap: space[1.5],
-                marginTop: mt,
-              }}
-            >
-              <View style={{ alignItems: 'flex-end', gap: 1, paddingBottom: 2 }}>
-                {!!m.unread && <Text style={[text.badge, { color: accent }]}>1</Text>}
-                {last && (
-                  <Text style={[text.badge, { color: C.textMuted, fontWeight: '400' }]}>
-                    {fmtClock(m.min)}
-                  </Text>
-                )}
-              </View>
-              {m.deleted ? (
-                <DeletedBubble first={first} swap={m.id === swapped} />
-              ) : (
-                <MyBubble
-                  text={m.text ?? ''}
-                  accent={accent}
-                  first={first}
-                  onLongPress={() => openMsgMenu(m.id)}
-                />
-              )}
-            </MsgIn>
-          );
-        }}
+        renderItem={renderMessage}
       />
 
       <KeyboardStickyView
@@ -465,15 +377,18 @@ export default function ChatRoomScreen({
           onPress={async () => {
             const message = targetMsg?.text;
             if (!onCopy || !message) {
+              setSheet(null);
               toast.show('메시지를 복사하지 못했어요');
               return;
             }
 
+            setSheet(null);
             try {
               await onCopy(message);
-              setSheet(null);
+              if (!mountedRef.current) return;
               toast.show('메시지를 복사했어요');
             } catch {
+              if (!mountedRef.current) return;
               toast.show('메시지를 복사하지 못했어요');
             }
           }}
@@ -515,6 +430,148 @@ export default function ChatRoomScreen({
     </View>
   );
 }
+
+type ChatMessageRowProps = {
+  message: ChatMessage;
+  first: boolean;
+  last: boolean;
+  isFresh: boolean;
+  partner: string;
+  partnerField: ChatField;
+  accent: string;
+  offer: 'pending' | 'accepted' | 'declined';
+  swapped: boolean;
+  onAccept: () => void;
+  onDecline: () => void;
+  onOpenMenu: (id: number) => void;
+};
+
+const ChatMessageRow = React.memo(function ChatMessageRow({
+  message,
+  first,
+  last,
+  isFresh,
+  partner,
+  partnerField,
+  accent,
+  offer,
+  swapped,
+  onAccept,
+  onDecline,
+  onOpenMenu,
+}: ChatMessageRowProps) {
+  if (message.who === 'sys') {
+    return (
+      <MsgIn on={isFresh} style={{ alignItems: 'center', paddingTop: 10, paddingBottom: 2 }}>
+        <View
+          style={{
+            backgroundColor: C.lineSoft,
+            borderRadius: radius.lg,
+            paddingVertical: space[1.5],
+            paddingHorizontal: space[3],
+          }}
+        >
+          <Text
+            style={[text.meta, { color: C.textSecondary, fontWeight: '400', textAlign: 'center' }]}
+          >
+            {message.text}
+          </Text>
+        </View>
+      </MsgIn>
+    );
+  }
+
+  const marginTop = first ? space[3.5] : space[1];
+  if (message.who !== 'me') {
+    return (
+      <MsgIn
+        on={isFresh}
+        style={{
+          flexDirection: 'row',
+          gap: space[2],
+          alignItems: 'flex-start',
+          marginTop,
+        }}
+      >
+        {first ? <ChatAvatar size={36} field={partnerField} /> : <View style={{ width: 36 }} />}
+        <View style={{ flex: 1, minWidth: 0, gap: 5 }}>
+          {first && (
+            <Text style={[text.caption, { color: C.ink, fontWeight: '700', paddingLeft: 2 }]}>
+              {partner}
+            </Text>
+          )}
+          <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: space[1.5] }}>
+            {message.kind === 'offer' ? (
+              <OfferCard
+                accent={accent}
+                first={first}
+                state={offer}
+                onAccept={onAccept}
+                onDecline={onDecline}
+              />
+            ) : (
+              <View
+                style={[
+                  bubbleR(false, first),
+                  {
+                    maxWidth: 236,
+                    backgroundColor: C.surface,
+                    paddingVertical: space[2.5],
+                    paddingHorizontal: space[3.5],
+                    ...shadowCompat.card,
+                  },
+                ]}
+              >
+                <Text style={[text.label, { color: C.ink, fontWeight: '400' }]}>
+                  {message.text}
+                </Text>
+              </View>
+            )}
+            {last && (
+              <Text
+                style={[text.badge, { color: C.textMuted, fontWeight: '400', paddingBottom: 2 }]}
+              >
+                {fmtClock(message.min)}
+              </Text>
+            )}
+          </View>
+        </View>
+      </MsgIn>
+    );
+  }
+
+  return (
+    <MsgIn
+      on={isFresh}
+      style={{
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        alignItems: 'flex-end',
+        gap: space[1.5],
+        marginTop,
+      }}
+    >
+      <View style={{ alignItems: 'flex-end', gap: 1, paddingBottom: 2 }}>
+        {!!message.unread && <Text style={[text.badge, { color: accent }]}>1</Text>}
+        {last && (
+          <Text style={[text.badge, { color: C.textMuted, fontWeight: '400' }]}>
+            {fmtClock(message.min)}
+          </Text>
+        )}
+      </View>
+      {message.deleted ? (
+        <DeletedBubble first={first} swap={swapped} />
+      ) : (
+        <MyBubble
+          text={message.text ?? ''}
+          accent={accent}
+          first={first}
+          onLongPress={() => onOpenMenu(message.id)}
+        />
+      )}
+    </MsgIn>
+  );
+});
 
 const bubbleR = (mine: boolean, first: boolean) =>
   first

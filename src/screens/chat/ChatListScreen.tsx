@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Easing, FlatList, Pressable, Text, Vibration, View } from 'react-native';
+import * as Haptics from 'expo-haptics';
+import { Animated, Easing, FlatList, Platform, Pressable, Text, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { BellIcon, BellOffIcon, LeaveIcon } from '@/components/icons';
 import { BottomSheet, Toast, useToast } from '@/components/ui';
@@ -85,7 +86,11 @@ export default function ChatListScreen({
   const openMenu = (id: string) => {
     setTarget(id);
     setSheet('menu');
-    Vibration.vibrate(10);
+    if (Platform.OS === 'android') {
+      void Haptics.performAndroidHapticsAsync(Haptics.AndroidHaptics.Long_Press);
+      return;
+    }
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
   const toggleMute = () => {
     if (!tgt) return;
@@ -114,7 +119,7 @@ export default function ChatListScreen({
       <View style={{ height: topInset }} />
       <View
         style={{
-          height: 54,
+          height: layout.appHeaderHeight,
           paddingHorizontal: space[5],
           justifyContent: 'center',
         }}
@@ -126,7 +131,7 @@ export default function ChatListScreen({
         data={list}
         keyExtractor={(room) => room.id}
         style={{ flex: 1 }}
-        contentContainerStyle={{ paddingTop: space[1], paddingBottom: 100 }}
+        contentContainerStyle={{ paddingTop: space[1], paddingBottom: space[4] }}
         showsVerticalScrollIndicator={false}
         renderItem={({ item: room }) => (
           <RoomRow
