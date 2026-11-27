@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
   dialog: {
     width: '100%',
     backgroundColor: color.surface,
-    borderRadius: 22,
+    borderRadius: layout.minimumTouchTargetSize / 2,
     paddingTop: space[6],
     paddingHorizontal: space[5],
     paddingBottom: space[4],

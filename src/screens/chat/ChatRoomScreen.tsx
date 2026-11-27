@@ -66,7 +66,6 @@ type ConfirmKind = null | 'leave' | 'del';
 type MessageRow = { m: ChatMessage; first: boolean; last: boolean };
 
 const READ_RECEIPT_DELAY_MS = 1800;
-const OFFER_CARD_WIDTH = 252;
 
 export default function ChatRoomScreen({
   partner = '박준호',
@@ -532,7 +531,7 @@ const ChatMessageRow = React.memo(function ChatMessageRow({
                 style={[
                   bubbleR(false, first),
                   {
-                    maxWidth: 236,
+                    maxWidth: layout.chatIncomingMessageMaxWidth,
                     backgroundColor: C.surface,
                     paddingVertical: space[2.5],
                     paddingHorizontal: space[3.5],
@@ -598,18 +597,18 @@ const bubbleR = (mine: boolean, first: boolean) =>
   first
     ? mine
       ? {
-          borderTopLeftRadius: 18,
-          borderTopRightRadius: 6,
-          borderBottomRightRadius: 18,
-          borderBottomLeftRadius: 18,
+          borderTopLeftRadius: radius.bubble,
+          borderTopRightRadius: radius.sm,
+          borderBottomRightRadius: radius.bubble,
+          borderBottomLeftRadius: radius.bubble,
         }
       : {
-          borderTopLeftRadius: 6,
-          borderTopRightRadius: 18,
-          borderBottomRightRadius: 18,
-          borderBottomLeftRadius: 18,
+          borderTopLeftRadius: radius.sm,
+          borderTopRightRadius: radius.bubble,
+          borderBottomRightRadius: radius.bubble,
+          borderBottomLeftRadius: radius.bubble,
         }
-    : { borderRadius: 18 };
+    : { borderRadius: radius.bubble };
 
 function MsgIn({ on, style, children }: { on: boolean; style: object; children: React.ReactNode }) {
   const v = useEnter(duration.d3, easing.out, 0, on);
@@ -682,7 +681,7 @@ function MyBubble({
       onAccessibilityAction={(event) => {
         if (event.nativeEvent.actionName === 'openMenu') onLongPress();
       }}
-      style={{ maxWidth: 250 }}
+      style={{ maxWidth: layout.chatMessageMaxWidth }}
     >
       <Animated.View
         style={[
@@ -762,7 +761,7 @@ function OfferCard({
       style={[
         bubbleR(false, first),
         {
-          width: OFFER_CARD_WIDTH,
+          width: layout.chatOfferCardWidth,
           backgroundColor: C.surface,
           overflow: 'hidden',
           ...shadowCompat.card,
@@ -937,7 +936,7 @@ function Composer({
           flex: 1,
           minWidth: 0,
           height: layout.minimumTouchTargetSize,
-          borderRadius: 22,
+          borderRadius: layout.minimumTouchTargetSize / 2,
           borderWidth: 1.5,
           borderColor: on.interpolate({
             inputRange: [0, 1],
@@ -978,7 +977,7 @@ function Composer({
             style={{
               width: layout.minimumTouchTargetSize,
               height: layout.minimumTouchTargetSize,
-              borderRadius: 22,
+              borderRadius: layout.minimumTouchTargetSize / 2,
               alignItems: 'center',
               justifyContent: 'center',
               backgroundColor: on.interpolate({

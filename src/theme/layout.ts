@@ -19,6 +19,9 @@ export const layout = {
   appHeaderHeight: 52,
   minimumTouchTargetSize: 44,
   teamCreateNameBottomPadding: 60,
+  chatIncomingMessageMaxWidth: 236,
+  chatMessageMaxWidth: 250,
+  chatOfferCardWidth: 252,
 } as const;
 
 export const radius = {
@@ -30,6 +33,7 @@ export const radius = {
   card: 14,
   xl: 16,
   '2xl': 20,
+  bubble: 18,
   full: 9999,
 } as const;
 
