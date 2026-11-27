@@ -26,6 +26,6 @@ export const S = StyleSheet.create({
     paddingVertical: space[1],
     paddingHorizontal: space[2.5],
     borderRadius: radius.full,
-    backgroundColor: 'rgba(25,27,32,0.55)',
+    backgroundColor: color.overlayBadge,
   },
 });
