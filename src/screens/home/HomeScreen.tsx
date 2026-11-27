@@ -47,7 +47,7 @@ export function HomeScreen({ userName, contests, onOpenContestList }: HomeScreen
         <AppHeader onPressNotification={() => {}} onPressSearch={() => {}} />
       </View>
       <ScrollView>
-        {/* 이번 주 마감 공모전은 섹션 안에서 고르고, 없으면 섹션이 숨겨져요 */}
+        {/* 이번 주 마감 공모전은 섹션 안에서 고르고, 없으면 안내 카드를 보여줘요 */}
         <DeadlineSection contests={contests} />
         <CategorySection
           onPressAll={() => onOpenContestList()}
