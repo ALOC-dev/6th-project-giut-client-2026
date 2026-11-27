@@ -22,7 +22,8 @@ export type Person = {
   dept: string;
   bio: string;
   tags: string[];
-  role: Role;
+  role: Role; // 첫 번째 세부 역할의 큰 역할
+  positions: string[]; // 세부 역할 (최대 3개)
   grade: Grade;
   status: Status;
 };

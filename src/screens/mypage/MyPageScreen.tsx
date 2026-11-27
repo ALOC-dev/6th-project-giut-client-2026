@@ -1,13 +1,14 @@
 import { ScrollView, Share, StyleSheet, View } from 'react-native';
 
+import { ProfileCard } from '@/components/profile/ProfileCard';
 import { FolderTabBar } from '@/components/tabs/FolderTabBar';
 import { color, space } from '@/theme';
 
 import { ActivityHistorySection } from './ActivityHistorySection';
 import { MyPageHeader } from './MyPageHeader';
+import { MyProfileActions } from './MyProfileActions';
 import type { MyProfile, PortfolioItem } from './myProfile';
 import { PortfolioSection } from './PortfolioSection';
-import { ProfileCard } from './ProfileCard';
 import { ProfileEmptyCard } from './ProfileEmptyCard';
 import type { Scrap } from './scrap';
 import { ScrapSection } from './ScrapSection';
@@ -78,9 +79,14 @@ export function MyPageScreen({
           {profile ? (
             <ProfileCard
               profile={profile}
-              summary={summary}
-              onPressEdit={onPressEditProfile}
-              onPressShare={() => handleShare(profile.nickname)}
+              recommendationCount={summary.receivedRecommendationCount}
+              collaborationCount={summary.collaborationCount}
+              actions={
+                <MyProfileActions
+                  onPressEdit={onPressEditProfile}
+                  onPressShare={() => handleShare(profile.nickname)}
+                />
+              }
             />
           ) : (
             <ProfileEmptyCard onPressCreate={onPressCreateProfile} />

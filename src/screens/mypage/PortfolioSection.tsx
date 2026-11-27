@@ -145,7 +145,7 @@ function PortfolioImage({ uri, iconSize, style }: PortfolioImageProps) {
   );
 }
 
-// '2025.05 – 2025.07 · 프론트엔드'
+// '2025.05 – 2025.07 · 프론트엔드 개발자'
 function getMeta(item: PortfolioItem) {
   const period = formatMonthPeriod(item.projectStartDate, item.projectEndDate);
   const roles = item.roles.map(({ name }) => name).join(', ');

@@ -63,7 +63,7 @@ export type Profile = {
   profileImageUrl: string | null;
   bio: string | null; // 최대 200자
   searchable: boolean;
-  roles: CodeName[]; // 세부 포지션
+  roles: CodeName[]; // 세부 역할 (최대 3개, 첫 번째가 프로필 색)
   tags: ProfileTag[];
   portfolioItems: PortfolioItem[];
   activityHistories: ActivityHistory[];
@@ -88,15 +88,39 @@ export type MyProfile = {
   summary: ProfileSummary;
 };
 
-// TODO: API 연결 시 GET /api/profile/roles(대표 역할별 세부 역할)로 교체
-const ROLE_KEY_BY_CODE: Record<string, RoleKey | undefined> = {
-  FRONTEND_DEVELOPER: 'dev',
-  BACKEND_DEVELOPER: 'dev',
-  DATA_ANALYST: 'plan',
+// 큰 역할별 세부 역할. 프로필에는 세부 역할을 최대 3개까지 고르고, 첫 번째가 프로필 색을 정해요
+// TODO: API 연결 시 GET /api/profile/roles로 교체. 프론트엔드, 백엔드, 데이터 분석 외의 코드는 임시
+export const ROLE_CATALOG: Record<RoleKey, CodeName[]> = {
+  dev: [
+    { code: 'BACKEND_DEVELOPER', name: '백엔드 개발자' },
+    { code: 'FRONTEND_DEVELOPER', name: '프론트엔드 개발자' },
+    { code: 'MOBILE_DEVELOPER', name: '모바일 개발자' },
+    { code: 'DATA_ANALYST', name: '데이터 분석' },
+    { code: 'DATA_ENGINEER', name: '데이터 엔지니어' },
+    { code: 'AI_ENGINEER', name: 'AI 엔지니어' },
+  ],
+  design: [
+    { code: 'UI_UX_DESIGNER', name: 'UI/UX 디자이너' },
+    { code: 'GRAPHIC_DESIGNER', name: '그래픽 디자이너' },
+    { code: 'PRODUCT_DESIGNER', name: '프로덕트 디자이너' },
+  ],
+  plan: [
+    { code: 'SERVICE_PLANNER', name: '서비스 기획' },
+    { code: 'BUSINESS_PLANNER', name: '사업 기획' },
+    { code: 'PROJECT_MANAGER', name: '프로젝트 매니저' },
+  ],
+  mkt: [
+    { code: 'DIGITAL_MARKETER', name: '디지털 마케터' },
+    { code: 'CONTENT_MARKETER', name: '콘텐츠 마케터' },
+    { code: 'BRAND_MARKETER', name: '브랜드 마케터' },
+  ],
 };
 
+const ROLE_KEYS = Object.keys(ROLE_CATALOG) as RoleKey[];
+
+// 세부 역할 코드 → 큰 역할
 export function getRoleKey(code: string) {
-  return ROLE_KEY_BY_CODE[code];
+  return ROLE_KEYS.find((key) => ROLE_CATALOG[key].some((it) => it.code === code));
 }
 
 const PRIMARY_ROLE_KEY: Record<string, RoleKey | undefined> = {
@@ -106,7 +130,10 @@ const PRIMARY_ROLE_KEY: Record<string, RoleKey | undefined> = {
   MARKETING: 'mkt',
 };
 
+// 프로필 색을 정하는 큰 역할. 첫 번째 세부 역할 기준, 없으면 대표 역할
 export function getPrimaryRoleKey(profile: Profile) {
+  const first = profile.roles[0];
+  if (first) return getRoleKey(first.code);
   const code = profile.primaryRoles[0]?.code;
   return code ? PRIMARY_ROLE_KEY[code] : undefined;
 }

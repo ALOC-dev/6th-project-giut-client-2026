@@ -1,6 +1,6 @@
 export { MOCK_EMPTY_PROFILE, MOCK_MY_PROFILE, MOCK_SCRAPS } from './mocks';
 export { MyPageScreen } from './MyPageScreen';
-export { getRoleKey } from './myProfile';
+export { getPrimaryRoleKey, getRoleKey, ROLE_CATALOG } from './myProfile';
 export type {
   ActivityCategory,
   ActivityHistory,

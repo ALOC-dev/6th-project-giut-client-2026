@@ -1,22 +1,29 @@
 import { useLocalSearchParams } from 'expo-router';
 
-import { MOCK_PEOPLE } from '@/screens/giuthub';
-import { UserProfileNotFoundScreen, UserProfileScreen } from '@/screens/user-profile';
+import {
+  getPublicProfile,
+  UserProfileNotFoundScreen,
+  UserProfileScreen,
+} from '@/screens/user-profile';
 
 export default function UserProfileRoute() {
   const params = useLocalSearchParams<{ userId?: string | string[] }>();
   const userId = Array.isArray(params.userId) ? params.userId[0] : params.userId;
 
   // TODO: API 연결 시 GET /api/profile/{userId}로 교체, 로딩 / 실패 화면 추가
-  const person = MOCK_PEOPLE.find((it) => it.id === userId);
-  if (!person) return <UserProfileNotFoundScreen />;
+  const detail = userId ? getPublicProfile(userId) : undefined;
+  if (!detail) return <UserProfileNotFoundScreen />;
 
   return (
     <UserProfileScreen
-      key={person.id}
-      name={person.name}
+      key={detail.profile.userId}
+      detail={detail}
       // TODO: 공유 / 신고 / 차단 메뉴 추가
       onPressMore={() => {}}
+      // TODO: 팀 제안 화면이 생기면 이동
+      onPressPropose={() => {}}
+      // TODO: 채팅 화면이 생기면 이 사람과의 대화로 이동
+      onPressMessage={() => {}}
     />
   );
 }

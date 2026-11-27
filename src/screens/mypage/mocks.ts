@@ -5,8 +5,9 @@ import type { CodeName, MyProfile, ProfileTag } from './myProfile';
 import type { Scrap } from './scrap';
 
 const ROLE = {
-  frontend: { code: 'FRONTEND_DEVELOPER', name: '프론트엔드' },
+  frontend: { code: 'FRONTEND_DEVELOPER', name: '프론트엔드 개발자' },
   data: { code: 'DATA_ANALYST', name: '데이터 분석' },
+  service: { code: 'SERVICE_PLANNER', name: '서비스 기획' },
 } satisfies Record<string, CodeName>;
 
 const TAG = {
@@ -35,7 +36,7 @@ export const MOCK_MY_PROFILE: MyProfile = {
     profileImageUrl: null,
     bio: '데이터로 문제를 풀고 쓰기 쉬운 서비스로 만드는 걸 좋아해요. 주로 프론트엔드와 데이터 분석을 맡아요. 끝까지 함께 완주할 팀원을 찾고 있어요! 그리고 저는 물범을 좋아합니다. 점박이물범을 좋아합니다. ',
     searchable: true,
-    roles: [ROLE.frontend, ROLE.data],
+    roles: [ROLE.frontend, ROLE.data, ROLE.service],
     tags: [TAG.python, TAG.sql, TAG.react, TAG.typescript, TAG.pandas, TAG.figma, TAG.git],
     portfolioItems: [
       {
