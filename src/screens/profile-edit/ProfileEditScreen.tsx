@@ -8,6 +8,8 @@ import { MOCK_DEPARTMENTS } from '@/screens/giuthub';
 import type { Profile } from '@/screens/mypage';
 import { color, space } from '@/theme';
 
+import { toActivityStatus } from './activityStatus';
+import { ActivityStatusField } from './ActivityStatusField';
 import { groupByCollege } from './colleges';
 import { CountedInput } from './CountedInput';
 import { DepartmentField } from './DepartmentField';
@@ -33,13 +35,16 @@ type ProfileEditScreenProps = {
   onClose: () => void;
 };
 
-// TODO: 활동 상태, 역할, 기술 스택, 자기소개, 저장 버튼 추가
+// TODO: 역할, 기술 스택, 자기소개, 저장 버튼 추가
 export function ProfileEditScreen({ profile, onClose }: ProfileEditScreenProps) {
   const insets = useSafeAreaInsets();
 
   const [name, setName] = useState(profile.nickname);
   const [department, setDepartment] = useState(profile.departmentName);
   const [grade, setGrade] = useState(profile.grade);
+  const [activityStatus, setActivityStatus] = useState(() =>
+    toActivityStatus(profile.activityStatusName),
+  );
 
   return (
     <View style={[S.screen, { paddingTop: insets.top }]}>
@@ -82,6 +87,10 @@ export function ProfileEditScreen({ profile, onClose }: ProfileEditScreenProps) 
             value={String(grade)}
             onChange={(key) => setGrade(Number(key))}
           />
+        </FormField>
+
+        <FormField label="활동 상태">
+          <ActivityStatusField value={activityStatus} onChange={setActivityStatus} />
         </FormField>
       </ScrollView>
     </View>
