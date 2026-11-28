@@ -10,5 +10,13 @@ export default function ProfileEditRoute() {
   // 프로필이 없으면 편집할 게 없어서 마이페이지로
   if (!profile) return <Redirect href="/my" />;
 
-  return <ProfileEditScreen key={profile.userId} profile={profile} onClose={() => router.back()} />;
+  return (
+    <ProfileEditScreen
+      key={profile.userId}
+      profile={profile}
+      onClose={() => router.back()}
+      // TODO: API 연결 시 PUT /api/userprofile/me/profile로 저장하고, 저장 중 / 실패 처리 추가
+      onSave={() => router.back()}
+    />
+  );
 }

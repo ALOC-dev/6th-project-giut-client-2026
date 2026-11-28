@@ -1,4 +1,5 @@
-import { getRoleKey, ROLE_CATALOG, type CodeName, type Profile } from '@/screens/mypage';
+// 화면 전체를 불러오지 않도록 index 대신 파일에서 바로 가져와요 (테스트에서도 쓰여요)
+import { getRoleKey, ROLE_CATALOG, type CodeName, type Profile } from '@/screens/mypage/myProfile';
 import type { RoleKey } from '@/screens/teams';
 
 // 세부 역할은 큰 역할에 상관없이 합쳐서 최대 3개. 처음 고른 세부 역할이 프로필 색을 정해요

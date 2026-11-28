@@ -11,10 +11,10 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Press, SegmentedControl, Text } from '@/components/ui';
+import { Button, Press, SegmentedControl, Text } from '@/components/ui';
 import { MOCK_DEPARTMENTS } from '@/screens/giuthub';
 import type { Profile } from '@/screens/mypage';
-import { color, space } from '@/theme';
+import { color, shadow, space } from '@/theme';
 
 import { toActivityStatus } from './activityStatus';
 import { ActivityStatusField } from './ActivityStatusField';
@@ -24,6 +24,11 @@ import { CountedTextArea } from './CountedTextArea';
 import { DepartmentField } from './DepartmentField';
 import { FormField } from './FormField';
 import { ProfilePhotoField } from './ProfilePhotoField';
+import {
+  toUpdateProfileRequest,
+  type ProfileForm,
+  type UpdateProfileRequest,
+} from './profileRequest';
 import { RoleField } from './RoleField';
 import { MAX_DETAIL_ROLES, toRoleSelection } from './roles';
 import { SkillField } from './SkillField';
@@ -51,10 +56,10 @@ const GRADE_SEGMENTS = [
 type ProfileEditScreenProps = {
   profile: Profile;
   onClose: () => void;
+  onSave: (request: UpdateProfileRequest) => void;
 };
 
-// TODO: 저장 버튼 추가
-export function ProfileEditScreen({ profile, onClose }: ProfileEditScreenProps) {
+export function ProfileEditScreen({ profile, onClose, onSave }: ProfileEditScreenProps) {
   const insets = useSafeAreaInsets();
 
   const [name, setName] = useState(profile.nickname);
@@ -69,13 +74,32 @@ export function ProfileEditScreen({ profile, onClose }: ProfileEditScreenProps) 
   );
   const [bio, setBio] = useState(profile.bio ?? '');
 
+  const form: ProfileForm = {
+    name,
+    department,
+    grade,
+    activityStatus,
+    roleSelection,
+    skills,
+    bio,
+  };
+  // 처음 값과 비교해서 바뀐 게 있을 때만 저장할 수 있어요
+  const [initialForm] = useState(form);
+  const isChanged = JSON.stringify(form) !== JSON.stringify(initialForm);
+  const isValid = name.trim().length > 0 && department.length > 0;
+
+  const handleSave = () => {
+    onSave(toUpdateProfileRequest(profile, form));
+  };
+
   const { height: windowHeight } = useWindowDimensions();
   const scrollRef = useRef<ScrollViewInstance>(null);
   const scrollY = useRef(0);
+  const bottomBarHeight = useRef(0);
 
-  // 새로 열린 세부 역할 상자가 화면 아래로 넘치면 그만큼만 살짝 스크롤해요
+  // 새로 열린 세부 역할 상자가 화면 아래(저장 버튼 위)로 넘치면 그만큼만 살짝 스크롤해요
   const revealBottom = (bottomInWindow: number) => {
-    const visibleBottom = windowHeight - insets.bottom - REVEAL_MARGIN;
+    const visibleBottom = windowHeight - bottomBarHeight.current - REVEAL_MARGIN;
     const overflow = bottomInWindow - visibleBottom;
     if (overflow <= 0) return;
     scrollRef.current?.scrollTo({ y: scrollY.current + overflow, animated: true });
@@ -163,6 +187,21 @@ export function ProfileEditScreen({ profile, onClose }: ProfileEditScreenProps) 
           </FormField>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <View
+        style={[S.bottomBar, { paddingBottom: Math.max(insets.bottom, space[3]) }]}
+        onLayout={(e) => {
+          bottomBarHeight.current = e.nativeEvent.layout.height;
+        }}
+      >
+        <Button
+          label="저장하기"
+          disabled={!isChanged || !isValid}
+          onPress={handleSave}
+          // 파란 그림자는 버튼이 파란색일 때만 (꺼진 회색 버튼에는 없음)
+          style={isChanged && isValid && S.saveButton}
+        />
+      </View>
     </View>
   );
 }
@@ -194,5 +233,15 @@ const S = StyleSheet.create({
     paddingHorizontal: space[5],
     paddingBottom: space[8],
     gap: space[6],
+  },
+  bottomBar: {
+    paddingTop: space[3],
+    paddingHorizontal: space[5],
+    borderTopWidth: 1,
+    borderTopColor: color.lineSoft,
+    backgroundColor: color.surface,
+  },
+  saveButton: {
+    ...shadow.brand,
   },
 });
