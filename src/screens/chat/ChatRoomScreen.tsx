@@ -66,6 +66,7 @@ type ConfirmKind = null | 'leave' | 'del';
 type MessageRow = { m: ChatMessage; first: boolean; last: boolean };
 
 const READ_RECEIPT_DELAY_MS = 1800;
+const CHAT_MESSAGE_MAX_LENGTH = 2000;
 
 export default function ChatRoomScreen({
   partner = '박준호',
@@ -954,7 +955,8 @@ function Composer({
           value={value}
           onChangeText={onChange}
           onSubmitEditing={onSend}
-          blurOnSubmit={false}
+          submitBehavior="submit"
+          maxLength={CHAT_MESSAGE_MAX_LENGTH}
           returnKeyType="send"
           placeholder={placeholder}
           placeholderTextColor={C.textFaint}
