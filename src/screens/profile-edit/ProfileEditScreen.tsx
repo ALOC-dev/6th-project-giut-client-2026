@@ -23,6 +23,8 @@ import { FormField } from './FormField';
 import { ProfilePhotoField } from './ProfilePhotoField';
 import { RoleField } from './RoleField';
 import { MAX_DETAIL_ROLES, toRoleSelection } from './roles';
+import { SkillField } from './SkillField';
+import { MAX_SKILLS, MOCK_SKILL_OPTIONS } from './skills';
 
 const MAX_NAME_LENGTH = 10;
 // 세부 역할 상자를 보여줄 때 화면 아래와 띄울 간격
@@ -45,7 +47,7 @@ type ProfileEditScreenProps = {
   onClose: () => void;
 };
 
-// TODO: 기술 스택, 자기소개, 저장 버튼 추가
+// TODO: 자기소개, 저장 버튼 추가
 export function ProfileEditScreen({ profile, onClose }: ProfileEditScreenProps) {
   const insets = useSafeAreaInsets();
 
@@ -56,6 +58,9 @@ export function ProfileEditScreen({ profile, onClose }: ProfileEditScreenProps) 
     toActivityStatus(profile.activityStatusName),
   );
   const [roleSelection, setRoleSelection] = useState(() => toRoleSelection(profile));
+  const [skills, setSkills] = useState(() =>
+    profile.tags.filter(({ type }) => type === 'SKILL').slice(0, MAX_SKILLS),
+  );
 
   const { height: windowHeight } = useWindowDimensions();
   const scrollRef = useRef<ScrollViewInstance>(null);
@@ -126,6 +131,10 @@ export function ProfileEditScreen({ profile, onClose }: ProfileEditScreenProps) 
 
         <FormField label="내 역할" hint={`세부 역할 최대 ${MAX_DETAIL_ROLES}개 선택 가능`}>
           <RoleField value={roleSelection} onChange={setRoleSelection} onReveal={revealBottom} />
+        </FormField>
+
+        <FormField label="기술 스택" hint={`${skills.length}/${MAX_SKILLS}개 선택`}>
+          <SkillField options={MOCK_SKILL_OPTIONS} value={skills} onChange={setSkills} />
         </FormField>
       </ScrollView>
     </View>
