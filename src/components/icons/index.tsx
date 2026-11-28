@@ -28,6 +28,125 @@ export function SearchIcon({ size = 18, color: iconColor = color.textMuted }: Ic
   );
 }
 
+export function MoreIcon({ size = 22, color: iconColor = color.ink }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Circle cx={5} cy={12} r={1.8} fill={iconColor} />
+      <Circle cx={12} cy={12} r={1.8} fill={iconColor} />
+      <Circle cx={19} cy={12} r={1.8} fill={iconColor} />
+    </Svg>
+  );
+}
+
+export function BellIcon({ size = 20, color: iconColor = color.ink }: IconProps) {
+  return (
+    <Svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={iconColor}
+      strokeWidth={1.9}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <Path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+      <Path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+    </Svg>
+  );
+}
+
+export function BellOffIcon({ size = 14, color: iconColor = color.textFaint }: IconProps) {
+  return (
+    <Svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={iconColor}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <Path d="M6 8a6 6 0 0 1 9.3-5" />
+      <Path d="M18 8c0 7 3 9 3 9H7" />
+      <Path d="M6 8c0 7-3 9-3 9" />
+      <Path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+      <Path d="M3 3l18 18" />
+    </Svg>
+  );
+}
+
+export function CopyIcon({ size = 20, color: iconColor = color.ink }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Rect x={8.5} y={8.5} width={11} height={11} rx={2.5} stroke={iconColor} strokeWidth={2} />
+      <Path
+        d="M15.5 8.5V6.5A2 2 0 0013.5 4.5h-7a2 2 0 00-2 2v7a2 2 0 002 2h2"
+        stroke={iconColor}
+        strokeWidth={2}
+      />
+    </Svg>
+  );
+}
+
+export function TrashIcon({ size = 20, color: iconColor = color.danger }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M5 7h14M10 4h4M7 7l.8 11.2A2 2 0 009.8 20h4.4a2 2 0 002-1.8L17 7"
+        stroke={iconColor}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+export function SendIcon({ size = 20, color: iconColor = color.surface }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M12 19V6M6 11l6-6 6 6"
+        stroke={iconColor}
+        strokeWidth={2.4}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+export function LeaveIcon({ size = 20, color: iconColor = color.danger }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M14 4H6.5A1.5 1.5 0 005 5.5v13A1.5 1.5 0 006.5 20H14"
+        stroke={iconColor}
+        strokeWidth={2}
+        strokeLinecap="round"
+      />
+      <Path
+        d="M11 12h9M17 8.5L20.5 12 17 15.5"
+        stroke={iconColor}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+export function DeletedIcon({ size = 15, color: iconColor = color.textMuted }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 16 16" fill="none">
+      <Circle cx={8} cy={8} r={6.2} stroke={iconColor} strokeWidth={1.5} />
+      <Path d="M3.8 12.2l8.4-8.4" stroke={iconColor} strokeWidth={1.5} strokeLinecap="round" />
+    </Svg>
+  );
+}
+
 export function EnvelopeIcon({
   width = 20,
   height = 16,

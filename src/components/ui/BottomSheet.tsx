@@ -34,9 +34,10 @@ export type BottomSheetProps = {
   contentStyle?: StyleProp<ViewStyle>;
   sheetStyle?: StyleProp<ViewStyle>;
   accessibilityLabel?: string;
+  onDismiss?: () => void;
 };
 
-export function BottomSheet({ visible, ...props }: BottomSheetProps) {
+export function BottomSheet({ visible, onDismiss, ...props }: BottomSheetProps) {
   const [mounted, setMounted] = useState(visible);
 
   useEffect(() => {
@@ -46,7 +47,10 @@ export function BottomSheet({ visible, ...props }: BottomSheetProps) {
     return () => cancelAnimationFrame(frame);
   }, [mounted, visible]);
 
-  const handleExited = useCallback(() => setMounted(false), []);
+  const handleExited = useCallback(() => {
+    setMounted(false);
+    onDismiss?.();
+  }, [onDismiss]);
 
   if (!mounted) return null;
   return <BottomSheetContent visible={visible} onExited={handleExited} {...props} />;

@@ -1,11 +1,27 @@
-import { View } from 'react-native';
+import { router } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Text } from '@/components/ui';
+import { ChatListScreen, type OpenedRoom } from '@/screens/chat';
 
 export default function ChatScreen() {
+  const insets = useSafeAreaInsets();
+  const openRoom = (room: OpenedRoom) => {
+    router.push({
+      pathname: '/chat/[id]',
+      params: {
+        id: room.id,
+        name: room.name,
+        field: room.field,
+        offer: room.offer ? 'true' : 'false',
+      },
+    });
+  };
+
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text variant="titleLg">채팅</Text>
-    </View>
+    <ChatListScreen
+      topInset={insets.top}
+      onOpen={openRoom}
+      onBrowse={() => router.navigate('/contest')}
+    />
   );
 }
