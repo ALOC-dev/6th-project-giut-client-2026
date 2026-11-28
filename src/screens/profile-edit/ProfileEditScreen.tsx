@@ -1,6 +1,8 @@
 import { XIcon } from 'phosphor-react-native';
 import { useRef, useState } from 'react';
 import {
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   useWindowDimensions,
@@ -18,6 +20,7 @@ import { toActivityStatus } from './activityStatus';
 import { ActivityStatusField } from './ActivityStatusField';
 import { groupByCollege } from './colleges';
 import { CountedInput } from './CountedInput';
+import { CountedTextArea } from './CountedTextArea';
 import { DepartmentField } from './DepartmentField';
 import { FormField } from './FormField';
 import { ProfilePhotoField } from './ProfilePhotoField';
@@ -27,6 +30,9 @@ import { SkillField } from './SkillField';
 import { MAX_SKILLS, MOCK_SKILL_OPTIONS } from './skills';
 
 const MAX_NAME_LENGTH = 10;
+const MAX_BIO_LENGTH = 200; // API 최대 길이 (시안은 300)
+// 키보드가 다 올라온 뒤에 스크롤하려고 기다리는 시간
+const KEYBOARD_WAIT_MS = 300;
 // 세부 역할 상자를 보여줄 때 화면 아래와 띄울 간격
 const REVEAL_MARGIN = space[6];
 
@@ -47,7 +53,7 @@ type ProfileEditScreenProps = {
   onClose: () => void;
 };
 
-// TODO: 자기소개, 저장 버튼 추가
+// TODO: 저장 버튼 추가
 export function ProfileEditScreen({ profile, onClose }: ProfileEditScreenProps) {
   const insets = useSafeAreaInsets();
 
@@ -61,6 +67,7 @@ export function ProfileEditScreen({ profile, onClose }: ProfileEditScreenProps) 
   const [skills, setSkills] = useState(() =>
     profile.tags.filter(({ type }) => type === 'SKILL').slice(0, MAX_SKILLS),
   );
+  const [bio, setBio] = useState(profile.bio ?? '');
 
   const { height: windowHeight } = useWindowDimensions();
   const scrollRef = useRef<ScrollViewInstance>(null);
@@ -72,6 +79,11 @@ export function ProfileEditScreen({ profile, onClose }: ProfileEditScreenProps) 
     const overflow = bottomInWindow - visibleBottom;
     if (overflow <= 0) return;
     scrollRef.current?.scrollTo({ y: scrollY.current + overflow, animated: true });
+  };
+
+  // 자기소개는 맨 아래라서 키보드가 올라오면 끝까지 내려서 보여줘요
+  const handleBioFocus = () => {
+    setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), KEYBOARD_WAIT_MS);
   };
 
   return (
@@ -87,56 +99,70 @@ export function ProfileEditScreen({ profile, onClose }: ProfileEditScreenProps) 
         </Press>
       </View>
 
-      <ScrollView
-        ref={scrollRef}
-        contentContainerStyle={S.content}
-        keyboardShouldPersistTaps="handled"
-        onScroll={(e) => {
-          scrollY.current = e.nativeEvent.contentOffset.y;
-        }}
-        scrollEventThrottle={16}
-      >
-        <Text variant="titleXl" accessibilityRole="header">
-          프로필 편집
-        </Text>
+      {/* iOS는 키보드 높이만큼 아래를 비워요. 안드로이드는 화면이 알아서 줄어들어요 */}
+      <KeyboardAvoidingView style={S.body} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView
+          ref={scrollRef}
+          contentContainerStyle={S.content}
+          keyboardShouldPersistTaps="handled"
+          onScroll={(e) => {
+            scrollY.current = e.nativeEvent.contentOffset.y;
+          }}
+          scrollEventThrottle={16}
+        >
+          <Text variant="titleXl" accessibilityRole="header">
+            프로필 편집
+          </Text>
 
-        <ProfilePhotoField
-          imageUrl={profile.profileImageUrl}
-          // TODO: 사진 선택 기능과 이미지 업로드 API가 생기면 연결
-          onPressEdit={() => {}}
-        />
-
-        <FormField label="이름">
-          <CountedInput
-            value={name}
-            onChangeText={setName}
-            maxLength={MAX_NAME_LENGTH}
-            label="이름"
-            placeholder="이름을 입력해 주세요"
+          <ProfilePhotoField
+            imageUrl={profile.profileImageUrl}
+            // TODO: 사진 선택 기능과 이미지 업로드 API가 생기면 연결
+            onPressEdit={() => {}}
           />
-        </FormField>
 
-        <FormField label="학과">
-          <DepartmentField value={department} colleges={COLLEGES} onChange={setDepartment} />
-          <SegmentedControl
-            segments={GRADE_SEGMENTS}
-            value={String(grade)}
-            onChange={(key) => setGrade(Number(key))}
-          />
-        </FormField>
+          <FormField label="이름">
+            <CountedInput
+              value={name}
+              onChangeText={setName}
+              maxLength={MAX_NAME_LENGTH}
+              label="이름"
+              placeholder="이름을 입력해 주세요"
+            />
+          </FormField>
 
-        <FormField label="활동 상태">
-          <ActivityStatusField value={activityStatus} onChange={setActivityStatus} />
-        </FormField>
+          <FormField label="학과">
+            <DepartmentField value={department} colleges={COLLEGES} onChange={setDepartment} />
+            <SegmentedControl
+              segments={GRADE_SEGMENTS}
+              value={String(grade)}
+              onChange={(key) => setGrade(Number(key))}
+            />
+          </FormField>
 
-        <FormField label="내 역할" hint={`세부 역할 최대 ${MAX_DETAIL_ROLES}개 선택 가능`}>
-          <RoleField value={roleSelection} onChange={setRoleSelection} onReveal={revealBottom} />
-        </FormField>
+          <FormField label="활동 상태">
+            <ActivityStatusField value={activityStatus} onChange={setActivityStatus} />
+          </FormField>
 
-        <FormField label="기술 스택" hint={`${skills.length}/${MAX_SKILLS}개 선택`}>
-          <SkillField options={MOCK_SKILL_OPTIONS} value={skills} onChange={setSkills} />
-        </FormField>
-      </ScrollView>
+          <FormField label="내 역할" hint={`세부 역할 최대 ${MAX_DETAIL_ROLES}개 선택 가능`}>
+            <RoleField value={roleSelection} onChange={setRoleSelection} onReveal={revealBottom} />
+          </FormField>
+
+          <FormField label="기술 스택" hint={`${skills.length}/${MAX_SKILLS}개 선택`}>
+            <SkillField options={MOCK_SKILL_OPTIONS} value={skills} onChange={setSkills} />
+          </FormField>
+
+          <FormField label="자기소개">
+            <CountedTextArea
+              value={bio}
+              onChangeText={setBio}
+              maxLength={MAX_BIO_LENGTH}
+              label="자기소개"
+              placeholder="어떤 일을 좋아하고 어떤 팀원을 찾는지 적어 주세요"
+              onFocus={handleBioFocus}
+            />
+          </FormField>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
@@ -147,6 +173,9 @@ const S = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: color.surface,
+  },
+  body: {
+    flex: 1,
   },
   topBar: {
     height: 52,
