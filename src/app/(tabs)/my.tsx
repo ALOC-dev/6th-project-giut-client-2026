@@ -32,8 +32,7 @@ export default function MyPageRoute() {
       onPressMenu={() => {}}
       // TODO: 프로필 등록 화면이 생기면 이동
       onPressCreateProfile={() => {}}
-      // TODO: 프로필 편집 화면이 생기면 이동
-      onPressEditProfile={() => {}}
+      onPressEditProfile={() => router.push('/profile-edit')}
       // TODO: 포트폴리오 편집 화면이 생기면 이동
       onPressEditPortfolio={() => {}}
       onPressPortfolio={openPortfolio}
