@@ -1,6 +1,12 @@
 import { XIcon } from 'phosphor-react-native';
-import { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { useRef, useState } from 'react';
+import {
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+  type ScrollViewInstance,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Press, SegmentedControl, Text } from '@/components/ui';
@@ -15,8 +21,12 @@ import { CountedInput } from './CountedInput';
 import { DepartmentField } from './DepartmentField';
 import { FormField } from './FormField';
 import { ProfilePhotoField } from './ProfilePhotoField';
+import { RoleField } from './RoleField';
+import { MAX_DETAIL_ROLES, toRoleSelection } from './roles';
 
 const MAX_NAME_LENGTH = 10;
+// 세부 역할 상자를 보여줄 때 화면 아래와 띄울 간격
+const REVEAL_MARGIN = space[6];
 
 // TODO: API 연결 시 GET /api/departments로 교체
 const COLLEGES = groupByCollege(MOCK_DEPARTMENTS);
@@ -35,7 +45,7 @@ type ProfileEditScreenProps = {
   onClose: () => void;
 };
 
-// TODO: 역할, 기술 스택, 자기소개, 저장 버튼 추가
+// TODO: 기술 스택, 자기소개, 저장 버튼 추가
 export function ProfileEditScreen({ profile, onClose }: ProfileEditScreenProps) {
   const insets = useSafeAreaInsets();
 
@@ -45,6 +55,19 @@ export function ProfileEditScreen({ profile, onClose }: ProfileEditScreenProps) 
   const [activityStatus, setActivityStatus] = useState(() =>
     toActivityStatus(profile.activityStatusName),
   );
+  const [roleSelection, setRoleSelection] = useState(() => toRoleSelection(profile));
+
+  const { height: windowHeight } = useWindowDimensions();
+  const scrollRef = useRef<ScrollViewInstance>(null);
+  const scrollY = useRef(0);
+
+  // 새로 열린 세부 역할 상자가 화면 아래로 넘치면 그만큼만 살짝 스크롤해요
+  const revealBottom = (bottomInWindow: number) => {
+    const visibleBottom = windowHeight - insets.bottom - REVEAL_MARGIN;
+    const overflow = bottomInWindow - visibleBottom;
+    if (overflow <= 0) return;
+    scrollRef.current?.scrollTo({ y: scrollY.current + overflow, animated: true });
+  };
 
   return (
     <View style={[S.screen, { paddingTop: insets.top }]}>
@@ -59,7 +82,15 @@ export function ProfileEditScreen({ profile, onClose }: ProfileEditScreenProps) 
         </Press>
       </View>
 
-      <ScrollView contentContainerStyle={S.content} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        ref={scrollRef}
+        contentContainerStyle={S.content}
+        keyboardShouldPersistTaps="handled"
+        onScroll={(e) => {
+          scrollY.current = e.nativeEvent.contentOffset.y;
+        }}
+        scrollEventThrottle={16}
+      >
         <Text variant="titleXl" accessibilityRole="header">
           프로필 편집
         </Text>
@@ -91,6 +122,10 @@ export function ProfileEditScreen({ profile, onClose }: ProfileEditScreenProps) 
 
         <FormField label="활동 상태">
           <ActivityStatusField value={activityStatus} onChange={setActivityStatus} />
+        </FormField>
+
+        <FormField label="내 역할" hint={`세부 역할 최대 ${MAX_DETAIL_ROLES}개 선택 가능`}>
+          <RoleField value={roleSelection} onChange={setRoleSelection} onReveal={revealBottom} />
         </FormField>
       </ScrollView>
     </View>
