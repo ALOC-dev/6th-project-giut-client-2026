@@ -3,26 +3,43 @@ import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Press, Text } from '@/components/ui';
+import { Press, SegmentedControl, Text } from '@/components/ui';
+import { MOCK_DEPARTMENTS } from '@/screens/giuthub';
 import type { Profile } from '@/screens/mypage';
 import { color, space } from '@/theme';
 
+import { groupByCollege } from './colleges';
 import { CountedInput } from './CountedInput';
+import { DepartmentField } from './DepartmentField';
 import { FormField } from './FormField';
 import { ProfilePhotoField } from './ProfilePhotoField';
 
 const MAX_NAME_LENGTH = 10;
+
+// TODO: API 연결 시 GET /api/departments로 교체
+const COLLEGES = groupByCollege(MOCK_DEPARTMENTS);
+
+// API의 학년은 1~5, 5는 졸업
+const GRADE_SEGMENTS = [
+  { key: '1', label: '1학년' },
+  { key: '2', label: '2학년' },
+  { key: '3', label: '3학년' },
+  { key: '4', label: '4학년' },
+  { key: '5', label: '졸업' },
+];
 
 type ProfileEditScreenProps = {
   profile: Profile;
   onClose: () => void;
 };
 
-// TODO: 학과, 학년, 활동 상태, 역할, 기술 스택, 자기소개, 저장 버튼 추가
+// TODO: 활동 상태, 역할, 기술 스택, 자기소개, 저장 버튼 추가
 export function ProfileEditScreen({ profile, onClose }: ProfileEditScreenProps) {
   const insets = useSafeAreaInsets();
 
   const [name, setName] = useState(profile.nickname);
+  const [department, setDepartment] = useState(profile.departmentName);
+  const [grade, setGrade] = useState(profile.grade);
 
   return (
     <View style={[S.screen, { paddingTop: insets.top }]}>
@@ -55,6 +72,15 @@ export function ProfileEditScreen({ profile, onClose }: ProfileEditScreenProps) 
             maxLength={MAX_NAME_LENGTH}
             label="이름"
             placeholder="이름을 입력해 주세요"
+          />
+        </FormField>
+
+        <FormField label="학과">
+          <DepartmentField value={department} colleges={COLLEGES} onChange={setDepartment} />
+          <SegmentedControl
+            segments={GRADE_SEGMENTS}
+            value={String(grade)}
+            onChange={(key) => setGrade(Number(key))}
           />
         </FormField>
       </ScrollView>
