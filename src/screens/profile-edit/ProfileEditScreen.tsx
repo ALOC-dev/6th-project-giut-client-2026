@@ -1,3 +1,4 @@
+import { usePreventRemove } from 'expo-router';
 import { XIcon } from 'phosphor-react-native';
 import { useRef, useState } from 'react';
 import {
@@ -19,6 +20,7 @@ import { color, shadow, space } from '@/theme';
 import { toActivityStatus } from './activityStatus';
 import { ActivityStatusField } from './ActivityStatusField';
 import { groupByCollege } from './colleges';
+import { confirmLeave } from './confirmLeave';
 import { CountedInput } from './CountedInput';
 import { CountedTextArea } from './CountedTextArea';
 import { DepartmentField } from './DepartmentField';
@@ -88,7 +90,19 @@ export function ProfileEditScreen({ profile, onClose, onSave }: ProfileEditScree
   const isChanged = JSON.stringify(form) !== JSON.stringify(initialForm);
   const isValid = name.trim().length > 0 && department.length > 0;
 
+  // 바뀐 게 있으면 X, 안드로이드 뒤로 가기, 쓸어서 닫기 모두 확인 창을 먼저 띄워요
+  const [leaving, setLeaving] = useState(false);
+  const disablePrevention = usePreventRemove(isChanged && !leaving, ({ repeat }) => {
+    confirmLeave(() => {
+      setLeaving(true);
+      repeat();
+    });
+  });
+
   const handleSave = () => {
+    // 저장하고 나갈 때는 확인 창 없이
+    setLeaving(true);
+    disablePrevention();
     onSave(toUpdateProfileRequest(profile, form));
   };
 
